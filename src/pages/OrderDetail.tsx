@@ -49,20 +49,35 @@ export default function OrderDetail() {
         .select(`
           *,
           specialist:specialist_profiles!inner(
-            *,
-            reviews(rating),
-            profiles!specialist_profiles_user_id_fkey(
-              first_name,
-              last_name_paterno,
-              last_name_materno,
-              display_name
-            )
+            id,
+            user_id,
+            phone,
+            status,
+            reviews(rating)
           )
         `)
         .eq('request_id', id);
 
       if (quotesError) throw quotesError;
-      setQuotes(quotesData || []);
+
+      // Fetch profiles separately to avoid FK relationship issues
+      const specialistIds = quotesData?.map(q => q.specialist.user_id).filter(Boolean) || [];
+      
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name_paterno, last_name_materno, display_name')
+        .in('id', specialistIds);
+
+      // Merge profiles into quotes
+      const quotesWithProfiles = quotesData?.map(quote => ({
+        ...quote,
+        specialist: {
+          ...quote.specialist,
+          profiles: profilesData?.find(p => p.id === quote.specialist.user_id)
+        }
+      })) || [];
+
+      setQuotes(quotesWithProfiles);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
