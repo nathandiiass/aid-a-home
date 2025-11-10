@@ -115,7 +115,7 @@ export function InProgressWorks() {
           <Card
             key={work.id}
             onClick={() => navigate(`/chat/${work.quote.id}`)}
-            className="flex-shrink-0 w-[280px] p-4 cursor-pointer transition-all hover:scale-105 animate-pulse-border overflow-hidden"
+            className="flex-shrink-0 w-[280px] p-4 cursor-pointer transition-all hover:scale-105 animate-pulse-border relative"
             style={{
               border: '2px solid hsl(var(--accent))',
               background: 'linear-gradient(135deg, hsl(var(--card)) 0%, hsla(var(--accent), 0.05) 100%)'
