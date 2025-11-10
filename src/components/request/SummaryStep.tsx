@@ -47,11 +47,13 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
 
   const formatDate = (date?: Date) => {
     if (!date) return "No especificada";
+    // Ensure date is a Date object (in case it's a string from localStorage)
+    const dateObj = date instanceof Date ? date : new Date(date);
     return new Intl.DateTimeFormat("es-MX", {
       weekday: "long",
       day: "numeric",
       month: "long",
-    }).format(date);
+    }).format(dateObj);
   };
 
   const formatTimeOption = (option?: string) => {

@@ -48,6 +48,10 @@ const CreateRequest = () => {
     const pendingRequest = localStorage.getItem('pendingRequest');
     if (pendingRequest) {
       const data = JSON.parse(pendingRequest);
+      // Convert date string back to Date object
+      if (data.date) {
+        data.date = new Date(data.date);
+      }
       setRequestData(data);
       setStep(5); // Go to summary
     }
