@@ -69,11 +69,10 @@ export function CompleteOrderDialog({ open, onOpenChange, order, onComplete }: C
         photoUrls.push(publicUrl);
       }
 
-      // Update quote status to completed
+      // Update quote with final data (status remains 'accepted' for now)
       const { error: updateError } = await supabase
         .from('quotes')
         .update({
-          status: 'completed',
           price_fixed: parseFloat(finalPrice),
           additional_notes: notes,
           attachments: photoUrls.length > 0 ? photoUrls : null

@@ -16,6 +16,7 @@ import Orders from "./pages/Orders";
 import OrderDetail from "./pages/OrderDetail";
 import Chat from "./pages/Chat";
 import SpecialistHome from "./pages/SpecialistHome";
+import SpecialistOrders from "./pages/SpecialistOrders";
 import SpecialistRequestDetail from "./pages/SpecialistRequestDetail";
 import QuoteForm from "./pages/QuoteForm";
 import NotFound from "./pages/NotFound";
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/orders/:id" element={<OrderDetail />} />
           <Route path="/chat/:quoteId" element={<Chat />} />
           <Route path="/specialist" element={<SpecialistHome />} />
+          <Route path="/specialist/orders" element={<SpecialistOrders />} />
           <Route path="/specialist/requests/:id" element={<SpecialistRequestDetail />} />
           <Route path="/specialist/requests/:id/quote" element={<QuoteForm />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

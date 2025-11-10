@@ -65,7 +65,7 @@ export default function SpecialistOrders() {
 
       setSpecialistProfile(profile);
 
-      // Get in-progress orders (quotes that were accepted)
+      // Get in-progress orders (quotes that were accepted but not completed yet)
       const { data: inProgressData, error: inProgressError } = await supabase
         .from('quotes')
         .select(`
@@ -78,6 +78,7 @@ export default function SpecialistOrders() {
           proposed_time_end,
           status,
           created_at,
+          attachments,
           request:service_requests!inner(
             id,
             activity,
@@ -92,11 +93,12 @@ export default function SpecialistOrders() {
         `)
         .eq('specialist_id', profile.id)
         .eq('status', 'accepted')
+        .is('attachments', null)
         .order('created_at', { ascending: false });
 
       if (inProgressError) throw inProgressError;
 
-      // Get completed orders
+      // Get completed orders (have attachments from completion form)
       const { data: completedData, error: completedError } = await supabase
         .from('quotes')
         .select(`
@@ -109,6 +111,7 @@ export default function SpecialistOrders() {
           proposed_time_end,
           status,
           created_at,
+          attachments,
           request:service_requests!inner(
             id,
             activity,
@@ -122,7 +125,8 @@ export default function SpecialistOrders() {
           )
         `)
         .eq('specialist_id', profile.id)
-        .eq('status', 'completed')
+        .eq('status', 'accepted')
+        .not('attachments', 'is', null)
         .order('created_at', { ascending: false });
 
       if (completedError) throw completedError;
