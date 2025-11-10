@@ -1,12 +1,15 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Star, Clock, Package, Shield, MessageCircle, Eye } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Star, Clock, Package, Shield, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useToast } from '@/hooks/use-toast';
+import confetti from 'canvas-confetti';
 
 interface QuoteCardProps {
   quote: any;
@@ -15,6 +18,8 @@ interface QuoteCardProps {
 
 export function QuoteCard({ quote, orderId }: QuoteCardProps) {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const specialist = quote.specialist;
   
   const averageRating = specialist?.reviews?.length > 0
@@ -27,6 +32,25 @@ export function QuoteCard({ quote, orderId }: QuoteCardProps) {
       .map(n => n[0])
       .join('')
       .toUpperCase() || '?';
+  };
+
+  const handleContratarConfirm = async () => {
+    // TODO: Implement actual hiring logic with database update
+    setShowConfirmDialog(false);
+    
+    // Show confetti
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+
+    toast({
+      title: "🎉 ¡Felicidades! Encontraste a tu especialista",
+      description: "La orden ha sido asignada exitosamente.",
+    });
+
+    // TODO: Navigate to chat or order view
   };
 
   return (
@@ -42,7 +66,7 @@ export function QuoteCard({ quote, orderId }: QuoteCardProps) {
         <div className="flex-1">
           <div className="flex items-start justify-between mb-2">
             <div>
-              <h3 className="font-semibold text-foreground">
+              <h3 className="font-semibold text-xl text-foreground">
                 {specialist?.user_id || 'Especialista'}
               </h3>
               {averageRating > 0 && (
@@ -107,28 +131,44 @@ export function QuoteCard({ quote, orderId }: QuoteCardProps) {
             <Button 
               size="sm" 
               variant="outline"
-              onClick={() => navigate(`/orders/${orderId}/quotes/${quote.id}`)}
-            >
-              <Eye className="w-4 h-4 mr-1" />
-              Ver propuesta
-            </Button>
-            <Button 
-              size="sm" 
-              variant="outline"
               onClick={() => navigate(`/chat/${quote.id}`)}
+              className="border-secondary text-secondary hover:bg-secondary/10"
             >
               <MessageCircle className="w-4 h-4 mr-1" />
               Chatear
             </Button>
             <Button 
               size="sm"
-              className="bg-accent hover:bg-accent/90"
+              onClick={() => setShowConfirmDialog(true)}
+              className="bg-accent hover:bg-accent/90 text-accent-foreground"
             >
               Contratar
             </Button>
           </div>
         </div>
       </div>
+
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-foreground">¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              Aceptas los términos y condiciones del especialista y continuar con la contratación.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="text-foreground">
+              No, cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleContratarConfirm}
+              className="bg-accent hover:bg-accent/90 text-accent-foreground"
+            >
+              Sí, contratar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

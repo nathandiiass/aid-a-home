@@ -14,6 +14,7 @@ import Locations from "./pages/Locations";
 import SpecialistRegistration from "./pages/SpecialistRegistration";
 import Orders from "./pages/Orders";
 import OrderDetail from "./pages/OrderDetail";
+import Chat from "./pages/Chat";
 import SpecialistHome from "./pages/SpecialistHome";
 import SpecialistRequestDetail from "./pages/SpecialistRequestDetail";
 import QuoteForm from "./pages/QuoteForm";
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/specialist-registration" element={<SpecialistRegistration />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/orders/:id" element={<OrderDetail />} />
+          <Route path="/chat/:quoteId" element={<Chat />} />
           <Route path="/specialist" element={<SpecialistHome />} />
           <Route path="/specialist/requests/:id" element={<SpecialistRequestDetail />} />
           <Route path="/specialist/requests/:id/quote" element={<QuoteForm />} />
