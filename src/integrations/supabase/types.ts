@@ -96,9 +96,12 @@ export type Database = {
       }
       quotes: {
         Row: {
+          additional_notes: string | null
+          attachments: string[] | null
           created_at: string
           description: string | null
           estimated_duration_hours: number | null
+          exclusions: string | null
           has_warranty: boolean | null
           id: string
           includes_materials: boolean | null
@@ -110,14 +113,21 @@ export type Database = {
           proposed_time_end: string | null
           proposed_time_start: string | null
           request_id: string
+          requires_visit: boolean | null
+          scope: string | null
           specialist_id: string
           status: Database["public"]["Enums"]["quote_status"]
+          visit_cost: number | null
+          warranty_days: number | null
           warranty_description: string | null
         }
         Insert: {
+          additional_notes?: string | null
+          attachments?: string[] | null
           created_at?: string
           description?: string | null
           estimated_duration_hours?: number | null
+          exclusions?: string | null
           has_warranty?: boolean | null
           id?: string
           includes_materials?: boolean | null
@@ -129,14 +139,21 @@ export type Database = {
           proposed_time_end?: string | null
           proposed_time_start?: string | null
           request_id: string
+          requires_visit?: boolean | null
+          scope?: string | null
           specialist_id: string
           status?: Database["public"]["Enums"]["quote_status"]
+          visit_cost?: number | null
+          warranty_days?: number | null
           warranty_description?: string | null
         }
         Update: {
+          additional_notes?: string | null
+          attachments?: string[] | null
           created_at?: string
           description?: string | null
           estimated_duration_hours?: number | null
+          exclusions?: string | null
           has_warranty?: boolean | null
           id?: string
           includes_materials?: boolean | null
@@ -148,8 +165,12 @@ export type Database = {
           proposed_time_end?: string | null
           proposed_time_start?: string | null
           request_id?: string
+          requires_visit?: boolean | null
+          scope?: string | null
           specialist_id?: string
           status?: Database["public"]["Enums"]["quote_status"]
+          visit_cost?: number | null
+          warranty_days?: number | null
           warranty_description?: string | null
         }
         Relationships: [

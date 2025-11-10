@@ -13,6 +13,9 @@ import Locations from "./pages/Locations";
 import SpecialistRegistration from "./pages/SpecialistRegistration";
 import Orders from "./pages/Orders";
 import OrderDetail from "./pages/OrderDetail";
+import SpecialistHome from "./pages/SpecialistHome";
+import SpecialistRequestDetail from "./pages/SpecialistRequestDetail";
+import QuoteForm from "./pages/QuoteForm";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +37,9 @@ const App = () => (
           <Route path="/specialist-registration" element={<SpecialistRegistration />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/orders/:id" element={<OrderDetail />} />
+          <Route path="/specialist" element={<SpecialistHome />} />
+          <Route path="/specialist/requests/:id" element={<SpecialistRequestDetail />} />
+          <Route path="/specialist/requests/:id/quote" element={<QuoteForm />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

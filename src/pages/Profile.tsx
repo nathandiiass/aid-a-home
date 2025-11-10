@@ -4,7 +4,10 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { LogOut, User, Briefcase } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
+import { BottomNavSpecialist } from '@/components/BottomNavSpecialist';
 import { supabase } from '@/integrations/supabase/client';
+import { Switch } from '@/components/ui/switch';
+import { useSpecialistMode } from '@/hooks/use-specialist-mode';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,6 +27,7 @@ export default function Profile() {
   const { toast } = useToast();
   const [isSpecialist, setIsSpecialist] = useState(false);
   const [checkingSpecialist, setCheckingSpecialist] = useState(true);
+  const { isSpecialistMode, toggleSpecialistMode } = useSpecialistMode();
 
   useEffect(() => {
     if (user) {
@@ -221,25 +225,33 @@ export default function Profile() {
               </div>
             ) : (
               <div className="border border-border rounded-lg p-6 space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Briefcase className="w-6 h-6 text-primary" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Briefcase className="w-6 h-6 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-foreground">Modo especialista</h3>
+                      <p className="text-sm text-secondary">Ver solicitudes de servicio</p>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-foreground">Modo especialista</h3>
-                    <p className="text-sm text-secondary">Cambia al modo especialista para ver solicitudes</p>
-                  </div>
+                  <Switch
+                    checked={isSpecialistMode}
+                    onCheckedChange={(checked) => {
+                      toggleSpecialistMode(checked);
+                      if (checked) {
+                        navigate('/specialist');
+                      }
+                    }}
+                  />
                 </div>
-                <Button variant="outline" className="w-full" disabled>
-                  Cambiar al modo especialista (próximamente)
-                </Button>
               </div>
             )}
           </div>
         )}
       </div>
 
-      <BottomNav />
+      {isSpecialistMode && isSpecialist ? <BottomNavSpecialist /> : <BottomNav />}
     </div>
   );
 }
