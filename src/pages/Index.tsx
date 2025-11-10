@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Leaf, Wrench, Zap, Paintbrush, Sparkles, Hammer, Lock, Flame, Car, Droplets, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/BottomNav";
+import { InProgressWorks } from "@/components/InProgressWorks";
 
 const categories = [
   { name: "Jardinería", icon: Leaf, color: "bg-category-jardines", textColor: "text-white", requests: "12,356", especialista: "Jardinero", actividad: "Mantenimiento de jardín" },
@@ -36,6 +37,11 @@ const Index = () => {
         </div>
         
         <ServiceSearch />
+      </div>
+
+      {/* In Progress Works */}
+      <div className="container max-w-2xl mx-auto px-4">
+        <InProgressWorks />
       </div>
 
       {/* Popular categories */}

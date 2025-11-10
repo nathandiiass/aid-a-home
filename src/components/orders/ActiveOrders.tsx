@@ -25,17 +25,26 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
 
   const fetchActiveOrders = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: allRequests, error } = await supabase
         .from('service_requests')
         .select(`
           *,
-          quotes(count)
+          quotes(count, status)
         `)
         .eq('status', 'active')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setOrders(data || []);
+      
+      // Filter out requests that have an accepted quote (those are in progress)
+      const activeOnly = (allRequests || []).filter(request => {
+        if (!request.quotes || request.quotes.length === 0) return true;
+        // Check if any quote is accepted
+        const hasAcceptedQuote = request.quotes.some((q: any) => q.status === 'accepted');
+        return !hasAcceptedQuote;
+      });
+      
+      setOrders(activeOnly);
     } catch (error) {
       console.error('Error fetching orders:', error);
       toast({

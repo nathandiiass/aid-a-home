@@ -59,6 +59,30 @@ All colors MUST be HSL.
   }
 }
 
+@layer utilities {
+  @keyframes pulse-border {
+    0%, 100% {
+      opacity: 1;
+      box-shadow: 0 0 20px hsla(var(--accent), 0.3);
+    }
+    50% {
+      opacity: 0.8;
+      box-shadow: 0 0 30px hsla(var(--accent), 0.5);
+    }
+  }
+
+  .animate-pulse-border {
+    animation: pulse-border 2s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-pulse-border {
+      animation: none;
+      box-shadow: 0 0 20px hsla(var(--accent), 0.3);
+    }
+  }
+}
+
 @layer base {
   * {
     @apply border-border;
