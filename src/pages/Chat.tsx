@@ -39,19 +39,12 @@ export default function Chat() {
 
   const loadChatData = async () => {
     try {
-      // Load quote details with specialist name
+      // Load quote details
       const { data: quoteData, error: quoteError } = await supabase
         .from('quotes')
         .select(`
           *,
-          specialist:specialist_profiles!inner(
-            id,
-            user_id,
-            profiles!inner(
-              first_name,
-              last_name
-            )
-          ),
+          specialist:specialist_profiles(*),
           request:service_requests(*)
         `)
         .eq('id', quoteId)
@@ -368,14 +361,12 @@ export default function Chat() {
         <Avatar className="w-12 h-12 flex-shrink-0">
           <AvatarImage src={quote.specialist?.avatar_url} />
           <AvatarFallback style={{ backgroundColor: '#669BBC', color: '#FFFFFF' }} className="font-semibold">
-            {getInitials(`${quote.specialist?.profiles?.first_name || ''} ${quote.specialist?.profiles?.last_name || ''}`.trim() || 'Especialista')}
+            {getInitials(quote.specialist?.user_id || 'Especialista')}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
           <h2 className="font-bold truncate" style={{ color: '#003049' }}>
-            {quote.specialist?.profiles?.first_name && quote.specialist?.profiles?.last_name
-              ? `${quote.specialist.profiles.first_name} ${quote.specialist.profiles.last_name}`
-              : 'Especialista'}
+            {quote.specialist?.user_id || 'Especialista'}
           </h2>
           <p className="text-xs" style={{ color: '#669BBC' }}>En línea</p>
         </div>
