@@ -63,15 +63,15 @@ All colors MUST be HSL.
   @keyframes pulse-glow {
     0%, 100% {
       border-color: hsl(var(--accent));
-      box-shadow: 0 0 20px hsla(var(--accent), 0.4),
-                  0 0 40px hsla(var(--accent), 0.2),
-                  inset 0 0 15px hsla(var(--accent), 0.1);
+      box-shadow: 0 0 15px hsla(var(--accent), 0.5),
+                  0 0 30px hsla(var(--accent), 0.3),
+                  inset 0 0 10px hsla(var(--accent), 0.1);
     }
     50% {
-      border-color: hsl(var(--accent) / 0.7);
-      box-shadow: 0 0 35px hsla(var(--accent), 0.7),
-                  0 0 60px hsla(var(--accent), 0.4),
-                  inset 0 0 25px hsla(var(--accent), 0.2);
+      border-color: hsl(var(--accent) / 0.8);
+      box-shadow: 0 0 25px hsla(var(--accent), 0.8),
+                  0 0 50px hsla(var(--accent), 0.5),
+                  inset 0 0 20px hsla(var(--accent), 0.15);
     }
   }
 
@@ -86,7 +86,7 @@ All colors MUST be HSL.
 
   .animate-pulse-border {
     position: relative;
-    animation: pulse-glow 1.5s ease-in-out infinite;
+    animation: pulse-glow 2.5s ease-in-out infinite;
   }
 
   .animate-pulse-border::before {
@@ -97,11 +97,11 @@ All colors MUST be HSL.
     background: linear-gradient(
       90deg,
       transparent,
-      hsla(var(--accent), 0.4),
+      hsla(var(--accent), 0.3),
       transparent
     );
     background-size: 200% 100%;
-    animation: shimmer 2s linear infinite;
+    animation: shimmer 3.5s linear infinite;
     pointer-events: none;
     z-index: -1;
   }
@@ -109,7 +109,7 @@ All colors MUST be HSL.
   @media (prefers-reduced-motion: reduce) {
     .animate-pulse-border {
       animation: none;
-      box-shadow: 0 0 20px hsla(var(--accent), 0.4);
+      box-shadow: 0 0 20px hsla(var(--accent), 0.5);
     }
     .animate-pulse-border::before {
       animation: none;
