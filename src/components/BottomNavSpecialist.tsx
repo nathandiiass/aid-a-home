@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, User } from 'lucide-react';
+import { List, ClipboardCheck, User } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -12,6 +12,11 @@ export const BottomNavSpecialist = () => {
       icon: List,
       label: 'Inicio',
       path: '/specialist'
+    },
+    {
+      icon: ClipboardCheck,
+      label: 'Órdenes',
+      path: '/specialist/orders'
     },
     {
       icon: User,
