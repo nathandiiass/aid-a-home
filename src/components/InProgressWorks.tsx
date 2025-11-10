@@ -102,7 +102,7 @@ export function InProgressWorks() {
         <h2 className="text-base font-semibold text-foreground mb-4">
           Trabajos en curso
         </h2>
-        <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2">
+        <div className="flex gap-6 overflow-x-auto py-6 px-2 -mx-4">
           <Skeleton className="flex-shrink-0 w-[280px] h-[140px] rounded-2xl" />
           <Skeleton className="flex-shrink-0 w-[280px] h-[140px] rounded-2xl" />
         </div>
@@ -120,7 +120,7 @@ export function InProgressWorks() {
         Trabajos en curso
       </h2>
       
-      <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2">
+      <div className="flex gap-6 overflow-x-auto py-6 px-2 -mx-4">
         {works.map((work) => (
           <div
             key={work.id}
