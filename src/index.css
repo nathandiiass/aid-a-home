@@ -60,22 +60,53 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
-  @keyframes pulse-border-width {
+  @keyframes breathing-border {
     0%, 100% {
       border-width: 2px;
-      box-shadow: 0 0 10px hsla(var(--accent), 0.4);
+      box-shadow: 0 0 15px hsla(var(--accent), 0.5),
+                  0 0 30px hsla(var(--accent), 0.25);
+      filter: brightness(1);
     }
     50% {
       border-width: 3.6px;
-      box-shadow: 0 0 25px hsla(var(--accent), 0.7),
-                  0 0 40px hsla(var(--accent), 0.4);
+      box-shadow: 0 0 30px hsla(var(--accent), 0.8),
+                  0 0 50px hsla(var(--accent), 0.5),
+                  0 0 70px hsla(var(--accent), 0.3);
+      filter: brightness(1.1);
+    }
+  }
+
+  @keyframes shimmer-wave {
+    0% {
+      background-position: -100% 0;
+    }
+    100% {
+      background-position: 200% 0;
     }
   }
 
   .animate-pulse-border {
-    animation: pulse-border-width 2.5s ease-in-out infinite !important;
+    animation: breathing-border 3s ease-in-out infinite !important;
     border-style: solid !important;
     border-color: hsl(var(--accent)) !important;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .animate-pulse-border::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsla(var(--accent), 0.15) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer-wave 3s ease-in-out infinite;
+    pointer-events: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -83,6 +114,9 @@ All colors MUST be HSL.
       animation: none !important;
       border-width: 2px;
       box-shadow: 0 0 15px hsla(var(--accent), 0.5);
+    }
+    .animate-pulse-border::after {
+      display: none;
     }
   }
 }
