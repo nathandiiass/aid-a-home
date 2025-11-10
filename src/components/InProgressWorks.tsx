@@ -22,7 +22,11 @@ export function InProgressWorks() {
   const fetchInProgressWorks = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      console.log('🔍 Usuario actual:', user?.id);
+      if (!user) {
+        console.log('❌ No hay usuario autenticado');
+        return;
+      }
 
       // Fetch service requests that have an accepted quote
       const { data, error } = await supabase
@@ -46,7 +50,12 @@ export function InProgressWorks() {
         .is('quotes.attachments', null)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      console.log('📊 Datos de trabajos en curso:', data);
+      console.log('❓ Cantidad de trabajos:', data?.length);
+      if (error) {
+        console.error('❌ Error en query:', error);
+        throw error;
+      }
 
       // Fetch specialist profiles for each work
       const worksWithSpecialists = await Promise.all(
@@ -73,6 +82,7 @@ export function InProgressWorks() {
         })
       );
 
+      console.log('✅ Trabajos con especialistas:', worksWithSpecialists);
       setWorks(worksWithSpecialists);
     } catch (error) {
       console.error('Error fetching in-progress works:', error);
