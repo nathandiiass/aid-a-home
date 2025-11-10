@@ -48,10 +48,10 @@ export default function OrderDetail() {
         .from('quotes')
         .select(`
           *,
-          specialist:specialist_profiles(
+          specialist:specialist_profiles!inner(
             *,
             reviews(rating),
-            profile:profiles(
+            profiles!specialist_profiles_user_id_fkey(
               first_name,
               last_name_paterno,
               last_name_materno,

@@ -31,11 +31,11 @@ export function QuoteCard({ quote, orderId, unreadCount = 0 }: QuoteCardProps) {
   };
 
   const getSpecialistName = () => {
-    const profile = specialist?.profile;
+    const profiles = specialist?.profiles;
     
-    if (!profile) return 'Especialista';
+    if (!profiles) return 'Especialista';
     
-    const { first_name, last_name_paterno, last_name_materno, display_name } = profile;
+    const { first_name, last_name_paterno, last_name_materno, display_name } = profiles;
     
     // Priority 1: first_name + last_name_paterno
     if (first_name && last_name_paterno) {
@@ -100,7 +100,7 @@ export function QuoteCard({ quote, orderId, unreadCount = 0 }: QuoteCardProps) {
     >
       <div className="flex gap-4">
         <Avatar className="w-[70px] h-[70px] flex-shrink-0">
-          <AvatarImage src={specialist?.profile?.avatar_url} />
+          <AvatarImage src={specialist?.profiles?.avatar_url} />
           <AvatarFallback className="bg-secondary text-secondary-foreground text-xl font-semibold">
             {getInitials(specialistName)}
           </AvatarFallback>
