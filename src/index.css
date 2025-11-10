@@ -60,31 +60,30 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
-  @keyframes border-glow-pulse {
+  @keyframes pulse-red-border {
     0%, 100% {
-      box-shadow: 
-        0 0 0 2px hsl(var(--accent)),
-        0 0 10px hsla(var(--accent), 0.6),
-        0 0 20px hsla(var(--accent), 0.4);
+      border-color: hsl(354 83% 42%);
+      box-shadow: 0 0 10px hsla(354, 83%, 42%, 0.5),
+                  0 0 20px hsla(354, 83%, 42%, 0.3);
     }
     50% {
-      box-shadow: 
-        0 0 0 3px hsl(var(--accent)),
-        0 0 20px hsla(var(--accent), 1),
-        0 0 40px hsla(var(--accent), 0.8),
-        0 0 60px hsla(var(--accent), 0.4);
+      border-color: hsl(354 83% 52%);
+      box-shadow: 0 0 20px hsla(354, 83%, 42%, 0.9),
+                  0 0 40px hsla(354, 83%, 42%, 0.6),
+                  0 0 60px hsla(354, 83%, 42%, 0.3);
     }
   }
 
   .animate-pulse-border {
-    position: relative;
-    animation: border-glow-pulse 2.5s ease-in-out infinite;
+    border: 2.5px solid hsl(354 83% 42%);
+    animation: pulse-red-border 2.5s ease-in-out infinite;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .animate-pulse-border {
       animation: none;
-      box-shadow: 0 0 0 2px hsl(var(--accent)), 0 0 10px hsla(var(--accent), 0.5);
+      border: 2.5px solid hsl(354 83% 42%);
+      box-shadow: 0 0 10px hsla(354, 83%, 42%, 0.4);
     }
   }
 }
