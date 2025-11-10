@@ -14,7 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      servicios_domesticos: {
+        Row: {
+          actividad: string
+          categoria: string
+          created_at: string | null
+          especialista: string
+          id: number
+        }
+        Insert: {
+          actividad: string
+          categoria: string
+          created_at?: string | null
+          especialista: string
+          id?: number
+        }
+        Update: {
+          actividad?: string
+          categoria?: string
+          created_at?: string | null
+          especialista?: string
+          id?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
