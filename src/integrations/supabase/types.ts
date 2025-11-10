@@ -62,6 +62,220 @@ export type Database = {
         }
         Relationships: []
       }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          quote_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          quote_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          quote_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotes: {
+        Row: {
+          created_at: string
+          description: string | null
+          estimated_duration_hours: number | null
+          has_warranty: boolean | null
+          id: string
+          includes_materials: boolean | null
+          materials_list: string | null
+          price_fixed: number | null
+          price_max: number | null
+          price_min: number | null
+          proposed_date: string | null
+          proposed_time_end: string | null
+          proposed_time_start: string | null
+          request_id: string
+          specialist_id: string
+          status: Database["public"]["Enums"]["quote_status"]
+          warranty_description: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          estimated_duration_hours?: number | null
+          has_warranty?: boolean | null
+          id?: string
+          includes_materials?: boolean | null
+          materials_list?: string | null
+          price_fixed?: number | null
+          price_max?: number | null
+          price_min?: number | null
+          proposed_date?: string | null
+          proposed_time_end?: string | null
+          proposed_time_start?: string | null
+          request_id: string
+          specialist_id: string
+          status?: Database["public"]["Enums"]["quote_status"]
+          warranty_description?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          estimated_duration_hours?: number | null
+          has_warranty?: boolean | null
+          id?: string
+          includes_materials?: boolean | null
+          materials_list?: string | null
+          price_fixed?: number | null
+          price_max?: number | null
+          price_min?: number | null
+          proposed_date?: string | null
+          proposed_time_end?: string | null
+          proposed_time_start?: string | null
+          request_id?: string
+          specialist_id?: string
+          status?: Database["public"]["Enums"]["quote_status"]
+          warranty_description?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "service_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: false
+            referencedRelation: "specialist_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          rating: number
+          request_id: string
+          specialist_id: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          request_id: string
+          specialist_id: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          request_id?: string
+          specialist_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "service_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: false
+            referencedRelation: "specialist_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_requests: {
+        Row: {
+          activity: string
+          category: string
+          created_at: string
+          description: string | null
+          evidence_urls: string[] | null
+          id: string
+          location_id: string | null
+          price_max: number | null
+          price_min: number | null
+          scheduled_date: string | null
+          status: Database["public"]["Enums"]["service_request_status"]
+          time_end: string | null
+          time_start: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity: string
+          category: string
+          created_at?: string
+          description?: string | null
+          evidence_urls?: string[] | null
+          id?: string
+          location_id?: string | null
+          price_max?: number | null
+          price_min?: number | null
+          scheduled_date?: string | null
+          status?: Database["public"]["Enums"]["service_request_status"]
+          time_end?: string | null
+          time_start?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity?: string
+          category?: string
+          created_at?: string
+          description?: string | null
+          evidence_urls?: string[] | null
+          id?: string
+          location_id?: string | null
+          price_max?: number | null
+          price_min?: number | null
+          scheduled_date?: string | null
+          status?: Database["public"]["Enums"]["service_request_status"]
+          time_end?: string | null
+          time_start?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_requests_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       servicios_domesticos: {
         Row: {
           actividad: string
@@ -226,7 +440,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      quote_status: "pending" | "accepted" | "rejected"
+      service_request_status:
+        | "draft"
+        | "active"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -353,6 +573,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      quote_status: ["pending", "accepted", "rejected"],
+      service_request_status: [
+        "draft",
+        "active",
+        "in_progress",
+        "completed",
+        "cancelled",
+      ],
+    },
   },
 } as const

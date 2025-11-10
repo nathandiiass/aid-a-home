@@ -9,46 +9,46 @@ All colors MUST be HSL.
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 197 100% 14%;
+    --foreground: 200 100% 14%;
 
     --card: 0 0% 100%;
-    --card-foreground: 197 100% 14%;
+    --card-foreground: 200 100% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 197 100% 14%;
+    --popover-foreground: 200 100% 14%;
 
     --primary: 0 100% 24%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 198 59% 57%;
+    --secondary: 199 52% 57%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 45 100% 91%;
-    --muted-foreground: 197 100% 14%;
+    --muted-foreground: 200 100% 14%;
 
-    --accent: 351 82% 44%;
+    --accent: 354 83% 42%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 197 100% 14% / 0.1;
-    --input: 197 100% 14% / 0.2;
-    --ring: 0 100% 24%;
+    --border: 200 100% 14% / 0.1;
+    --input: 199 52% 57% / 0.2;
+    --ring: 354 83% 42%;
 
     --radius: 1.25rem;
 
     /* Category colors */
-    --category-jardines: 198 59% 57%;
-    --category-plomeria: 351 82% 44%;
-    --category-electricidad: 197 100% 14%;
+    --category-jardines: 199 52% 57%;
+    --category-plomeria: 354 83% 42%;
+    --category-electricidad: 200 100% 14%;
     --category-pintura: 0 100% 24%;
     --category-limpieza: 45 100% 91%;
-    --category-carpinteria: 198 59% 57%;
-    --category-cerrajeria: 351 82% 44%;
-    --category-soldadura: 197 100% 14%;
+    --category-carpinteria: 199 52% 57%;
+    --category-cerrajeria: 354 83% 42%;
+    --category-soldadura: 200 100% 14%;
     --category-mecanica: 0 100% 24%;
-    --category-albercas: 198 59% 57%;
+    --category-albercas: 199 52% 57%;
     
     /* Shadows */
     --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.1);

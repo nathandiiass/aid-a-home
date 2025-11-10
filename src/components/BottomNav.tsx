@@ -1,4 +1,4 @@
-import { Home, User } from 'lucide-react';
+import { Home, User, ClipboardList } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
@@ -13,6 +13,11 @@ export const BottomNav = () => {
       icon: Home,
       label: 'Inicio',
       path: '/'
+    },
+    {
+      icon: ClipboardList,
+      label: 'Órdenes',
+      path: '/orders'
     },
     {
       icon: User,
