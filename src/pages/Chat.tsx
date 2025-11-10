@@ -105,22 +105,39 @@ export default function Chat() {
   };
 
   const handleContratarConfirm = async () => {
-    // TODO: Implement actual hiring logic with database update
-    setShowConfirmDialog(false);
-    
-    // Show confetti
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
+    try {
+      // Update quote status to accepted
+      const { error } = await supabase
+        .from('quotes')
+        .update({ status: 'accepted' })
+        .eq('id', quoteId);
 
-    toast({
-      title: "🎉 ¡Felicidades! Encontraste a tu especialista",
-      description: "La orden ha sido asignada exitosamente.",
-    });
+      if (error) throw error;
 
-    // TODO: Navigate to chat or order view
+      setShowConfirmDialog(false);
+      
+      // Show confetti
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+
+      toast({
+        title: "🎉 ¡Felicidades! Encontraste a tu especialista",
+        description: "La orden ha sido asignada exitosamente.",
+      });
+
+      // Reload quote data to reflect new status
+      loadChatData();
+    } catch (error: any) {
+      console.error('Error hiring specialist:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'No se pudo contratar al especialista'
+      });
+    }
   };
 
   const getInitials = (name: string) => {
