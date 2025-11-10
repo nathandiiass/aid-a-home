@@ -211,6 +211,17 @@ export default function SpecialistRegistration() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      // Update or insert user profile with name
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user!.id,
+          first_name: personalData.firstName,
+          last_name: personalData.lastName
+        });
+
+      if (profileError) throw profileError;
+
       // Upload ID document
       const fileExt = personalData.idDocument!.name.split('.').pop();
       const fileName = `${user!.id}/${Date.now()}.${fileExt}`;
@@ -226,7 +237,7 @@ export default function SpecialistRegistration() {
         .getPublicUrl(fileName);
 
       // Create specialist profile
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile, error: specialistError } = await supabase
         .from('specialist_profiles')
         .insert([{
           user_id: user!.id,
@@ -237,7 +248,7 @@ export default function SpecialistRegistration() {
         .select()
         .single();
 
-      if (profileError) throw profileError;
+      if (specialistError) throw specialistError;
 
       // Create specialties and activities
       for (const specialty of specialties) {
