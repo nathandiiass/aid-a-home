@@ -43,7 +43,7 @@ const MEXICAN_STATES = [
 
 export default function SpecialistRegistration() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -74,11 +74,14 @@ export default function SpecialistRegistration() {
   const [citiesByState, setCitiesByState] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
-    if (!user) {
-      navigate('/auth');
+    if (!authLoading) {
+      if (!user) {
+        navigate('/auth');
+      } else {
+        fetchServices();
+      }
     }
-    fetchServices();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const fetchServices = async () => {
     try {
@@ -307,6 +310,14 @@ export default function SpecialistRegistration() {
   };
 
   const uniqueSpecialists = [...new Set(services.map(s => s.especialista))];
+
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground">Cargando...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-20">
