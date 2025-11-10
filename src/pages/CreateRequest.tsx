@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ServiceSelector from "@/components/request/ServiceSelector";
 import BudgetStep from "@/components/request/BudgetStep";
 import DateTimeStep from "@/components/request/DateTimeStep";
 import LocationStep from "@/components/request/LocationStep";
@@ -31,32 +32,41 @@ export interface RequestData {
 const CreateRequest = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { especialista, actividad } = location.state || {};
+  const { especialista: initialEspecialista, actividad: initialActividad } = location.state || {};
   
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [requestData, setRequestData] = useState<RequestData>({
-    especialista: especialista || "",
-    actividad: actividad || "",
+    especialista: initialEspecialista || "",
+    actividad: initialActividad || "",
     noBudget: false,
     isUrgent: false,
     evidence: [],
   });
 
-  if (!especialista || !actividad) {
-    navigate("/");
-    return null;
-  }
+  // Check for pending request after login
+  useEffect(() => {
+    const pendingRequest = localStorage.getItem('pendingRequest');
+    if (pendingRequest) {
+      const data = JSON.parse(pendingRequest);
+      setRequestData(data);
+      setStep(5); // Go to summary
+    }
+  }, []);
 
   const updateData = (data: Partial<RequestData>) => {
     setRequestData(prev => ({ ...prev, ...data }));
   };
 
   const nextStep = () => {
+    // Validate service selection before moving forward
+    if (step === 0 && (!requestData.especialista || !requestData.actividad)) {
+      return;
+    }
     if (step < 5) setStep(step + 1);
   };
 
   const prevStep = () => {
-    if (step > 1) setStep(step - 1);
+    if (step > 0) setStep(step - 1);
   };
 
   const goToStep = (targetStep: number) => {
@@ -72,20 +82,24 @@ const CreateRequest = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => step === 1 ? navigate("/") : prevStep()}
+              onClick={() => step === 0 ? navigate("/") : prevStep()}
               className="shrink-0"
             >
               <ChevronLeft className="w-6 h-6" />
             </Button>
             <div className="flex-1 min-w-0">
-              <h1 className="text-lg font-semibold truncate">{actividad}</h1>
-              <p className="text-sm text-muted-foreground truncate">{especialista}</p>
+              <h1 className="text-lg font-semibold truncate">
+                {requestData.actividad || "Nueva solicitud"}
+              </h1>
+              <p className="text-sm text-muted-foreground truncate">
+                {requestData.especialista || "Selecciona un servicio"}
+              </p>
             </div>
           </div>
           
           {/* Progress bar */}
           <div className="flex gap-2 mt-4">
-            {[1, 2, 3, 4, 5].map((s) => (
+            {[0, 1, 2, 3, 4, 5].map((s) => (
               <div
                 key={s}
                 className={`h-1 flex-1 rounded-full transition-colors ${
@@ -99,6 +113,24 @@ const CreateRequest = () => {
 
       {/* Content */}
       <div className="container max-w-2xl mx-auto px-4 py-6">
+        {step === 0 && (
+          <div className="space-y-6">
+            <ServiceSelector
+              especialista={requestData.especialista}
+              actividad={requestData.actividad}
+              onEspecialistaChange={(value) => updateData({ especialista: value })}
+              onActividadChange={(value) => updateData({ actividad: value })}
+            />
+            <Button
+              onClick={nextStep}
+              disabled={!requestData.especialista || !requestData.actividad}
+              className="w-full h-12 text-base"
+              size="lg"
+            >
+              Continuar
+            </Button>
+          </div>
+        )}
         {step === 1 && (
           <BudgetStep data={requestData} updateData={updateData} onNext={nextStep} />
         )}

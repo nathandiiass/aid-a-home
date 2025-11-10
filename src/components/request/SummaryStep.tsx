@@ -9,8 +9,8 @@ import {
   MapPin,
   Camera,
   Edit,
-  CheckCircle,
 } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 
 interface SummaryStepProps {
@@ -21,12 +21,25 @@ interface SummaryStepProps {
 const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
   const [isPublishing, setIsPublishing] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handlePublish = async () => {
+    // Check if user is logged in
+    if (!user) {
+      // Save request data to localStorage
+      localStorage.setItem('pendingRequest', JSON.stringify(data));
+      toast.info("Inicia sesión para publicar tu solicitud");
+      navigate("/auth");
+      return;
+    }
+
     setIsPublishing(true);
     
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1500));
+    
+    // Clear pending request
+    localStorage.removeItem('pendingRequest');
     
     setIsPublishing(false);
     navigate("/success", { state: { specialistsCount: 12 } });

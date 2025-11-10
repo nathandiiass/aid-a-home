@@ -1,8 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { Mail, ArrowLeft } from 'lucide-react';
@@ -13,9 +20,24 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [birthDate, setBirthDate] = useState('');
+  const [gender, setGender] = useState('');
+  const [nationality, setNationality] = useState('');
   const navigate = useNavigate();
   const { signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
   const { toast } = useToast();
+
+  // Calculate age from birth date
+  const calculateAge = (date: string) => {
+    const today = new Date();
+    const birth = new Date(date);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  };
 
   const handleGoogleSignIn = async () => {
     const { error } = await signInWithGoogle();
@@ -32,9 +54,15 @@ export default function Auth() {
     e.preventDefault();
     
     if (isSignUp) {
+      const age = birthDate ? calculateAge(birthDate) : null;
+      
       const { error } = await signUpWithEmail(email, password, {
         first_name: firstName,
-        last_name: lastName
+        last_name: lastName,
+        birth_date: birthDate,
+        age: age,
+        gender: gender,
+        nationality: nationality
       });
       
       if (error) {
@@ -48,7 +76,14 @@ export default function Auth() {
           title: "¡Cuenta creada!",
           description: "Revisa tu correo para confirmar tu cuenta."
         });
-        navigate('/');
+        
+        // Check if there's a pending request
+        const pendingRequest = localStorage.getItem('pendingRequest');
+        if (pendingRequest) {
+          navigate('/create-request');
+        } else {
+          navigate('/');
+        }
       }
     } else {
       const { error } = await signInWithEmail(email, password);
@@ -60,7 +95,13 @@ export default function Auth() {
           variant: "destructive"
         });
       } else {
-        navigate('/');
+        // Check if there's a pending request
+        const pendingRequest = localStorage.getItem('pendingRequest');
+        if (pendingRequest) {
+          navigate('/create-request');
+        } else {
+          navigate('/');
+        }
       }
     }
   };
@@ -136,6 +177,50 @@ export default function Auth() {
                   required
                   className="mt-1"
                 />
+              </div>
+              <div>
+                <Label htmlFor="birthDate">Fecha de nacimiento</Label>
+                <Input
+                  id="birthDate"
+                  type="date"
+                  value={birthDate}
+                  onChange={(e) => setBirthDate(e.target.value)}
+                  required
+                  className="mt-1"
+                />
+                {birthDate && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Edad: {calculateAge(birthDate)} años
+                  </p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="gender">Género</Label>
+                <Select value={gender} onValueChange={setGender} required>
+                  <SelectTrigger id="gender" className="mt-1">
+                    <SelectValue placeholder="Selecciona tu género" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="masculino">Masculino</SelectItem>
+                    <SelectItem value="femenino">Femenino</SelectItem>
+                    <SelectItem value="otro">Otro</SelectItem>
+                    <SelectItem value="prefiero_no_decir">Prefiero no decir</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="nationality">Nacionalidad</Label>
+                <Select value={nationality} onValueChange={setNationality} required>
+                  <SelectTrigger id="nationality" className="mt-1">
+                    <SelectValue placeholder="Selecciona tu nacionalidad" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="mexicana">Mexicana</SelectItem>
+                    <SelectItem value="estadounidense">Estadounidense</SelectItem>
+                    <SelectItem value="canadiense">Canadiense</SelectItem>
+                    <SelectItem value="otra">Otra</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </>
           )}
