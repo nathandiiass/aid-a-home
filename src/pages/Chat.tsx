@@ -133,11 +133,38 @@ export default function Chat() {
 
   const handleFileSelect = (type: 'camera' | 'gallery' | 'document') => {
     setShowAttachMenu(false);
-    // TODO: Implement file upload functionality
+    
+    if (!fileInputRef.current) return;
+    
+    // Set accept attribute based on type
+    if (type === 'camera') {
+      fileInputRef.current.accept = 'image/*';
+      fileInputRef.current.capture = 'environment' as any;
+    } else if (type === 'gallery') {
+      fileInputRef.current.accept = 'image/*,video/*';
+      fileInputRef.current.removeAttribute('capture');
+    } else {
+      fileInputRef.current.accept = '.pdf,.jpg,.jpeg,.png,.doc,.docx';
+      fileInputRef.current.removeAttribute('capture');
+    }
+    
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    // TODO: Implement actual file upload to storage
     toast({
-      title: 'Próximamente',
-      description: `Funcionalidad de ${type === 'camera' ? 'cámara' : type === 'gallery' ? 'galería' : 'documentos'} disponible pronto.`
+      title: 'Archivo seleccionado',
+      description: `${files.length} archivo(s) listo(s) para enviar.`
     });
+
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const sendMessage = async () => {
@@ -373,41 +400,74 @@ export default function Chat() {
                   </p>
                 </div>
               ) : (
-                <Card
-                  className={`max-w-[80%] px-4 py-3 shadow-sm border ${
-                    isOwnMessage
-                      ? 'rounded-tr-sm'
-                      : 'rounded-tl-sm'
-                  }`}
-                  style={isOwnMessage ? {
-                    backgroundColor: '#C1121F',
-                    color: '#FFFFFF',
-                    borderColor: '#C1121F'
-                  } : {
-                    backgroundColor: '#FFFFFF',
-                    color: '#003049',
-                    borderColor: '#669BBC'
-                  }}
-                >
-                  <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
-                  <p className="text-xs mt-1.5 opacity-70">
-                    {format(new Date(message.created_at), 'HH:mm')}
-                  </p>
-                </Card>
+                <div className={`relative max-w-[80%] ${isOwnMessage ? 'ml-12' : 'mr-12'}`}>
+                  <Card
+                    className={`px-4 py-3 shadow-sm border ${
+                      isOwnMessage
+                        ? 'rounded-2xl rounded-tr-sm'
+                        : 'rounded-2xl rounded-tl-sm'
+                    }`}
+                    style={isOwnMessage ? {
+                      backgroundColor: '#003049',
+                      color: '#FFFFFF',
+                      borderColor: '#003049'
+                    } : {
+                      backgroundColor: '#FFFFFF',
+                      color: '#003049',
+                      borderColor: '#669BBC'
+                    }}
+                  >
+                    <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                    <p className="text-xs mt-1.5 opacity-70">
+                      {format(new Date(message.created_at), 'HH:mm')}
+                    </p>
+                  </Card>
+                  {/* WhatsApp-style tail */}
+                  <div 
+                    className={`absolute bottom-0 ${isOwnMessage ? 'right-0 -mr-2' : 'left-0 -ml-2'}`}
+                    style={{
+                      width: 0,
+                      height: 0,
+                      borderStyle: 'solid',
+                      ...(isOwnMessage ? {
+                        borderWidth: '0 0 12px 12px',
+                        borderColor: `transparent transparent #003049 transparent`
+                      } : {
+                        borderWidth: '0 12px 12px 0',
+                        borderColor: `transparent #FFFFFF transparent transparent`,
+                        filter: 'drop-shadow(-1px 0px 0px #669BBC)'
+                      })
+                    }}
+                  />
+                </div>
               )}
             </div>
           );
         })}
         
         {isTyping && (
-          <div className="flex justify-start animate-fade-in">
-            <Card className="px-4 py-3 shadow-sm border" style={{ backgroundColor: '#FFFFFF', borderColor: '#669BBC' }}>
-              <div className="flex gap-1">
-                <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#669BBC', animationDelay: '0ms' }}></span>
-                <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#669BBC', animationDelay: '150ms' }}></span>
-                <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#669BBC', animationDelay: '300ms' }}></span>
-              </div>
-            </Card>
+          <div className="flex justify-start animate-fade-in mr-12">
+            <div className="relative">
+              <Card className="px-4 py-3 shadow-sm border rounded-2xl rounded-tl-sm" style={{ backgroundColor: '#FFFFFF', borderColor: '#669BBC' }}>
+                <div className="flex gap-1">
+                  <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#669BBC', animationDelay: '0ms' }}></span>
+                  <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#669BBC', animationDelay: '150ms' }}></span>
+                  <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#669BBC', animationDelay: '300ms' }}></span>
+                </div>
+              </Card>
+              {/* Tail for typing indicator */}
+              <div 
+                className="absolute bottom-0 left-0 -ml-2"
+                style={{
+                  width: 0,
+                  height: 0,
+                  borderStyle: 'solid',
+                  borderWidth: '0 12px 12px 0',
+                  borderColor: 'transparent #FFFFFF transparent transparent',
+                  filter: 'drop-shadow(-1px 0px 0px #669BBC)'
+                }}
+              />
+            </div>
           </div>
         )}
         
@@ -417,6 +477,12 @@ export default function Chat() {
       {/* Fixed Composition Bar */}
       <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 shadow-lg z-40">
         <div className="flex gap-2 items-end max-w-screen-lg mx-auto">
+          <input
+            ref={fileInputRef}
+            type="file"
+            className="hidden"
+            onChange={handleFileChange}
+          />
           <Button 
             variant="ghost" 
             size="icon" 
@@ -441,7 +507,7 @@ export default function Chat() {
             disabled={!newMessage.trim()}
             size="icon"
             className="flex-shrink-0"
-            style={{ backgroundColor: '#C1121F', color: '#FFFFFF' }}
+            style={{ backgroundColor: '#003049', color: '#FFFFFF' }}
           >
             <Send className="w-5 h-5" />
           </Button>
@@ -498,7 +564,7 @@ export default function Chat() {
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleContratarConfirm}
-              style={{ backgroundColor: '#C1121F', color: '#FFFFFF' }}
+              style={{ backgroundColor: '#003049', color: '#FFFFFF' }}
             >
               Sí, contratar
             </AlertDialogAction>
