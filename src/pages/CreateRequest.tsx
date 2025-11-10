@@ -21,6 +21,7 @@ export interface RequestData {
   timeEnd?: string;
   isUrgent: boolean;
   location?: {
+    id?: string;
     lat: number;
     lng: number;
     address: string;

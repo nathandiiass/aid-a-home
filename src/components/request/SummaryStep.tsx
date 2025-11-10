@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
 
 interface SummaryStepProps {
   data: RequestData;
@@ -33,16 +35,90 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
       return;
     }
 
-    setIsPublishing(true);
-    
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    // Clear pending request
-    localStorage.removeItem('pendingRequest');
-    
-    setIsPublishing(false);
-    navigate("/success", { state: { specialistsCount: 12 } });
+    // Validate required fields
+    const requestSchema = z.object({
+      actividad: z.string().min(1, "Actividad requerida").max(200),
+      especialista: z.string().min(1, "Especialista requerido").max(200),
+      budgetMin: z.number().positive().optional(),
+      budgetMax: z.number().positive().optional(),
+      date: z.date().optional(),
+      locationId: z.string().uuid().optional(),
+    });
+
+    try {
+      // Validate input
+      const validatedData = requestSchema.parse({
+        actividad: data.actividad,
+        especialista: data.especialista,
+        budgetMin: data.budgetMin,
+        budgetMax: data.budgetMax,
+        date: data.date,
+        locationId: data.location?.id,
+      });
+
+      setIsPublishing(true);
+
+      // Upload evidence files to storage if any
+      let evidenceUrls: string[] = [];
+      if (data.evidence && data.evidence.length > 0) {
+        const uploadPromises = data.evidence.map(async (file, index) => {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${user.id}/${Date.now()}_${index}.${fileExt}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('specialist-documents')
+            .upload(fileName, file);
+
+          if (uploadError) throw uploadError;
+
+          const { data: { publicUrl } } = supabase.storage
+            .from('specialist-documents')
+            .getPublicUrl(fileName);
+
+          return publicUrl;
+        });
+
+        evidenceUrls = await Promise.all(uploadPromises);
+      }
+
+      // Insert service request
+      const { data: insertedRequest, error: insertError } = await supabase
+        .from('service_requests')
+        .insert({
+          user_id: user.id,
+          activity: validatedData.actividad,
+          category: validatedData.especialista,
+          status: 'active',
+          price_min: validatedData.budgetMin || null,
+          price_max: validatedData.budgetMax || null,
+          scheduled_date: validatedData.date ? validatedData.date.toISOString().split('T')[0] : null,
+          time_start: data.timeStart || null,
+          time_end: data.timeEnd || null,
+          location_id: validatedData.locationId || null,
+          description: null,
+          evidence_urls: evidenceUrls.length > 0 ? evidenceUrls : null,
+        })
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      // Clear pending request
+      localStorage.removeItem('pendingRequest');
+
+      toast.success("¡Solicitud publicada exitosamente!");
+      navigate("/orders?tab=active");
+    } catch (error: any) {
+      console.error('Error publishing request:', error);
+      
+      if (error instanceof z.ZodError) {
+        toast.error("Por favor completa todos los campos requeridos");
+      } else {
+        toast.error(error.message || "Error al publicar la solicitud");
+      }
+    } finally {
+      setIsPublishing(false);
+    }
   };
 
   const formatDate = (date?: Date) => {

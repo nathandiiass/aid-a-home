@@ -76,6 +76,7 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
 
     updateData({
       location: {
+        id: saved.id,
         lat: saved.lat || 19.4326,
         lng: saved.lng || -99.1332,
         address: fullAddress,
@@ -103,9 +104,11 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
     ].filter(Boolean).join(', ');
 
     try {
+      let locationId: string | undefined = undefined;
+
       // Save to database if user is logged in and checkbox is checked
       if (user && saveLocation) {
-        const { error } = await supabase
+        const { data: insertedLocation, error } = await supabase
           .from('locations')
           .insert([{
             user_id: user.id,
@@ -118,9 +121,13 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
             state: state.trim(),
             lat: 19.4326, // Mock - in real app, geocode
             lng: -99.1332  // Mock - in real app, geocode
-          }]);
+          }])
+          .select()
+          .single();
 
         if (error) throw error;
+        
+        locationId = insertedLocation?.id;
         
         toast({
           title: "Ubicación guardada",
@@ -130,6 +137,7 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
 
       updateData({
         location: {
+          id: locationId,
           lat: 19.4326,
           lng: -99.1332,
           address: fullAddress,
