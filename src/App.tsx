@@ -7,6 +7,8 @@ import Index from "./pages/Index";
 import CreateRequest from "./pages/CreateRequest";
 import Success from "./pages/Success";
 import Inbox from "./pages/Inbox";
+import Profile from "./pages/Profile";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +24,8 @@ const App = () => (
           <Route path="/create-request" element={<CreateRequest />} />
           <Route path="/success" element={<Success />} />
           <Route path="/inbox" element={<Inbox />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/auth" element={<Auth />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

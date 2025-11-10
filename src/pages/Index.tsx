@@ -2,6 +2,7 @@ import ServiceSearch from "@/components/ServiceSearch";
 import { Card } from "@/components/ui/card";
 import { Leaf, Wrench, Zap, Paintbrush, Sparkles, Hammer, Lock, Flame, Car, Droplets, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { BottomNav } from "@/components/BottomNav";
 
 const categories = [
   { name: "Jardinería", icon: Leaf, color: "bg-category-jardines", textColor: "text-white", requests: "12,356", especialista: "Jardinero", actividad: "Mantenimiento de jardín" },
@@ -24,7 +25,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20">
       {/* Header with search */}
       <div className="container max-w-2xl mx-auto px-4 py-6">
         <div className="mb-6">
@@ -86,6 +87,8 @@ const Index = () => {
           </ol>
         </Card>
       </div>
+
+      <BottomNav />
     </div>
   );
 };
