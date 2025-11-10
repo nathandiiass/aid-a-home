@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      locations: {
+        Row: {
+          city: string
+          created_at: string
+          ext_number: string | null
+          id: string
+          int_number: string | null
+          label: string
+          lat: number | null
+          lng: number | null
+          neighborhood: string | null
+          state: string
+          street: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          city: string
+          created_at?: string
+          ext_number?: string | null
+          id?: string
+          int_number?: string | null
+          label: string
+          lat?: number | null
+          lng?: number | null
+          neighborhood?: string | null
+          state: string
+          street: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          ext_number?: string | null
+          id?: string
+          int_number?: string | null
+          label?: string
+          lat?: number | null
+          lng?: number | null
+          neighborhood?: string | null
+          state?: string
+          street?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       servicios_domesticos: {
         Row: {
           actividad: string
@@ -37,6 +85,138 @@ export type Database = {
           id?: number
         }
         Relationships: []
+      }
+      specialist_activities: {
+        Row: {
+          activity: string
+          created_at: string
+          id: string
+          price_max: number | null
+          price_min: number | null
+          specialty_id: string
+        }
+        Insert: {
+          activity: string
+          created_at?: string
+          id?: string
+          price_max?: number | null
+          price_min?: number | null
+          specialty_id: string
+        }
+        Update: {
+          activity?: string
+          created_at?: string
+          id?: string
+          price_max?: number | null
+          price_min?: number | null
+          specialty_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "specialist_activities_specialty_id_fkey"
+            columns: ["specialty_id"]
+            isOneToOne: false
+            referencedRelation: "specialist_specialties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      specialist_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          id_document_url: string
+          phone: string
+          rfc: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          id_document_url: string
+          phone: string
+          rfc: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          id_document_url?: string
+          phone?: string
+          rfc?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      specialist_specialties: {
+        Row: {
+          created_at: string
+          id: string
+          role_label: string
+          specialist_id: string
+          specialty: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role_label: string
+          specialist_id: string
+          specialty: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role_label?: string
+          specialist_id?: string
+          specialty?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "specialist_specialties_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: false
+            referencedRelation: "specialist_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      specialist_work_zones: {
+        Row: {
+          cities: string[]
+          created_at: string
+          id: string
+          specialist_id: string
+          state: string
+        }
+        Insert: {
+          cities: string[]
+          created_at?: string
+          id?: string
+          specialist_id: string
+          state: string
+        }
+        Update: {
+          cities?: string[]
+          created_at?: string
+          id?: string
+          specialist_id?: string
+          state?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "specialist_work_zones_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: false
+            referencedRelation: "specialist_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

@@ -1,8 +1,10 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { LogOut, User, Briefcase } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
+import { supabase } from '@/integrations/supabase/client';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +22,33 @@ export default function Profile() {
   const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isSpecialist, setIsSpecialist] = useState(false);
+  const [checkingSpecialist, setCheckingSpecialist] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      checkSpecialistStatus();
+    } else {
+      setCheckingSpecialist(false);
+    }
+  }, [user]);
+
+  const checkSpecialistStatus = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('specialist_profiles')
+        .select('id')
+        .eq('user_id', user?.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      setIsSpecialist(!!data);
+    } catch (error: any) {
+      console.error('Error checking specialist status:', error);
+    } finally {
+      setCheckingSpecialist(false);
+    }
+  };
 
   const handleSignOut = async () => {
     const { error } = await signOut();
@@ -34,7 +63,7 @@ export default function Profile() {
     }
   };
 
-  if (loading) {
+  if (loading || checkingSpecialist) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-foreground">Cargando...</div>
@@ -161,23 +190,51 @@ export default function Profile() {
                   <p className="font-medium text-foreground">Configuración</p>
                   <p className="text-sm text-secondary">Idioma, notificaciones, privacidad</p>
                 </button>
+                <button 
+                  onClick={() => navigate('/locations')}
+                  className="w-full px-4 py-3 text-left hover:bg-muted/30 transition-colors"
+                >
+                  <p className="font-medium text-foreground">Ubicaciones</p>
+                  <p className="text-sm text-secondary">Administra tus direcciones guardadas</p>
+                </button>
               </div>
             </div>
 
-            <div className="border border-border rounded-lg p-6 space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Briefcase className="w-6 h-6 text-primary" />
+            {!isSpecialist ? (
+              <div className="border border-border rounded-lg p-6 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Briefcase className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-foreground">Trabaja como especialista</h3>
+                    <p className="text-sm text-secondary">Ofrece tus servicios y genera ingresos</p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground">Trabaja como especialista</h3>
-                  <p className="text-sm text-secondary">Ofrece tus servicios y genera ingresos</p>
-                </div>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => navigate('/specialist-registration')}
+                >
+                  Regístrate como especialista
+                </Button>
               </div>
-              <Button variant="outline" className="w-full">
-                Regístrate como especialista
-              </Button>
-            </div>
+            ) : (
+              <div className="border border-border rounded-lg p-6 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Briefcase className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-foreground">Modo especialista</h3>
+                    <p className="text-sm text-secondary">Cambia al modo especialista para ver solicitudes</p>
+                  </div>
+                </div>
+                <Button variant="outline" className="w-full" disabled>
+                  Cambiar al modo especialista (próximamente)
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>
