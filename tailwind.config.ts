@@ -47,14 +47,22 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-      },
-      backgroundImage: {
-        'gradient-primary': 'var(--gradient-primary)',
-        'gradient-card': 'var(--gradient-card)',
+        category: {
+          jardines: "hsl(var(--category-jardines))",
+          plomeria: "hsl(var(--category-plomeria))",
+          electricidad: "hsl(var(--category-electricidad))",
+          pintura: "hsl(var(--category-pintura))",
+          limpieza: "hsl(var(--category-limpieza))",
+          carpinteria: "hsl(var(--category-carpinteria))",
+          cerrajeria: "hsl(var(--category-cerrajeria))",
+          soldadura: "hsl(var(--category-soldadura))",
+          mecanica: "hsl(var(--category-mecanica))",
+          albercas: "hsl(var(--category-albercas))",
+        },
       },
       boxShadow: {
-        'glow': 'var(--shadow-glow)',
         'card': 'var(--shadow-card)',
+        'subtle': 'var(--shadow-subtle)',
       },
       transitionTimingFunction: {
         'smooth': 'var(--transition-smooth)',
