@@ -60,30 +60,31 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
-  @keyframes glow-pulse {
+  @keyframes border-glow-pulse {
     0%, 100% {
-      box-shadow: 0 0 5px 1px hsla(var(--accent), 0.6),
-                  0 0 15px 2px hsla(var(--accent), 0.4),
-                  inset 0 0 10px hsla(var(--accent), 0.1);
-      border-width: 2px;
+      box-shadow: 
+        0 0 0 2px hsl(var(--accent)),
+        0 0 10px hsla(var(--accent), 0.6),
+        0 0 20px hsla(var(--accent), 0.4);
     }
     50% {
-      box-shadow: 0 0 15px 3px hsla(var(--accent), 1),
-                  0 0 30px 4px hsla(var(--accent), 0.7),
-                  inset 0 0 20px hsla(var(--accent), 0.2);
-      border-width: 3.6px;
+      box-shadow: 
+        0 0 0 3px hsl(var(--accent)),
+        0 0 20px hsla(var(--accent), 1),
+        0 0 40px hsla(var(--accent), 0.8),
+        0 0 60px hsla(var(--accent), 0.4);
     }
   }
 
   .animate-pulse-border {
-    border: 2px solid hsl(var(--accent));
-    animation: glow-pulse 2.8s ease-in-out infinite;
+    position: relative;
+    animation: border-glow-pulse 2.5s ease-in-out infinite;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .animate-pulse-border {
       animation: none;
-      box-shadow: 0 0 10px hsla(var(--accent), 0.5);
+      box-shadow: 0 0 0 2px hsl(var(--accent)), 0 0 10px hsla(var(--accent), 0.5);
     }
   }
 }
