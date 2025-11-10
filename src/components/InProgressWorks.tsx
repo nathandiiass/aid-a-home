@@ -112,13 +112,10 @@ export function InProgressWorks() {
       
       <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2">
         {works.map((work) => (
-          <Card
+          <div
             key={work.id}
             onClick={() => navigate(`/chat/${work.quote.id}`)}
-            className="flex-shrink-0 w-[280px] p-4 cursor-pointer transition-all hover:scale-105 animate-pulse-border relative"
-            style={{
-              background: 'linear-gradient(135deg, hsl(var(--card)) 0%, hsla(var(--accent), 0.05) 100%)'
-            }}
+            className="flex-shrink-0 w-[280px] p-4 cursor-pointer transition-all hover:scale-105 animate-pulse-border rounded-2xl bg-card"
           >
             <div className="space-y-3">
               <div>
@@ -151,7 +148,7 @@ export function InProgressWorks() {
                 </div>
               )}
             </div>
-          </Card>
+          </div>
         ))}
       </div>
     </div>
