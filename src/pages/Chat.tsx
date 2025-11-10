@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { ArrowLeft, Send, Paperclip, Clock, DollarSign, Package, FileText, Ban, Timer, Shield, Eye, Paperclip as AttachIcon } from 'lucide-react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { ArrowLeft, Send, Paperclip, Clock, DollarSign, Package, FileText, Ban, Timer, Shield, Eye, Camera, Image as ImageIcon, File } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import confetti from 'canvas-confetti';
@@ -23,7 +24,10 @@ export default function Chat() {
   const [loading, setLoading] = useState(true);
   const [newMessage, setNewMessage] = useState('');
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showAttachMenu, setShowAttachMenu] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -125,6 +129,15 @@ export default function Chat() {
       .map(n => n[0])
       .join('')
       .toUpperCase() || 'E';
+  };
+
+  const handleFileSelect = (type: 'camera' | 'gallery' | 'document') => {
+    setShowAttachMenu(false);
+    // TODO: Implement file upload functionality
+    toast({
+      title: 'Próximamente',
+      description: `Funcionalidad de ${type === 'camera' ? 'cámara' : type === 'gallery' ? 'galería' : 'documentos'} disponible pronto.`
+    });
   };
 
   const sendMessage = async () => {
@@ -290,7 +303,7 @@ export default function Chat() {
 
             {quoteData.attachments && quoteData.attachments.length > 0 && (
               <div className="flex gap-2 text-sm">
-                <AttachIcon className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
+                <Paperclip className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
                 <div>
                   <span className="font-semibold text-foreground">Adjuntos: </span>
                   <span className="text-secondary">{quoteData.attachments.length} archivo(s)</span>
@@ -307,65 +320,77 @@ export default function Chat() {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30 flex flex-col">
-      {/* Header */}
-      <div className="bg-card border-b border-border px-4 py-3 flex items-center gap-3 shadow-sm">
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Fixed App Bar */}
+      <div className="sticky top-0 z-50 bg-card border-b border-border px-4 py-3 flex items-center gap-3 shadow-sm">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => navigate(-1)}
+          className="flex-shrink-0"
         >
           <ArrowLeft className="w-5 h-5" />
         </Button>
-        <Avatar className="w-12 h-12">
+        <Avatar className="w-12 h-12 flex-shrink-0">
           <AvatarImage src={quote.specialist?.avatar_url} />
-          <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold">
+          <AvatarFallback style={{ backgroundColor: '#669BBC', color: '#FFFFFF' }} className="font-semibold">
             {getInitials(quote.specialist?.user_id || 'Especialista')}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
-          <h2 className="font-bold text-foreground truncate">
+          <h2 className="font-bold truncate" style={{ color: '#003049' }}>
             {quote.specialist?.user_id || 'Especialista'}
           </h2>
-          <p className="text-xs text-secondary">En línea</p>
+          <p className="text-xs" style={{ color: '#669BBC' }}>En línea</p>
         </div>
         <Button 
           size="sm"
           onClick={() => setShowConfirmDialog(true)}
-          className="bg-accent hover:bg-accent/90 text-accent-foreground"
+          className="flex-shrink-0"
+          style={{ backgroundColor: '#C1121F', color: '#FFFFFF' }}
         >
           Contratar
         </Button>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
-        {messages.map((message) => {
+      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4 pb-24">
+        {messages.map((message, index) => {
           const isOwnMessage = message.sender_id === user?.id;
           const quoteContent = renderQuoteMessage(message.content);
           
           return (
             <div
               key={message.id}
-              className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} animate-fade-in`}
+              style={{ animationDelay: `${index * 50}ms` }}
             >
               {quoteContent ? (
                 <div className="max-w-[85%]">
                   {quoteContent}
-                  <p className="text-xs text-secondary mt-1 px-1">
+                  <p className="text-xs mt-1 px-1" style={{ color: '#669BBC' }}>
                     {format(new Date(message.created_at), 'HH:mm')}
                   </p>
                 </div>
               ) : (
                 <Card
-                  className={`max-w-[80%] px-4 py-3 shadow-sm ${
+                  className={`max-w-[80%] px-4 py-3 shadow-sm border ${
                     isOwnMessage
-                      ? 'bg-accent text-accent-foreground rounded-tr-sm'
-                      : 'bg-background border-secondary/20 text-foreground rounded-tl-sm'
+                      ? 'rounded-tr-sm'
+                      : 'rounded-tl-sm'
                   }`}
+                  style={isOwnMessage ? {
+                    backgroundColor: '#C1121F',
+                    color: '#FFFFFF',
+                    borderColor: '#C1121F'
+                  } : {
+                    backgroundColor: '#FFFFFF',
+                    color: '#003049',
+                    borderColor: '#669BBC'
+                  }}
                 >
                   <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
-                  <p className={`text-xs mt-1.5 ${isOwnMessage ? 'text-accent-foreground/70' : 'text-secondary'}`}>
+                  <p className="text-xs mt-1.5 opacity-70">
                     {format(new Date(message.created_at), 'HH:mm')}
                   </p>
                 </Card>
@@ -373,45 +398,107 @@ export default function Chat() {
             </div>
           );
         })}
+        
+        {isTyping && (
+          <div className="flex justify-start animate-fade-in">
+            <Card className="px-4 py-3 shadow-sm border" style={{ backgroundColor: '#FFFFFF', borderColor: '#669BBC' }}>
+              <div className="flex gap-1">
+                <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#669BBC', animationDelay: '0ms' }}></span>
+                <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#669BBC', animationDelay: '150ms' }}></span>
+                <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#669BBC', animationDelay: '300ms' }}></span>
+              </div>
+            </Card>
+          </div>
+        )}
+        
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div className="bg-card border-t border-border px-4 py-3 flex gap-2 shadow-sm">
-        <Button variant="ghost" size="icon" className="text-secondary hover:text-foreground">
-          <Paperclip className="w-5 h-5" />
-        </Button>
-        <Input
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-          placeholder="Escribe un mensaje..."
-          className="flex-1 border-input/50 focus-visible:ring-secondary"
-        />
-        <Button
-          onClick={sendMessage}
-          disabled={!newMessage.trim()}
-          className="bg-accent hover:bg-accent/90 text-accent-foreground"
-        >
-          <Send className="w-5 h-5" />
-        </Button>
+      {/* Fixed Composition Bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 shadow-lg z-40">
+        <div className="flex gap-2 items-end max-w-screen-lg mx-auto">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => setShowAttachMenu(true)}
+            className="flex-shrink-0"
+            style={{ color: '#669BBC' }}
+          >
+            <Paperclip className="w-5 h-5" />
+          </Button>
+          <div className="flex-1 rounded-full px-4 py-2 border" style={{ backgroundColor: '#FDF0D5', borderColor: '#669BBC' }}>
+            <Input
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+              placeholder="Escribe un mensaje..."
+              className="border-0 bg-transparent focus-visible:ring-0 p-0 h-auto resize-none"
+              style={{ color: '#003049' }}
+            />
+          </div>
+          <Button
+            onClick={sendMessage}
+            disabled={!newMessage.trim()}
+            size="icon"
+            className="flex-shrink-0"
+            style={{ backgroundColor: '#C1121F', color: '#FFFFFF' }}
+          >
+            <Send className="w-5 h-5" />
+          </Button>
+        </div>
       </div>
 
+      {/* Attach Menu Sheet */}
+      <Sheet open={showAttachMenu} onOpenChange={setShowAttachMenu}>
+        <SheetContent side="bottom" className="rounded-t-3xl">
+          <SheetHeader>
+            <SheetTitle>Adjuntar archivo</SheetTitle>
+          </SheetHeader>
+          <div className="grid gap-4 py-6">
+            <Button
+              variant="outline"
+              className="h-14 justify-start gap-3"
+              onClick={() => handleFileSelect('camera')}
+            >
+              <Camera className="w-5 h-5" style={{ color: '#669BBC' }} />
+              <span>Cámara</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-14 justify-start gap-3"
+              onClick={() => handleFileSelect('gallery')}
+            >
+              <ImageIcon className="w-5 h-5" style={{ color: '#669BBC' }} />
+              <span>Galería</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-14 justify-start gap-3"
+              onClick={() => handleFileSelect('document')}
+            >
+              <File className="w-5 h-5" style={{ color: '#669BBC' }} />
+              <span>Documento</span>
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Confirm Dialog */}
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-foreground">¿Estás seguro?</AlertDialogTitle>
-            <AlertDialogDescription className="text-secondary">
+            <AlertDialogTitle style={{ color: '#003049' }}>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogDescription style={{ color: '#669BBC' }}>
               Aceptas los términos y condiciones del especialista y continuar con la contratación.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="text-foreground">
+            <AlertDialogCancel style={{ color: '#003049' }}>
               No, cancelar
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleContratarConfirm}
-              className="bg-accent hover:bg-accent/90 text-accent-foreground"
+              style={{ backgroundColor: '#C1121F', color: '#FFFFFF' }}
             >
               Sí, contratar
             </AlertDialogAction>
