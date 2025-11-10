@@ -21,6 +21,49 @@ export function QuoteCard({ quote, orderId, unreadCount = 0 }: QuoteCardProps) {
     ? specialist.reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / specialist.reviews.length
     : 0;
 
+  const capitalizeWords = (text: string) => {
+    return text
+      .trim()
+      .replace(/\s+/g, ' ')
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
+  const getSpecialistName = () => {
+    const profile = specialist?.profile;
+    
+    if (!profile) return 'Especialista';
+    
+    const { first_name, last_name_paterno, last_name_materno, display_name } = profile;
+    
+    // Priority 1: first_name + last_name_paterno
+    if (first_name && last_name_paterno) {
+      const fullName = `${first_name} ${last_name_paterno}`;
+      return capitalizeWords(fullName);
+    }
+    
+    // Priority 2: first_name + last_name_materno
+    if (first_name && last_name_materno) {
+      const fullName = `${first_name} ${last_name_materno}`;
+      return capitalizeWords(fullName);
+    }
+    
+    // Priority 3: display_name
+    if (display_name) {
+      return capitalizeWords(display_name);
+    }
+    
+    // Priority 4: just first_name
+    if (first_name) {
+      return capitalizeWords(first_name);
+    }
+    
+    // Fallback
+    console.warn('Specialist profile incomplete:', specialist?.id);
+    return 'Especialista';
+  };
+
   const getInitials = (name: string) => {
     return name
       ?.split(' ')
@@ -28,6 +71,11 @@ export function QuoteCard({ quote, orderId, unreadCount = 0 }: QuoteCardProps) {
       .join('')
       .toUpperCase() || '?';
   };
+
+  const specialistName = getSpecialistName();
+  const truncatedName = specialistName.length > 32 
+    ? specialistName.substring(0, 29) + '...' 
+    : specialistName;
 
   const getQuoteSummary = () => {
     const parts = [];
@@ -52,17 +100,17 @@ export function QuoteCard({ quote, orderId, unreadCount = 0 }: QuoteCardProps) {
     >
       <div className="flex gap-4">
         <Avatar className="w-[70px] h-[70px] flex-shrink-0">
-          <AvatarImage src={specialist?.avatar_url} />
+          <AvatarImage src={specialist?.profile?.avatar_url} />
           <AvatarFallback className="bg-secondary text-secondary-foreground text-xl font-semibold">
-            {getInitials(specialist?.user_id || 'Especialista')}
+            {getInitials(specialistName)}
           </AvatarFallback>
         </Avatar>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between mb-2">
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-lg text-foreground mb-1 truncate">
-                {specialist?.user_id || 'Especialista'}
+              <h3 className="font-bold text-lg mb-1 truncate" style={{ color: '#003049' }}>
+                {truncatedName}
               </h3>
               {averageRating > 0 && (
                 <div className="inline-flex items-center gap-1.5 bg-muted px-2.5 py-1 rounded-full">

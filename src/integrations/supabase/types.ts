@@ -94,6 +94,36 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          first_name: string
+          id: string
+          last_name_materno: string | null
+          last_name_paterno: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          first_name: string
+          id: string
+          last_name_materno?: string | null
+          last_name_paterno?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          first_name?: string
+          id?: string
+          last_name_materno?: string | null
+          last_name_paterno?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       quotes: {
         Row: {
           additional_notes: string | null

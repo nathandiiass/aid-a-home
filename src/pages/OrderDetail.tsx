@@ -50,7 +50,13 @@ export default function OrderDetail() {
           *,
           specialist:specialist_profiles(
             *,
-            reviews(rating)
+            reviews(rating),
+            profile:profiles(
+              first_name,
+              last_name_paterno,
+              last_name_materno,
+              display_name
+            )
           )
         `)
         .eq('request_id', id);
