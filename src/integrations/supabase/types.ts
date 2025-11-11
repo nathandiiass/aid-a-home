@@ -96,30 +96,45 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
+          bio: string | null
           created_at: string
+          date_of_birth: string | null
           display_name: string | null
           first_name: string
+          gender: string | null
           id: string
           last_name_materno: string | null
           last_name_paterno: string | null
+          nationality: string | null
           updated_at: string
         }
         Insert: {
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          date_of_birth?: string | null
           display_name?: string | null
           first_name: string
+          gender?: string | null
           id: string
           last_name_materno?: string | null
           last_name_paterno?: string | null
+          nationality?: string | null
           updated_at?: string
         }
         Update: {
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          date_of_birth?: string | null
           display_name?: string | null
           first_name?: string
+          gender?: string | null
           id?: string
           last_name_materno?: string | null
           last_name_paterno?: string | null
+          nationality?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -386,36 +401,90 @@ export type Database = {
           },
         ]
       }
+      specialist_credentials: {
+        Row: {
+          attachment_url: string | null
+          created_at: string
+          description: string | null
+          end_year: number | null
+          expires_at: string | null
+          id: string
+          issued_at: string | null
+          issuer: string
+          specialist_id: string
+          start_year: number | null
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          attachment_url?: string | null
+          created_at?: string
+          description?: string | null
+          end_year?: number | null
+          expires_at?: string | null
+          id?: string
+          issued_at?: string | null
+          issuer: string
+          specialist_id: string
+          start_year?: number | null
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          attachment_url?: string | null
+          created_at?: string
+          description?: string | null
+          end_year?: number | null
+          expires_at?: string | null
+          id?: string
+          issued_at?: string | null
+          issuer?: string
+          specialist_id?: string
+          start_year?: number | null
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       specialist_profiles: {
         Row: {
           created_at: string
           id: string
           id_document_url: string
+          materials_policy: boolean | null
           phone: string
           rfc: string
           status: string
           updated_at: string
           user_id: string
+          warranty_days: number | null
         }
         Insert: {
           created_at?: string
           id?: string
           id_document_url: string
+          materials_policy?: boolean | null
           phone: string
           rfc: string
           status?: string
           updated_at?: string
           user_id: string
+          warranty_days?: number | null
         }
         Update: {
           created_at?: string
           id?: string
           id_document_url?: string
+          materials_policy?: boolean | null
           phone?: string
           rfc?: string
           status?: string
           updated_at?: string
           user_id?: string
+          warranty_days?: number | null
         }
         Relationships: [
           {

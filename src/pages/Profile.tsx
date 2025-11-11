@@ -8,6 +8,9 @@ import { BottomNavSpecialist } from '@/components/BottomNavSpecialist';
 import { supabase } from '@/integrations/supabase/client';
 import { Switch } from '@/components/ui/switch';
 import { useSpecialistMode } from '@/hooks/use-specialist-mode';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PersonalInfoTab } from '@/components/profile/PersonalInfoTab';
+import { CredentialsTab } from '@/components/profile/CredentialsTab';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,6 +29,7 @@ export default function Profile() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSpecialist, setIsSpecialist] = useState(false);
+  const [specialistId, setSpecialistId] = useState<string | null>(null);
   const [checkingSpecialist, setCheckingSpecialist] = useState(true);
   const { isSpecialistMode, toggleSpecialistMode } = useSpecialistMode();
 
@@ -47,6 +51,7 @@ export default function Profile() {
 
       if (error) throw error;
       setIsSpecialist(!!data);
+      setSpecialistId(data?.id || null);
     } catch (error: any) {
       console.error('Error checking specialist status:', error);
     } finally {
@@ -183,26 +188,41 @@ export default function Profile() {
               </AlertDialog>
             </div>
 
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-foreground">Mi cuenta</h2>
-              <div className="border border-border rounded-lg divide-y divide-border">
-                <button className="w-full px-4 py-3 text-left hover:bg-muted/30 transition-colors">
-                  <p className="font-medium text-foreground">Información personal</p>
-                  <p className="text-sm text-secondary">Editar nombre, apellido, fecha de nacimiento</p>
-                </button>
-                <button className="w-full px-4 py-3 text-left hover:bg-muted/30 transition-colors">
-                  <p className="font-medium text-foreground">Configuración</p>
-                  <p className="text-sm text-secondary">Idioma, notificaciones, privacidad</p>
-                </button>
-                <button 
-                  onClick={() => navigate('/locations')}
-                  className="w-full px-4 py-3 text-left hover:bg-muted/30 transition-colors"
-                >
-                  <p className="font-medium text-foreground">Ubicaciones</p>
-                  <p className="text-sm text-secondary">Administra tus direcciones guardadas</p>
-                </button>
+            {isSpecialistMode && isSpecialist && specialistId ? (
+              <Tabs defaultValue="personal" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="personal">Información personal</TabsTrigger>
+                  <TabsTrigger value="credentials">Estudios y certificaciones</TabsTrigger>
+                </TabsList>
+                <TabsContent value="personal" className="mt-6">
+                  <PersonalInfoTab userId={user.id} specialistId={specialistId} />
+                </TabsContent>
+                <TabsContent value="credentials" className="mt-6">
+                  <CredentialsTab specialistId={specialistId} />
+                </TabsContent>
+              </Tabs>
+            ) : (
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold text-foreground">Mi cuenta</h2>
+                <div className="border border-border rounded-lg divide-y divide-border">
+                  <button className="w-full px-4 py-3 text-left hover:bg-muted/30 transition-colors">
+                    <p className="font-medium text-foreground">Información personal</p>
+                    <p className="text-sm text-secondary">Editar nombre, apellido, fecha de nacimiento</p>
+                  </button>
+                  <button className="w-full px-4 py-3 text-left hover:bg-muted/30 transition-colors">
+                    <p className="font-medium text-foreground">Configuración</p>
+                    <p className="text-sm text-secondary">Idioma, notificaciones, privacidad</p>
+                  </button>
+                  <button 
+                    onClick={() => navigate('/locations')}
+                    className="w-full px-4 py-3 text-left hover:bg-muted/30 transition-colors"
+                  >
+                    <p className="font-medium text-foreground">Ubicaciones</p>
+                    <p className="text-sm text-secondary">Administra tus direcciones guardadas</p>
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             {!isSpecialist ? (
               <div className="border border-border rounded-lg p-6 space-y-3">
