@@ -25,12 +25,21 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
 
   const fetchActiveOrders = async () => {
     try {
+      // Get current authenticated user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setOrders([]);
+        setLoading(false);
+        return;
+      }
+
       const { data: allRequests, error } = await supabase
         .from('service_requests')
         .select(`
           *,
           quotes(id, status)
         `)
+        .eq('user_id', user.id)
         .eq('status', 'active')
         .order('created_at', { ascending: false });
 

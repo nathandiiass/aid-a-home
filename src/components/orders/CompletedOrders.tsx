@@ -24,12 +24,21 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
 
   const fetchCompleted = async () => {
     try {
+      // Get current authenticated user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setCompleted([]);
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('service_requests')
         .select(`
           *,
           reviews(rating, comment)
         `)
+        .eq('user_id', user.id)
         .eq('status', 'completed')
         .order('updated_at', { ascending: false });
 
