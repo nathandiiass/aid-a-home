@@ -38,10 +38,13 @@ export default function SpecialistProfile() {
 
   const loadSpecialistData = async () => {
     try {
-      // Load specialist profile
+      const { data: { user } } = await supabase.auth.getUser();
+      const isOwnProfile = user?.id && specialist?.user_id === user.id;
+
+      // Load specialist profile - exclude sensitive fields if not owner
       const { data: specialistData, error: specialistError } = await supabase
         .from('specialist_profiles')
-        .select('*')
+        .select('id, user_id, materials_policy, warranty_days, status, created_at, updated_at')
         .eq('id', specialistId)
         .single();
 
