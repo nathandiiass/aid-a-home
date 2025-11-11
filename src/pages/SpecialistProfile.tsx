@@ -231,160 +231,132 @@ export default function SpecialistProfile() {
       </div>
 
       {/* Hero Section */}
-      <div className="px-4 pt-6 pb-4 text-center bg-gradient-to-b from-background to-card/30">
-        <Avatar className="w-40 h-40 mx-auto mb-4 border-4 shadow-lg" style={{ borderColor: '#669BBC' }}>
-          <AvatarImage src={profile.avatar_url} className="object-cover" />
-          <AvatarFallback style={{ backgroundColor: '#669BBC', color: '#FFFFFF' }} className="text-5xl font-bold">
+      <div className="px-4 pt-8 pb-6 text-center">
+        <Avatar className="w-32 h-32 mx-auto mb-4 border-4" style={{ borderColor: '#669BBC' }}>
+          <AvatarImage src={profile.avatar_url} />
+          <AvatarFallback style={{ backgroundColor: '#669BBC', color: '#FFFFFF' }} className="text-4xl font-bold">
             {getInitials(displayName)}
           </AvatarFallback>
         </Avatar>
-        <div className="flex items-center justify-center gap-2 mb-1">
-          <h2 className="text-2xl font-bold" style={{ color: '#003049' }}>
-            {displayName}
-          </h2>
-          {verifiedStatus && (
-            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: '#669BBC' }}>
-              <span className="text-white text-sm">✓</span>
-            </div>
-          )}
-        </div>
+        <h2 className="text-2xl font-bold mb-2" style={{ color: '#003049' }}>
+          {displayName}
+        </h2>
+        {verifiedStatus && (
+          <Badge style={{ backgroundColor: '#FDF0D5', color: '#003049' }} className="mb-2">
+            ✓ Verificado
+          </Badge>
+        )}
         {workZones.length > 0 && workZones[0]?.cities?.length > 0 && (
-          <p className="text-sm" style={{ color: '#669BBC' }}>
-            {workZones[0].cities[0]}, {workZones[0].state}
+          <p className="text-sm flex items-center justify-center gap-1" style={{ color: '#669BBC' }}>
+            <MapPin className="w-4 h-4" />
+            {workZones[0].cities[0]}
           </p>
         )}
       </div>
 
-      {/* Stats Cards Grid */}
-      <div className="px-4 py-6 bg-card/50">
-        <div className="grid grid-cols-4 gap-3">
-          {/* Verified Badge */}
-          <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-background shadow-sm border" style={{ borderColor: verifiedStatus ? '#669BBC' : '#E0E0E0' }}>
-            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: verifiedStatus ? '#669BBC' : '#E0E0E0' }}>
-              <span className="text-white text-lg">✓</span>
-            </div>
-            <p className="text-[10px] text-center leading-tight" style={{ color: verifiedStatus ? '#003049' : '#999' }}>
-              {verifiedStatus ? 'Verificado' : 'Pendiente'}
-            </p>
-          </div>
-
-          {/* Rating */}
-          <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-background shadow-sm border" style={{ borderColor: '#669BBC' }}>
-            <div className="flex items-center gap-1">
+      {/* Summary Cards */}
+      <div className="px-4 mb-6">
+        <div className="grid grid-cols-2 gap-4">
+          <Card className="p-4 text-center" style={{ borderColor: '#669BBC' }}>
+            <div className="flex items-center justify-center gap-1 mb-1">
               <Star className="w-5 h-5 fill-current" style={{ color: '#C1121F' }} />
-              <span className="text-lg font-bold" style={{ color: '#003049' }}>
+              <span className="text-2xl font-bold" style={{ color: '#003049' }}>
                 {rating > 0 ? rating.toFixed(1) : '—'}
               </span>
             </div>
-            <p className="text-[10px] text-center leading-tight" style={{ color: '#669BBC' }}>
-              Rating
+            <p className="text-xs" style={{ color: '#669BBC' }}>
+              {rating > 0 ? 'Puntuación' : 'Sin calificaciones'}
             </p>
-          </div>
-
-          {/* Reviews */}
-          <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-background shadow-sm border" style={{ borderColor: '#669BBC' }}>
-            <div className="text-lg font-bold" style={{ color: '#003049' }}>
+          </Card>
+          <Card className="p-4 text-center" style={{ borderColor: '#669BBC' }}>
+            <div className="text-2xl font-bold mb-1" style={{ color: '#003049' }}>
               {reviewCount}
             </div>
-            <p className="text-[10px] text-center leading-tight" style={{ color: '#669BBC' }}>
-              Reseñas
-            </p>
-          </div>
-
-          {/* Phone/Contact */}
-          {specialist.phone && (
-            <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-background shadow-sm border" style={{ borderColor: '#669BBC' }}>
-              <Phone className="w-5 h-5" style={{ color: '#669BBC' }} />
-              <p className="text-[10px] text-center leading-tight" style={{ color: '#669BBC' }}>
-                Contacto
-              </p>
-            </div>
-          )}
+            <p className="text-xs" style={{ color: '#669BBC' }}>Reseñas</p>
+          </Card>
         </div>
       </div>
 
-      <div className="px-4 space-y-5 pb-6">
-
-        {/* About / Bio Section */}
-        {(profile.bio || specialist.bio) && (
-          <Card className="p-5 shadow-sm" style={{ borderColor: '#669BBC' }}>
-            <h3 className="font-bold text-base mb-3 uppercase tracking-wide" style={{ color: '#003049' }}>
-              Sobre mí
-            </h3>
-            <p className="text-sm leading-relaxed" style={{ color: '#669BBC' }}>
-              {profile.bio || specialist.bio}
-            </p>
+      <div className="px-4 space-y-6">
+        {/* Contact Info */}
+        {specialist.phone && (
+          <Card className="p-4" style={{ borderColor: '#669BBC' }}>
+            <div className="flex items-center gap-3">
+              <Phone className="w-5 h-5" style={{ color: '#669BBC' }} />
+              <div>
+                <h3 className="font-bold text-sm" style={{ color: '#003049' }}>
+                  Teléfono
+                </h3>
+                <p className="text-sm" style={{ color: '#669BBC' }}>
+                  {specialist.phone}
+                </p>
+              </div>
+            </div>
           </Card>
         )}
 
         {/* Services */}
         {specialties.length > 0 && (
-          <Card className="p-5 shadow-sm" style={{ borderColor: '#669BBC' }}>
-            <h3 className="font-bold text-base mb-4 uppercase tracking-wide" style={{ color: '#003049' }}>
-              Servicios
+          <Card className="p-4" style={{ borderColor: '#669BBC' }}>
+            <h3 className="font-bold text-lg mb-3" style={{ color: '#003049' }}>
+              Servicios que ofrece
             </h3>
-            <div className="space-y-5">
-              {specialties.map((specialty: any, idx: number) => (
-                <div key={specialty.id} className={idx !== 0 ? 'pt-4 border-t border-border/30' : ''}>
-                  <h4 className="font-semibold mb-3 text-sm" style={{ color: '#003049' }}>
-                    {specialty.specialty} · {specialty.role_label}
+            <div className="space-y-4">
+              {specialties.map((specialty: any) => (
+                <div key={specialty.id}>
+                  <h4 className="font-semibold mb-2" style={{ color: '#003049' }}>
+                    {specialty.specialty}
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {specialty.activities?.slice(0, 6).map((activity: any) => (
-                      <div
+                    {specialty.activities?.map((activity: any) => (
+                      <Badge
                         key={activity.id}
-                        className="px-3 py-1.5 rounded-full text-xs border"
-                        style={{ borderColor: '#669BBC', color: '#003049', backgroundColor: '#FDF0D5' }}
+                        variant="outline"
+                        style={{ borderColor: '#669BBC', color: '#003049' }}
                       >
                         {activity.activity}
                         {activity.price_min && activity.price_max && (
-                          <span className="ml-1 font-semibold" style={{ color: '#C1121F' }}>
-                            ${activity.price_min}-${activity.price_max}
+                          <span className="ml-1 text-xs" style={{ color: '#669BBC' }}>
+                            (${activity.price_min}-${activity.price_max})
                           </span>
                         )}
-                      </div>
+                      </Badge>
                     ))}
-                    {specialty.activities?.length > 6 && (
-                      <div className="px-3 py-1.5 text-xs" style={{ color: '#669BBC' }}>
-                        +{specialty.activities.length - 6} más
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}
             </div>
-            <div className="mt-4 pt-4 border-t border-border/30">
-              <p className="text-xs italic" style={{ color: '#669BBC' }}>
-                * Los precios pueden variar según alcance y materiales
-              </p>
-            </div>
+            <p className="text-xs mt-4" style={{ color: '#669BBC' }}>
+              * Los precios pueden variar según alcance y materiales.
+            </p>
           </Card>
         )}
 
+
         {/* Work Zones */}
         {workZones.length > 0 && (
-          <Card className="p-5 shadow-sm" style={{ borderColor: '#669BBC' }}>
+          <Card className="p-4" style={{ borderColor: '#669BBC' }}>
             <div className="flex items-start gap-3">
-              <MapPin className="w-5 h-5 mt-1 flex-shrink-0" style={{ color: '#669BBC' }} />
+              <MapPin className="w-5 h-5 mt-0.5" style={{ color: '#669BBC' }} />
               <div className="flex-1">
-                <h3 className="font-bold text-base mb-4 uppercase tracking-wide" style={{ color: '#003049' }}>
+                <h3 className="font-bold text-lg mb-3" style={{ color: '#003049' }}>
                   Zonas de trabajo
                 </h3>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {workZones.map((zone: any) => (
                     <div key={zone.id}>
-                      <h4 className="font-semibold mb-2 text-sm" style={{ color: '#003049' }}>
+                      <h4 className="font-semibold mb-2" style={{ color: '#003049' }}>
                         {zone.state}
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {zone.cities?.map((city: string, idx: number) => (
-                          <div
+                          <Badge
                             key={idx}
-                            className="px-3 py-1 rounded-full text-xs border"
-                            style={{ borderColor: '#669BBC', color: '#003049', backgroundColor: '#FFFFFF' }}
+                            variant="outline"
+                            style={{ borderColor: '#669BBC', color: '#003049' }}
                           >
                             {city}
-                          </div>
+                          </Badge>
                         ))}
                       </div>
                     </div>
@@ -395,51 +367,26 @@ export default function SpecialistProfile() {
           </Card>
         )}
 
-        {/* Contact Info */}
-        {specialist.phone && (
-          <Card className="p-5 shadow-sm" style={{ borderColor: '#669BBC' }}>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FDF0D5' }}>
-                <Phone className="w-6 h-6" style={{ color: '#669BBC' }} />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-sm mb-1" style={{ color: '#003049' }}>
-                  Teléfono de contacto
-                </h3>
-                <a 
-                  href={`tel:${specialist.phone}`}
-                  className="text-base font-semibold"
-                  style={{ color: '#C1121F' }}
-                >
-                  {specialist.phone}
-                </a>
-              </div>
-            </div>
-          </Card>
-        )}
-
       </div>
 
       {/* Footer Actions */}
       {quoteId && (
-        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4 shadow-lg z-50">
-          <div className="flex gap-3 max-w-screen-lg mx-auto">
-            <Button
-              variant="outline"
-              className="flex-1 h-12 font-semibold"
-              style={{ borderColor: '#669BBC', color: '#003049' }}
-              onClick={() => navigate(`/chat/${quoteId}`)}
-            >
-              Volver al chat
-            </Button>
-            <Button
-              className="flex-1 h-12 font-semibold shadow-md"
-              style={{ backgroundColor: '#C1121F', color: '#FFFFFF' }}
-              onClick={() => setShowConfirmDialog(true)}
-            >
-              Contratar
-            </Button>
-          </div>
+        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4 flex gap-3">
+          <Button
+            variant="outline"
+            className="flex-1"
+            style={{ borderColor: '#669BBC', color: '#003049' }}
+            onClick={() => navigate(`/chat/${quoteId}`)}
+          >
+            Volver al chat
+          </Button>
+          <Button
+            className="flex-1"
+            style={{ backgroundColor: '#C1121F', color: '#FFFFFF' }}
+            onClick={() => setShowConfirmDialog(true)}
+          >
+            Contratar
+          </Button>
         </div>
       )}
 
