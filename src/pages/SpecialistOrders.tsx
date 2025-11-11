@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/card';
 import { ArrowUpDown } from 'lucide-react';
 import { InProgressOrderCard } from '@/components/specialist/InProgressOrderCard';
 import { CompletedOrderCard } from '@/components/specialist/CompletedOrderCard';
+import { SentQuoteCard } from '@/components/specialist/SentQuoteCard';
 import { useSpecialistMode } from '@/hooks/use-specialist-mode';
 
 export default function SpecialistOrders() {
@@ -22,6 +23,7 @@ export default function SpecialistOrders() {
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'en-curso');
   const [inProgressOrders, setInProgressOrders] = useState<any[]>([]);
   const [completedOrders, setCompletedOrders] = useState<any[]>([]);
+  const [sentQuotes, setSentQuotes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('date_desc');
   const [specialistProfile, setSpecialistProfile] = useState<any>(null);
@@ -131,8 +133,39 @@ export default function SpecialistOrders() {
 
       if (completedError) throw completedError;
 
+      // Get all sent quotes
+      const { data: sentData, error: sentError } = await supabase
+        .from('quotes')
+        .select(`
+          id,
+          price_fixed,
+          price_min,
+          price_max,
+          proposed_date,
+          proposed_time_start,
+          proposed_time_end,
+          status,
+          created_at,
+          request:service_requests!inner(
+            id,
+            activity,
+            category,
+            user_id,
+            location:locations(
+              neighborhood,
+              city,
+              state
+            )
+          )
+        `)
+        .eq('specialist_id', profile.id)
+        .order('created_at', { ascending: false });
+
+      if (sentError) throw sentError;
+
       setInProgressOrders(inProgressData || []);
       setCompletedOrders(completedData || []);
+      setSentQuotes(sentData || []);
     } catch (error: any) {
       console.error('Error loading orders:', error);
       toast({
@@ -167,6 +200,7 @@ export default function SpecialistOrders() {
 
   const sortedInProgress = sortOrders(inProgressOrders);
   const sortedCompleted = sortOrders(completedOrders);
+  const sortedSent = sortOrders(sentQuotes);
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -187,9 +221,10 @@ export default function SpecialistOrders() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="en-curso">En curso</TabsTrigger>
             <TabsTrigger value="completadas">Completadas</TabsTrigger>
+            <TabsTrigger value="enviadas">Enviadas</TabsTrigger>
           </TabsList>
 
           <TabsContent value="en-curso" className="space-y-4">
@@ -216,6 +251,18 @@ export default function SpecialistOrders() {
             ) : (
               sortedCompleted.map((order) => (
                 <CompletedOrderCard key={order.id} order={order} />
+              ))
+            )}
+          </TabsContent>
+
+          <TabsContent value="enviadas" className="space-y-4">
+            {sortedSent.length === 0 ? (
+              <Card className="p-8 text-center">
+                <p className="text-muted-foreground">No has enviado cotizaciones</p>
+              </Card>
+            ) : (
+              sortedSent.map((quote) => (
+                <SentQuoteCard key={quote.id} quote={quote} />
               ))
             )}
           </TabsContent>
