@@ -62,11 +62,13 @@ export function CompleteOrderDialog({ open, onOpenChange, order, onComplete }: C
 
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
+        const { data, error: urlError } = await supabase.storage
           .from('specialist-documents')
-          .getPublicUrl(fileName);
+          .createSignedUrl(fileName, 31536000); // 1 year expiry
 
-        photoUrls.push(publicUrl);
+        if (urlError) throw urlError;
+
+        photoUrls.push(data.signedUrl);
       }
 
       // Update quote with final data (status remains 'accepted' for now)

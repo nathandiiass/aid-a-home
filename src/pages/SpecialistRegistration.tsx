@@ -222,9 +222,11 @@ export default function SpecialistRegistration() {
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
+      const { data, error: urlError } = await supabase.storage
         .from('specialist-documents')
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 31536000); // 1 year expiry
+
+      if (urlError) throw urlError;
 
       // Create specialist profile
       const { data: profile, error: profileError } = await supabase
@@ -233,7 +235,7 @@ export default function SpecialistRegistration() {
           user_id: user!.id,
           phone: personalData.phone,
           rfc: personalData.rfc,
-          id_document_url: publicUrl
+          id_document_url: data.signedUrl
         }])
         .select()
         .single();

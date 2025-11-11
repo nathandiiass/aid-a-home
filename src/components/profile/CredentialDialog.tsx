@@ -126,11 +126,13 @@ export function CredentialDialog({
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
+      const { data, error: urlError } = await supabase.storage
         .from('specialist-documents')
-        .getPublicUrl(filePath);
+        .createSignedUrl(filePath, 31536000); // 1 year expiry
 
-      handleInputChange('attachment_url', publicUrl);
+      if (urlError) throw urlError;
+
+      handleInputChange('attachment_url', data.signedUrl);
       
       toast({
         title: 'Éxito',

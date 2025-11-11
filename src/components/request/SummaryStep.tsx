@@ -71,11 +71,13 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
 
           if (uploadError) throw uploadError;
 
-          const { data: { publicUrl } } = supabase.storage
+          const { data, error: urlError } = await supabase.storage
             .from('specialist-documents')
-            .getPublicUrl(fileName);
+            .createSignedUrl(fileName, 31536000); // 1 year expiry
 
-          return publicUrl;
+          if (urlError) throw urlError;
+
+          return data.signedUrl;
         });
 
         evidenceUrls = await Promise.all(uploadPromises);
