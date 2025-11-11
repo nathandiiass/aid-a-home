@@ -8,64 +8,51 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* LAZO Brand Colors - Neutrals */
     --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
-    
+    --foreground: 200 100% 14%;
+
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
-    
+    --card-foreground: 200 100% 14%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
-    
-    /* LAZO Brand Colors - Primary (Blue) */
-    --primary: 217 100% 61%;
+    --popover-foreground: 200 100% 14%;
+
+    --primary: 0 100% 24%;
     --primary-foreground: 0 0% 100%;
-    
-    /* LAZO Brand Colors - Secondary (Turquoise) */
-    --secondary: 176 57% 46%;
+
+    --secondary: 199 52% 57%;
     --secondary-foreground: 0 0% 100%;
-    
-    /* LAZO Brand Colors - Muted (Cream) */
-    --muted: 45 85% 91%;
-    --muted-foreground: 0 0% 20%;
-    
-    /* LAZO Brand Colors - Accent (Salmon) */
-    --accent: 14 100% 71%;
+
+    --muted: 45 100% 91%;
+    --muted-foreground: 200 100% 14%;
+
+    --accent: 354 83% 42%;
     --accent-foreground: 0 0% 100%;
-    
-    /* Destructive */
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
+
+    --border: 200 100% 14% / 0.1;
+    --input: 199 52% 57% / 0.2;
+    --ring: 354 83% 42%;
+
+    --radius: 1.25rem;
+
+    /* Category colors */
+    --category-jardines: 199 52% 57%;
+    --category-plomeria: 354 83% 42%;
+    --category-electricidad: 200 100% 14%;
+    --category-pintura: 0 100% 24%;
+    --category-limpieza: 45 100% 91%;
+    --category-carpinteria: 199 52% 57%;
+    --category-cerrajeria: 354 83% 42%;
+    --category-soldadura: 200 100% 14%;
+    --category-mecanica: 0 100% 24%;
+    --category-albercas: 199 52% 57%;
     
-    /* LAZO Brand Colors - Gray Scale */
-    --gray-dark: 0 0% 20%;
-    --gray-medium: 0 0% 47%;
-    --gray-light: 0 0% 90%;
-    
-    /* Borders & Inputs */
-    --border: 0 0% 90%;
-    --border-subtle: 0 0% 0% / 0.1;
-    --input: 176 57% 46% / 0.2;
-    --ring: 217 100% 61%;
-    
-    --radius: 1rem;
-    
-    /* Category colors - Updated to LAZO palette */
-    --category-jardines: 176 57% 46%;
-    --category-plomeria: 217 100% 61%;
-    --category-electricidad: 14 100% 71%;
-    --category-pintura: 176 57% 46%;
-    --category-limpieza: 45 85% 91%;
-    --category-carpinteria: 217 100% 61%;
-    --category-cerrajeria: 14 100% 71%;
-    --category-soldadura: 0 0% 20%;
-    --category-mecanica: 176 57% 46%;
-    --category-albercas: 217 100% 61%;
-    
-    /* Shadows - LAZO style */
-    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.05);
-    --shadow-subtle: 0 1px 4px rgba(0, 0, 0, 0.05);
+    /* Shadows */
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --shadow-subtle: 0 1px 4px rgba(0, 0, 0, 0.08);
     
     /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

@@ -13,12 +13,6 @@ export default {
       },
     },
     extend: {
-      fontFamily: {
-        'museo': ['"Museo Moderno"', 'sans-serif'],
-        'roboto': ['Roboto', 'sans-serif'],
-        'sans': ['Roboto', 'sans-serif'],
-        'heading': ['"Museo Moderno"', 'sans-serif'],
-      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -64,11 +58,6 @@ export default {
           soldadura: "hsl(var(--category-soldadura))",
           mecanica: "hsl(var(--category-mecanica))",
           albercas: "hsl(var(--category-albercas))",
-        },
-        gray: {
-          dark: "hsl(var(--gray-dark))",
-          medium: "hsl(var(--gray-medium))",
-          light: "hsl(var(--gray-light))",
         },
       },
       boxShadow: {

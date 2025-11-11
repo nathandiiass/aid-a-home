@@ -11,7 +11,6 @@ import { useSpecialistMode } from '@/hooks/use-specialist-mode';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PersonalInfoTab } from '@/components/profile/PersonalInfoTab';
 import { CredentialsTab } from '@/components/profile/CredentialsTab';
-import { Logo } from '@/components/Logo';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -87,11 +86,8 @@ export default function Profile() {
         {!user ? (
           // Not logged in view
           <div className="space-y-6">
-            <div className="flex items-center gap-3 mb-6">
-              <Logo size="md" />
-            </div>
             <div>
-              <h1 className="text-3xl font-heading font-bold text-foreground mb-2">Tu cuenta</h1>
+              <h1 className="text-3xl font-bold text-foreground mb-2">Tu cuenta</h1>
               <p className="text-secondary">
                 Inicia sesión para guardar tus solicitudes, ver cotizaciones y registrar servicios.
               </p>
@@ -142,11 +138,8 @@ export default function Profile() {
         ) : (
           // Logged in view
           <div className="space-y-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Logo size="md" />
-            </div>
             <div>
-              <h1 className="text-3xl font-heading font-bold text-foreground mb-2">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
                 {user.user_metadata?.first_name || 'Usuario'}
               </h1>
               <p className="text-secondary">{user.email}</p>
