@@ -29,7 +29,7 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
         .from('service_requests')
         .select(`
           *,
-          quotes(count, status)
+          quotes(id, status)
         `)
         .eq('status', 'active')
         .order('created_at', { ascending: false });
@@ -88,7 +88,7 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
             <Badge 
               className="absolute top-3 right-3 bg-accent text-accent-foreground rounded-full px-2 py-1"
             >
-              {order.quotes[0].count}
+              {order.quotes.length}
             </Badge>
           )}
           
