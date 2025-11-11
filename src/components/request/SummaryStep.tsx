@@ -61,7 +61,12 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
       // Upload evidence files to storage if any
       let evidenceUrls: string[] = [];
       if (data.evidence && data.evidence.length > 0) {
-        const uploadPromises = data.evidence.map(async (file, index) => {
+        // Filter out any undefined or invalid files
+        const validFiles = data.evidence.filter((file): file is File => 
+          file instanceof File && file.name && file.size > 0
+        );
+
+        const uploadPromises = validFiles.map(async (file, index) => {
           const fileExt = file.name.split('.').pop();
           const fileName = `${user.id}/${Date.now()}_${index}.${fileExt}`;
           
@@ -262,10 +267,10 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
             <div>
               <p className="font-medium mb-1">Evidencias</p>
               <p className="text-muted-foreground">
-                {data.evidence.length > 0
-                  ? `${data.evidence.length} archivo${
-                      data.evidence.length !== 1 ? "s" : ""
-                    } adjunto${data.evidence.length !== 1 ? "s" : ""}`
+                {data.evidence.filter((file): file is File => file instanceof File).length > 0
+                  ? `${data.evidence.filter((file): file is File => file instanceof File).length} archivo${
+                      data.evidence.filter((file): file is File => file instanceof File).length !== 1 ? "s" : ""
+                    } adjunto${data.evidence.filter((file): file is File => file instanceof File).length !== 1 ? "s" : ""}`
                   : "Sin archivos"}
               </p>
             </div>
