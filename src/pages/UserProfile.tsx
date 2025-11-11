@@ -18,7 +18,7 @@ export default function UserProfile() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, first_name, last_name_paterno, last_name_materno, display_name, avatar_url, date_of_birth, gender, nationality, bio, created_at, updated_at")
+        .select("*")
         .eq("id", userId)
         .single();
 

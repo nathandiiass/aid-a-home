@@ -39,9 +39,8 @@ export default function SpecialistProfile() {
   const loadSpecialistData = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      const isOwnProfile = user?.id && specialist?.user_id === user.id;
 
-      // Load specialist profile - exclude sensitive fields if not owner
+      // Load specialist profile - RLS will handle access control
       const { data: specialistData, error: specialistError } = await supabase
         .from('specialist_profiles')
         .select('id, user_id, materials_policy, warranty_days, status, created_at, updated_at')
@@ -281,22 +280,7 @@ export default function SpecialistProfile() {
       </div>
 
       <div className="px-4 space-y-6">
-        {/* Contact Info */}
-        {specialist.phone && (
-          <Card className="p-4" style={{ borderColor: '#669BBC' }}>
-            <div className="flex items-center gap-3">
-              <Phone className="w-5 h-5" style={{ color: '#669BBC' }} />
-              <div>
-                <h3 className="font-bold text-sm" style={{ color: '#003049' }}>
-                  Teléfono
-                </h3>
-                <p className="text-sm" style={{ color: '#669BBC' }}>
-                  {specialist.phone}
-                </p>
-              </div>
-            </div>
-          </Card>
-        )}
+        {/* Contact Info removed - phone is sensitive PII not accessible to non-owners */}
 
         {/* Services */}
         {specialties.length > 0 && (

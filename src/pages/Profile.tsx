@@ -32,7 +32,7 @@ export default function Profile() {
   const [isSpecialist, setIsSpecialist] = useState(false);
   const [specialistId, setSpecialistId] = useState<string | null>(null);
   const [checkingSpecialist, setCheckingSpecialist] = useState(true);
-  const { isSpecialistMode, toggleSpecialistMode } = useSpecialistMode();
+  const { isSpecialistMode, toggleSpecialistMode, isLoading: roleLoading } = useSpecialistMode();
 
   useEffect(() => {
     if (user) {
@@ -73,7 +73,7 @@ export default function Profile() {
     }
   };
 
-  if (loading || checkingSpecialist) {
+  if (loading || checkingSpecialist || roleLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-foreground">Cargando...</div>

@@ -6,39 +6,42 @@ export const useSpecialistMode = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkSpecialistRole = async () => {
+    checkSpecialistRole();
+  }, []);
+
+  const checkSpecialistRole = async () => {
+    try {
       const { data: { user } } = await supabase.auth.getUser();
-      
       if (!user) {
         setIsSpecialistMode(false);
         setIsLoading(false);
         return;
       }
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', user.id)
         .eq('role', 'specialist')
         .maybeSingle();
 
+      if (error) throw error;
       setIsSpecialistMode(!!data);
+    } catch (error) {
+      console.error('Error checking specialist role:', error);
+      setIsSpecialistMode(false);
+    } finally {
       setIsLoading(false);
-    };
-
-    checkSpecialistRole();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      checkSpecialistRole();
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+    }
+  };
 
   const toggleSpecialistMode = (value: boolean) => {
-    // This is now UI-only for switching between views
-    // Actual role must exist in database
-    setIsSpecialistMode(value);
+    // Only allow toggling if user has specialist role
+    if (value) {
+      checkSpecialistRole();
+    } else {
+      setIsSpecialistMode(false);
+    }
   };
 
   return { isSpecialistMode, toggleSpecialistMode, isLoading };
