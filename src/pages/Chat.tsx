@@ -48,8 +48,8 @@ export default function Chat() {
         .from('quotes')
         .select(`
           *,
-          specialist:specialist_profiles(*, profiles!specialist_profiles_user_id_fkey(*)),
-          request:service_requests(*, profiles!service_requests_user_id_fkey(*))
+          specialist:specialist_profiles(*),
+          request:service_requests(*)
         `)
         .eq('id', quoteId)
         .single();
@@ -57,12 +57,30 @@ export default function Chat() {
       if (quoteError) throw quoteError;
       setQuote(quoteData);
 
-      // Store specialist and user profiles
-      if (quoteData.specialist?.profiles) {
-        setSpecialistProfile(quoteData.specialist.profiles);
+      // Load specialist profile
+      if (quoteData.specialist?.user_id) {
+        const { data: specialistProfileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', quoteData.specialist.user_id)
+          .single();
+        
+        if (specialistProfileData) {
+          setSpecialistProfile(specialistProfileData);
+        }
       }
-      if (quoteData.request?.profiles) {
-        setUserProfile(quoteData.request.profiles);
+
+      // Load user profile
+      if (quoteData.request?.user_id) {
+        const { data: userProfileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', quoteData.request.user_id)
+          .single();
+        
+        if (userProfileData) {
+          setUserProfile(userProfileData);
+        }
       }
 
       // Load messages
