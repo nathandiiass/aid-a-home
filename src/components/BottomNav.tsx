@@ -41,12 +41,12 @@ export const BottomNav = () => {
               className={cn(
                 "flex flex-col items-center justify-center gap-1 flex-1 py-2 transition-colors",
                 isActive 
-                  ? "text-accent" 
-                  : "text-secondary/70 hover:text-secondary"
+                  ? "text-primary" 
+                  : "text-gray-medium hover:text-gray-dark"
               )}
             >
               <Icon className="w-6 h-6" />
-              <span className="text-xs font-medium">{item.label}</span>
+              <span className="text-xs font-medium font-roboto">{item.label}</span>
             </button>
           );
         })}

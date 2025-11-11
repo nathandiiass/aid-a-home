@@ -4,6 +4,7 @@ import { Leaf, Wrench, Zap, Paintbrush, Sparkles, Hammer, Lock, Flame, Car, Drop
 import { useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/BottomNav";
 import { InProgressWorks } from "@/components/InProgressWorks";
+import { Logo } from "@/components/Logo";
 
 const categories = [
   { name: "Jardinería", icon: Leaf, color: "bg-category-jardines", textColor: "text-white", requests: "12,356", especialista: "Jardinero", actividad: "Mantenimiento de jardín" },
@@ -29,11 +30,14 @@ const Index = () => {
     <div className="min-h-screen bg-background pb-20">
       {/* Header with search */}
       <div className="container max-w-2xl mx-auto px-4 py-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Aid a Home</h1>
-          <p className="text-muted-foreground text-sm">
-            Encuentra especialistas para tus servicios domésticos
-          </p>
+        <div className="mb-6 flex items-center gap-4">
+          <Logo size="lg" />
+          <div>
+            <h1 className="text-2xl font-heading font-bold text-foreground">LAZO</h1>
+            <p className="text-gray-medium text-sm font-roboto">
+              Encuentra especialistas para tus servicios domésticos
+            </p>
+          </div>
         </div>
         
         <ServiceSearch />
@@ -46,7 +50,7 @@ const Index = () => {
 
       {/* Popular categories */}
       <div className="container max-w-2xl mx-auto px-4 pb-8">
-        <h2 className="text-base font-semibold text-foreground mb-4">
+        <h2 className="text-base font-heading font-semibold text-foreground mb-4">
           Categorías populares
         </h2>
         
@@ -84,8 +88,8 @@ const Index = () => {
 
         {/* Info card */}
         <Card className="mt-8 p-6 bg-muted border border-border shadow-subtle">
-          <h3 className="font-semibold text-foreground mb-3">¿Cómo funciona?</h3>
-          <ol className="space-y-2 text-sm text-muted-foreground">
+          <h3 className="font-heading font-semibold text-foreground mb-3">¿Cómo funciona?</h3>
+          <ol className="space-y-2 text-sm text-gray-dark font-roboto">
             <li>1. Busca el servicio que necesitas</li>
             <li>2. Completa los detalles de tu solicitud</li>
             <li>3. Recibe cotizaciones de especialistas</li>
