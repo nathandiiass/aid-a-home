@@ -233,6 +233,13 @@ export type Database = {
             referencedRelation: "specialist_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "quotes_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: false
+            referencedRelation: "specialist_profiles_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       reviews: {
@@ -276,6 +283,13 @@ export type Database = {
             columns: ["specialist_id"]
             isOneToOne: false
             referencedRelation: "specialist_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: false
+            referencedRelation: "specialist_profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -526,6 +540,13 @@ export type Database = {
             referencedRelation: "specialist_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "specialist_specialties_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: false
+            referencedRelation: "specialist_profiles_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       specialist_work_zones: {
@@ -558,6 +579,13 @@ export type Database = {
             referencedRelation: "specialist_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "specialist_work_zones_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: false
+            referencedRelation: "specialist_profiles_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -583,7 +611,44 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      specialist_profiles_public: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          materials_policy: boolean | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+          warranty_days: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          materials_policy?: boolean | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          warranty_days?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          materials_policy?: boolean | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          warranty_days?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "specialist_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       has_role: {
