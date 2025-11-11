@@ -12,6 +12,7 @@ import { InProgressOrderCard } from '@/components/specialist/InProgressOrderCard
 import { CompletedOrderCard } from '@/components/specialist/CompletedOrderCard';
 import { SentQuoteCard } from '@/components/specialist/SentQuoteCard';
 import { useSpecialistMode } from '@/hooks/use-specialist-mode';
+import { Logo } from '@/components/Logo';
 
 export default function SpecialistOrders() {
   const { user, loading: authLoading } = useAuth();
@@ -204,6 +205,7 @@ export default function SpecialistOrders() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
+      <Logo className="pt-4 pb-2" />
       <div className="container max-w-4xl mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold mb-6" style={{ color: '#003049' }}>Órdenes</h1>
 

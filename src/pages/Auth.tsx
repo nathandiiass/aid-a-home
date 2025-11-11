@@ -13,6 +13,7 @@ import {
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { Mail, ArrowLeft } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 
 export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -108,6 +109,7 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
+      <Logo className="pt-4 pb-2" />
       <div className="max-w-md mx-auto p-6">
         <button
           onClick={() => navigate('/')}

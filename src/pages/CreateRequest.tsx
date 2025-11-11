@@ -8,6 +8,7 @@ import DateTimeStep from "@/components/request/DateTimeStep";
 import LocationStep from "@/components/request/LocationStep";
 import EvidenceStep from "@/components/request/EvidenceStep";
 import SummaryStep from "@/components/request/SummaryStep";
+import { Logo } from "@/components/Logo";
 
 export interface RequestData {
   especialista: string;
@@ -80,6 +81,8 @@ const CreateRequest = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20">
+      <Logo className="pt-4 pb-2" />
+      
       {/* Header */}
       <div className="sticky top-0 z-10 bg-card border-b border-border">
         <div className="container max-w-2xl mx-auto px-4 py-4">

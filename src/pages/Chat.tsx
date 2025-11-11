@@ -14,6 +14,7 @@ import { ArrowLeft, Send, Paperclip, Clock, DollarSign, Package, FileText, Ban, 
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import confetti from 'canvas-confetti';
+import { Logo } from '@/components/Logo';
 
 export default function Chat() {
   const { quoteId } = useParams();
@@ -432,6 +433,8 @@ export default function Chat() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <Logo className="pt-4 pb-2" />
+      
       {/* Fixed App Bar */}
       <div className="sticky top-0 z-50 bg-card border-b border-border px-4 py-3 flex items-center gap-3 shadow-sm">
         <Button

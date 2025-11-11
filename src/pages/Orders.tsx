@@ -10,6 +10,7 @@ import { Search, Filter } from 'lucide-react';
 import { ActiveOrders } from '@/components/orders/ActiveOrders';
 import { DraftOrders } from '@/components/orders/DraftOrders';
 import { CompletedOrders } from '@/components/orders/CompletedOrders';
+import { Logo } from '@/components/Logo';
 
 export default function Orders() {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ export default function Orders() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
+      <Logo className="pt-4 pb-2" />
       <div className="container max-w-4xl mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold text-foreground mb-6">Órdenes</h1>
         

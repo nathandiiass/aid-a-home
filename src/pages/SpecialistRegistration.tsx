@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Logo } from '@/components/Logo';
 import {
   Select,
   SelectContent,
@@ -321,6 +322,8 @@ export default function SpecialistRegistration() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
+      <Logo className="pt-4 pb-2" />
+      
       {/* Header */}
       <div className="sticky top-0 z-10 bg-card border-b border-border">
         <div className="max-w-2xl mx-auto px-4 py-4">

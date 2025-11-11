@@ -2,12 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Logo } from "@/components/Logo";
 
 const Inbox = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
+      <Logo className="pt-4 pb-2" />
       <div className="container max-w-2xl mx-auto px-4 py-6">
         <div className="flex items-center gap-4 mb-6">
           <Button

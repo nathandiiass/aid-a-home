@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Calendar, Clock, MapPin, DollarSign } from 'lucide-react';
 import { useSpecialistMode } from '@/hooks/use-specialist-mode';
+import { Logo } from '@/components/Logo';
 
 interface ServiceRequest {
   id: string;
@@ -126,6 +127,7 @@ export default function SpecialistHome() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
+      <Logo className="pt-4 pb-2" />
       <div className="max-w-lg mx-auto p-6 space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground mb-2">Solicitudes</h1>

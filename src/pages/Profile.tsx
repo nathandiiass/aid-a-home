@@ -23,6 +23,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
+import { Logo } from '@/components/Logo';
 
 export default function Profile() {
   const { user, signOut, loading } = useAuth();
@@ -82,6 +83,7 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
+      <Logo className="pt-4 pb-2" />
       <div className="max-w-lg mx-auto p-6">
         {!user ? (
           // Not logged in view

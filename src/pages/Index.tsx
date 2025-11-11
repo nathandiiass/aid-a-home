@@ -4,6 +4,7 @@ import { Leaf, Wrench, Zap, Paintbrush, Sparkles, Hammer, Lock, Flame, Car, Drop
 import { useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/BottomNav";
 import { InProgressWorks } from "@/components/InProgressWorks";
+import { Logo } from "@/components/Logo";
 
 const categories = [
   { name: "Jardinería", icon: Leaf, color: "bg-category-jardines", textColor: "text-white", requests: "12,356", especialista: "Jardinero", actividad: "Mantenimiento de jardín" },
@@ -27,6 +28,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20">
+      {/* Logo */}
+      <Logo className="pt-4 pb-2" />
+      
       {/* Header with search */}
       <div className="container max-w-2xl mx-auto px-4 py-6">
         <div className="mb-6">
