@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
+import { useSpecialistMode } from '@/hooks/use-specialist-mode';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -18,9 +19,12 @@ export default function Chat() {
   const { quoteId } = useParams();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { isSpecialistMode } = useSpecialistMode();
   const { toast } = useToast();
   const [messages, setMessages] = useState<any[]>([]);
   const [quote, setQuote] = useState<any>(null);
+  const [specialistProfile, setSpecialistProfile] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [newMessage, setNewMessage] = useState('');
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -44,14 +48,22 @@ export default function Chat() {
         .from('quotes')
         .select(`
           *,
-          specialist:specialist_profiles(*),
-          request:service_requests(*)
+          specialist:specialist_profiles(*, user:profiles(*)),
+          request:service_requests(*, user:profiles(*))
         `)
         .eq('id', quoteId)
         .single();
 
       if (quoteError) throw quoteError;
       setQuote(quoteData);
+
+      // Store specialist and user profiles
+      if (quoteData.specialist?.user) {
+        setSpecialistProfile(quoteData.specialist.user);
+      }
+      if (quoteData.request?.user) {
+        setUserProfile(quoteData.request.user);
+      }
 
       // Load messages
       const { data: messagesData, error: messagesError } = await supabase
@@ -147,6 +159,43 @@ export default function Chat() {
       .join('')
       .toUpperCase() || 'E';
   };
+
+  const getDisplayName = (profile: any) => {
+    if (!profile) return 'Usuario';
+    
+    const firstName = profile.first_name || '';
+    const lastNamePaterno = profile.last_name_paterno || '';
+    const lastNameMaterno = profile.last_name_materno || '';
+    
+    // Capitalize first letter of each word
+    const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    
+    // Try: Nombre + Apellido Paterno
+    if (firstName && lastNamePaterno) {
+      return `${capitalize(firstName)} ${capitalize(lastNamePaterno)}`;
+    }
+    
+    // Fallback: Nombre + Apellido Materno
+    if (firstName && lastNameMaterno) {
+      return `${capitalize(firstName)} ${capitalize(lastNameMaterno)}`;
+    }
+    
+    // Fallback: display_name
+    if (profile.display_name) {
+      return profile.display_name;
+    }
+    
+    // Fallback: just first name
+    if (firstName) {
+      return capitalize(firstName);
+    }
+    
+    return 'Usuario';
+  };
+
+  // Determine who the interlocutor is based on mode
+  const interlocutorProfile = isSpecialistMode ? userProfile : specialistProfile;
+  const interlocutorName = getDisplayName(interlocutorProfile);
 
   const handleFileSelect = (type: 'camera' | 'gallery' | 'document') => {
     setShowAttachMenu(false);
@@ -376,37 +425,40 @@ export default function Chat() {
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <Avatar className="w-12 h-12 flex-shrink-0">
-          <AvatarImage src={quote.specialist?.avatar_url} />
+          <AvatarImage src={interlocutorProfile?.avatar_url} />
           <AvatarFallback style={{ backgroundColor: '#669BBC', color: '#FFFFFF' }} className="font-semibold">
-            {getInitials(quote.specialist?.user_id || 'Especialista')}
+            {getInitials(interlocutorName)}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
           <h2 className="font-bold truncate" style={{ color: '#003049' }}>
-            {quote.specialist?.user_id || 'Especialista'}
+            {interlocutorName}
           </h2>
           <p className="text-xs" style={{ color: '#669BBC' }}>En línea</p>
         </div>
-        <Button 
-          size="sm"
-          onClick={() => setShowConfirmDialog(true)}
-          className="flex-shrink-0"
-          style={{ backgroundColor: '#C1121F', color: '#FFFFFF' }}
-        >
-          Contratar
-        </Button>
+        {!isSpecialistMode && (
+          <Button 
+            size="sm"
+            onClick={() => setShowConfirmDialog(true)}
+            className="flex-shrink-0"
+            style={{ backgroundColor: '#C1121F', color: '#FFFFFF' }}
+          >
+            Contratar
+          </Button>
+        )}
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4 pb-24">
         {messages.map((message, index) => {
-          const isOwnMessage = message.sender_id === user?.id;
+          // Determine if message is from specialist
+          const isSpecialistMessage = message.sender_id === quote.specialist?.user_id;
           const quoteContent = renderQuoteMessage(message.content);
           
           return (
             <div
               key={message.id}
-              className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} animate-fade-in`}
+              className={`flex ${isSpecialistMessage ? 'justify-start' : 'justify-end'} animate-fade-in`}
               style={{ animationDelay: `${index * 50}ms` }}
             >
               {quoteContent ? (
@@ -417,21 +469,21 @@ export default function Chat() {
                   </p>
                 </div>
               ) : (
-                <div className={`relative max-w-[80%] ${isOwnMessage ? 'ml-12' : 'mr-12'}`}>
+                <div className={`relative max-w-[80%] ${isSpecialistMessage ? 'mr-12' : 'ml-12'}`}>
                   <Card
                     className={`px-4 py-3 shadow-sm border ${
-                      isOwnMessage
-                        ? 'rounded-2xl rounded-tr-sm'
-                        : 'rounded-2xl rounded-tl-sm'
+                      isSpecialistMessage
+                        ? 'rounded-2xl rounded-tl-sm'
+                        : 'rounded-2xl rounded-tr-sm'
                     }`}
-                    style={isOwnMessage ? {
-                      backgroundColor: '#003049',
-                      color: '#FFFFFF',
-                      borderColor: '#003049'
-                    } : {
+                    style={isSpecialistMessage ? {
                       backgroundColor: '#FFFFFF',
                       color: '#003049',
                       borderColor: '#669BBC'
+                    } : {
+                      backgroundColor: '#003049',
+                      color: '#FFFFFF',
+                      borderColor: '#003049'
                     }}
                   >
                     <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
@@ -441,18 +493,18 @@ export default function Chat() {
                   </Card>
                   {/* WhatsApp-style tail */}
                   <div 
-                    className={`absolute bottom-0 ${isOwnMessage ? 'right-0 -mr-2' : 'left-0 -ml-2'}`}
+                    className={`absolute bottom-0 ${isSpecialistMessage ? 'left-0 -ml-2' : 'right-0 -mr-2'}`}
                     style={{
                       width: 0,
                       height: 0,
                       borderStyle: 'solid',
-                      ...(isOwnMessage ? {
-                        borderWidth: '0 0 12px 12px',
-                        borderColor: `transparent transparent #003049 transparent`
-                      } : {
+                      ...(isSpecialistMessage ? {
                         borderWidth: '0 12px 12px 0',
                         borderColor: `transparent #FFFFFF transparent transparent`,
                         filter: 'drop-shadow(-1px 0px 0px #669BBC)'
+                      } : {
+                        borderWidth: '0 0 12px 12px',
+                        borderColor: `transparent transparent #003049 transparent`
                       })
                     }}
                   />
