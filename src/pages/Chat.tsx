@@ -48,8 +48,8 @@ export default function Chat() {
         .from('quotes')
         .select(`
           *,
-          specialist:specialist_profiles(*, user:profiles(*)),
-          request:service_requests(*, user:profiles(*))
+          specialist:specialist_profiles(*, profiles!specialist_profiles_user_id_fkey(*)),
+          request:service_requests(*, profiles!service_requests_user_id_fkey(*))
         `)
         .eq('id', quoteId)
         .single();
@@ -58,11 +58,11 @@ export default function Chat() {
       setQuote(quoteData);
 
       // Store specialist and user profiles
-      if (quoteData.specialist?.user) {
-        setSpecialistProfile(quoteData.specialist.user);
+      if (quoteData.specialist?.profiles) {
+        setSpecialistProfile(quoteData.specialist.profiles);
       }
-      if (quoteData.request?.user) {
-        setUserProfile(quoteData.request.user);
+      if (quoteData.request?.profiles) {
+        setUserProfile(quoteData.request.profiles);
       }
 
       // Load messages
