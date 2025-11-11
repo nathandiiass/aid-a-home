@@ -10,6 +10,7 @@ import { Search, Filter } from 'lucide-react';
 import { ActiveOrders } from '@/components/orders/ActiveOrders';
 import { DraftOrders } from '@/components/orders/DraftOrders';
 import { CompletedOrders } from '@/components/orders/CompletedOrders';
+import { ReceivedQuotes } from '@/components/orders/ReceivedQuotes';
 
 export default function Orders() {
   const navigate = useNavigate();
@@ -58,9 +59,10 @@ export default function Orders() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full grid grid-cols-3 mb-6">
+          <TabsList className="w-full grid grid-cols-4 mb-6">
             <TabsTrigger value="active">Activas</TabsTrigger>
             <TabsTrigger value="draft">Por activar</TabsTrigger>
+            <TabsTrigger value="received">Enviadas</TabsTrigger>
             <TabsTrigger value="completed">Completadas</TabsTrigger>
           </TabsList>
 
@@ -70,6 +72,10 @@ export default function Orders() {
 
           <TabsContent value="draft">
             <DraftOrders searchQuery={searchQuery} />
+          </TabsContent>
+
+          <TabsContent value="received">
+            <ReceivedQuotes searchQuery={searchQuery} />
           </TabsContent>
 
           <TabsContent value="completed">
