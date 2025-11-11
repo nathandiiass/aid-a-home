@@ -76,6 +76,17 @@ export default function SpecialistHome() {
 
       // Load active requests matching specialist's categories
       if (categories.length > 0) {
+        // First, get all request IDs where this specialist has already sent a quote
+        const { data: existingQuotes, error: quotesError } = await supabase
+          .from('quotes')
+          .select('request_id')
+          .eq('specialist_id', profile.id);
+
+        if (quotesError) throw quotesError;
+
+        const quotedRequestIds = existingQuotes?.map(q => q.request_id) || [];
+
+        // Load active requests, excluding those already quoted
         const { data: requestsData, error: requestsError } = await supabase
           .from('service_requests')
           .select(`
@@ -90,7 +101,13 @@ export default function SpecialistHome() {
           .order('created_at', { ascending: false });
 
         if (requestsError) throw requestsError;
-        setRequests(requestsData || []);
+
+        // Filter out requests that already have quotes from this specialist
+        const filteredRequests = requestsData?.filter(
+          req => !quotedRequestIds.includes(req.id)
+        ) || [];
+
+        setRequests(filteredRequests);
       }
     } catch (error: any) {
       console.error('Error loading data:', error);

@@ -168,7 +168,7 @@ export default function QuoteForm() {
         description: 'Cotización enviada correctamente',
       });
 
-      navigate('/specialist');
+      navigate('/specialist/orders?tab=enviadas');
     } catch (error: any) {
       console.error('Error submitting quote:', error);
       toast({
