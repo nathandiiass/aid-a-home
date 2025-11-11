@@ -448,12 +448,19 @@ export default function Chat() {
             {getInitials(interlocutorName)}
           </AvatarFallback>
         </Avatar>
-        <div className="flex-1 min-w-0">
+        <button 
+          className="flex-1 min-w-0 text-left"
+          onClick={() => {
+            if (!isSpecialistMode && quote?.specialist?.id) {
+              navigate(`/specialist/${quote.specialist.id}/profile?quoteId=${quoteId}`);
+            }
+          }}
+        >
           <h2 className="font-bold truncate" style={{ color: '#003049' }}>
             {interlocutorName}
           </h2>
           <p className="text-xs" style={{ color: '#669BBC' }}>En línea</p>
-        </div>
+        </button>
         {!isSpecialistMode && (
           <Button 
             size="sm"
