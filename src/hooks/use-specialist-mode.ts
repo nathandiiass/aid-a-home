@@ -35,10 +35,29 @@ export const useSpecialistMode = () => {
     }
   };
 
-  const toggleSpecialistMode = (value: boolean) => {
-    // Only allow toggling if user has specialist role
+  const toggleSpecialistMode = async (value: boolean) => {
     if (value) {
-      checkSpecialistRole();
+      // Re-verify the user has specialist role before enabling
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setIsSpecialistMode(false);
+          return;
+        }
+
+        const { data, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'specialist')
+          .maybeSingle();
+
+        if (error) throw error;
+        setIsSpecialistMode(!!data);
+      } catch (error) {
+        console.error('Error checking specialist role:', error);
+        setIsSpecialistMode(false);
+      }
     } else {
       setIsSpecialistMode(false);
     }
