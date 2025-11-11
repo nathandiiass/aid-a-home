@@ -20,6 +20,7 @@ import SpecialistOrders from "./pages/SpecialistOrders";
 import SpecialistRequestDetail from "./pages/SpecialistRequestDetail";
 import QuoteForm from "./pages/QuoteForm";
 import SpecialistProfile from "./pages/SpecialistProfile";
+import UserProfile from "./pages/UserProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,7 @@ const App = () => (
           <Route path="/specialist/requests/:id" element={<SpecialistRequestDetail />} />
           <Route path="/specialist/requests/:id/quote" element={<QuoteForm />} />
           <Route path="/specialist/:specialistId/profile" element={<SpecialistProfile />} />
+          <Route path="/user/:userId/profile" element={<UserProfile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

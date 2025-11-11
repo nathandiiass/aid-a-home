@@ -453,6 +453,8 @@ export default function Chat() {
           onClick={() => {
             if (!isSpecialistMode && quote?.specialist?.id) {
               navigate(`/specialist/${quote.specialist.id}/profile?quoteId=${quoteId}`);
+            } else if (isSpecialistMode && quote?.request?.user_id) {
+              navigate(`/user/${quote.request.user_id}/profile?quoteId=${quoteId}`);
             }
           }}
         >
