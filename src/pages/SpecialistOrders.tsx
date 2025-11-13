@@ -35,15 +35,10 @@ export default function SpecialistOrders() {
       return;
     }
 
-    if (!isSpecialistMode) {
-      navigate('/profile');
-      return;
-    }
-
-    if (user) {
+    if (user && !authLoading) {
       loadSpecialistOrders();
     }
-  }, [user, authLoading, navigate, isSpecialistMode]);
+  }, [user, authLoading, navigate]);
 
   useEffect(() => {
     setSearchParams({ tab: activeTab });

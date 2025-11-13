@@ -39,15 +39,10 @@ export default function SpecialistHome() {
       return;
     }
 
-    if (!isSpecialistMode) {
-      navigate('/profile');
-      return;
-    }
-
-    if (user) {
+    if (user && !authLoading) {
       loadSpecialistData();
     }
-  }, [user, authLoading, navigate, isSpecialistMode]);
+  }, [user, authLoading, navigate]);
 
   const loadSpecialistData = async () => {
     try {
