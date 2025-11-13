@@ -19,10 +19,9 @@ export const useSpecialistMode = () => {
       }
 
       const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
+        .from('specialist_profiles')
+        .select('id')
         .eq('user_id', user.id)
-        .eq('role', 'specialist')
         .maybeSingle();
 
       if (error) throw error;
@@ -37,7 +36,7 @@ export const useSpecialistMode = () => {
 
   const toggleSpecialistMode = async (value: boolean) => {
     if (value) {
-      // Re-verify the user has specialist role before enabling
+      // Re-verify the user has specialist profile before enabling
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
@@ -46,16 +45,15 @@ export const useSpecialistMode = () => {
         }
 
         const { data, error } = await supabase
-          .from('user_roles')
-          .select('role')
+          .from('specialist_profiles')
+          .select('id')
           .eq('user_id', user.id)
-          .eq('role', 'specialist')
           .maybeSingle();
 
         if (error) throw error;
         setIsSpecialistMode(!!data);
       } catch (error) {
-        console.error('Error checking specialist role:', error);
+        console.error('Error checking specialist profile:', error);
         setIsSpecialistMode(false);
       }
     } else {
