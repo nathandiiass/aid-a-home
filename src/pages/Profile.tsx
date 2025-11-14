@@ -260,11 +260,9 @@ export default function Profile() {
                   <Switch
                     checked={isSpecialistMode}
                     onCheckedChange={async (checked) => {
+                      await toggleSpecialistMode(checked);
                       if (checked) {
-                        // Navigate immediately without waiting for toggle
                         navigate('/specialist');
-                      } else {
-                        await toggleSpecialistMode(checked);
                       }
                     }}
                   />
