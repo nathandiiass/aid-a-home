@@ -28,6 +28,25 @@ interface ActiveOrdersProps {
   searchQuery: string;
 }
 
+interface ServiceRequest {
+  id: string;
+  activity: string;
+  category: string;
+  service_title: string | null;
+  scheduled_date: string | null;
+  time_start: string | null;
+  time_end: string | null;
+  time_preference: string | null;
+  is_urgent: boolean | null;
+  price_min: number | null;
+  price_max: number | null;
+  location_id: string | null;
+  locations?: {
+    neighborhood: string;
+    city: string;
+  };
+}
+
 export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -147,6 +166,25 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
     }
   };
 
+  const formatTimeDisplay = (order: ServiceRequest) => {
+    if (order.is_urgent) {
+      return "¡Urgente!";
+    }
+    
+    if (order.time_start && order.time_end) {
+      return `${order.time_start.slice(0, 5)}–${order.time_end.slice(0, 5)}`;
+    }
+
+    const timeOptions: Record<string, string> = {
+      morning: "Mañana (9:00-12:00)",
+      afternoon: "Tarde (12:00-17:00)",
+      evening: "Noche (17:00-21:00)",
+      anytime: "Cualquier hora",
+    };
+
+    return timeOptions[order.time_preference || ''] || "Por definir";
+  };
+
   if (loading) {
     return <div className="text-center py-8 text-muted-foreground">Cargando...</div>;
   }
@@ -196,14 +234,12 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
                 </div>
               )}
               
-              {order.time_start && order.time_end && (
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <Clock className="w-5 h-5 text-accent" />
-                  <span className="font-medium">
-                    {order.time_start.slice(0, 5)}–{order.time_end.slice(0, 5)}
-                  </span>
-                </div>
-              )}
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <Clock className="w-5 h-5 text-accent" />
+                <span className={`font-medium ${order.is_urgent ? "text-destructive font-semibold" : ""}`}>
+                  {formatTimeDisplay(order)}
+                </span>
+              </div>
 
               {order.locations && (
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">

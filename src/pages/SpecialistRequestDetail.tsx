@@ -18,6 +18,8 @@ interface RequestDetail {
   scheduled_date: string | null;
   time_start: string | null;
   time_end: string | null;
+  time_preference: string | null;
+  is_urgent: boolean | null;
   price_min: number | null;
   price_max: number | null;
   evidence_urls: string[] | null;
@@ -72,6 +74,27 @@ export default function SpecialistRequestDetail() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatTimeDisplay = () => {
+    if (!request) return "";
+    
+    if (request.is_urgent) {
+      return "¡Urgente!";
+    }
+    
+    if (request.time_start && request.time_end) {
+      return `${request.time_start} - ${request.time_end}`;
+    }
+
+    const timeOptions: Record<string, string> = {
+      morning: "Mañana (9:00-12:00)",
+      afternoon: "Tarde (12:00-17:00)",
+      evening: "Noche (17:00-21:00)",
+      anytime: "Cualquier hora",
+    };
+
+    return timeOptions[request.time_preference || ''] || "Por definir";
   };
 
   if (authLoading || loading) {
@@ -172,14 +195,14 @@ export default function SpecialistRequestDetail() {
                 </div>
               )}
 
-              {request.time_start && request.time_end && (
-                <div className="flex items-center gap-3">
-                  <Clock className="w-5 h-5 text-primary" />
-                  <div>
-                    <p className="font-medium text-foreground">{request.time_start} - {request.time_end}</p>
-                  </div>
+              <div className="flex items-center gap-3">
+                <Clock className="w-5 h-5 text-primary" />
+                <div>
+                  <p className={`font-medium ${request.is_urgent ? "text-destructive font-semibold" : "text-foreground"}`}>
+                    {formatTimeDisplay()}
+                  </p>
                 </div>
-              )}
+              </div>
             </Card>
 
             {/* Ubicación aproximada */}
