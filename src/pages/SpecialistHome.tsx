@@ -13,6 +13,7 @@ interface ServiceRequest {
   id: string;
   activity: string;
   category: string;
+  service_title: string | null;
   scheduled_date: string | null;
   time_start: string | null;
   time_end: string | null;
@@ -139,11 +140,13 @@ export default function SpecialistHome() {
           <div className="space-y-4">
             {requests.map((request) => (
               <Card key={request.id} className="p-4 space-y-3 hover:shadow-md transition-shadow">
-                <h3 className="font-semibold text-foreground text-lg">{request.activity}</h3>
+                <h3 className="font-semibold text-foreground text-lg">
+                  {request.service_title || request.activity}
+                </h3>
                 
                 <div className="space-y-2 text-sm">
                   {request.scheduled_date && (
-                    <div className="flex items-center gap-2 text-secondary">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <Calendar className="w-4 h-4" />
                       <span>
                         {new Date(request.scheduled_date).toLocaleDateString('es-MX', {
@@ -156,36 +159,36 @@ export default function SpecialistHome() {
                   )}
 
                   {request.time_start && request.time_end && (
-                    <div className="flex items-center gap-2 text-secondary">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <Clock className="w-4 h-4" />
                       <span>{request.time_start} - {request.time_end}</span>
                     </div>
                   )}
 
-                  {(request.price_min || request.price_max) && (
-                    <div className="flex items-center gap-2 text-secondary">
-                      <DollarSign className="w-4 h-4" />
-                      <span>
-                        {request.price_min && request.price_max
-                          ? `$${request.price_min} - $${request.price_max}`
-                          : request.price_min
-                          ? `Desde $${request.price_min}`
-                          : `Hasta $${request.price_max}`}
-                      </span>
+                  {request.locations && (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <MapPin className="w-4 h-4" />
+                      <span>{request.locations.neighborhood}, {request.locations.city}</span>
                     </div>
                   )}
 
-                  {request.locations && (
-                    <div className="flex items-center gap-2 text-secondary">
-                      <MapPin className="w-4 h-4" />
-                      <span>{request.locations.neighborhood}, {request.locations.city}</span>
+                  {(request.price_min || request.price_max) && (
+                    <div className="flex items-center gap-2 text-primary font-semibold text-base">
+                      <DollarSign className="w-5 h-5" />
+                      <span>
+                        {request.price_min && request.price_max
+                          ? `$${request.price_min} - $${request.price_max} MXN`
+                          : request.price_min
+                          ? `Desde $${request.price_min} MXN`
+                          : `Hasta $${request.price_max} MXN`}
+                      </span>
                     </div>
                   )}
                 </div>
 
                 <Button
                   onClick={() => navigate(`/specialist/requests/${request.id}`)}
-                  className="w-full bg-accent hover:bg-accent/90 text-white"
+                  className="w-full"
                 >
                   Ver solicitud
                 </Button>
