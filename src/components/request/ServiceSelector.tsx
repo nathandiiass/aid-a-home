@@ -168,7 +168,6 @@ const ServiceSelector = ({
               <SelectValue placeholder="Todas las actividades" />
             </SelectTrigger>
             <SelectContent className="bg-background z-50">
-              <SelectItem value="">Todas las actividades</SelectItem>
               {actividades.map((act) => (
                 <SelectItem key={act} value={act}>
                   {act}
@@ -185,7 +184,6 @@ const ServiceSelector = ({
               <SelectValue placeholder="Todas las categorías" />
             </SelectTrigger>
             <SelectContent className="bg-background z-50">
-              <SelectItem value="">Todas las categorías</SelectItem>
               {categorias.map((cat) => (
                 <SelectItem key={cat} value={cat}>
                   {cat}
