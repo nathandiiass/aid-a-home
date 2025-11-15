@@ -34,9 +34,9 @@ export const HowItWorksStep = ({ stepNumber, title, imageSrc, imagePosition }: H
   }, []);
 
   return (
-    <div className="mb-12 md:mb-16">
+    <div className="mb-8 md:mb-16">
       <div className={cn(
-        "flex flex-col gap-6",
+        "flex flex-col gap-4",
         "md:flex-row md:items-center md:gap-12",
         imagePosition === "right" && "md:flex-row-reverse"
       )}>
@@ -45,8 +45,8 @@ export const HowItWorksStep = ({ stepNumber, title, imageSrc, imagePosition }: H
           ref={imageRef}
           className={cn(
             "flex-shrink-0 transition-transform duration-300 ease-out",
-            "w-full md:w-1/2",
-            isInView && "scale-105"
+            "w-32 mx-auto md:w-1/2 md:mx-0",
+            isInView && "md:scale-105"
           )}
         >
           <img 
@@ -59,10 +59,10 @@ export const HowItWorksStep = ({ stepNumber, title, imageSrc, imagePosition }: H
         {/* Content */}
         <div className="flex-1 md:w-1/2">
           <div className="flex items-start gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-bold text-xl flex-shrink-0">
+            <div className="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary text-primary-foreground font-bold text-lg md:text-xl flex-shrink-0">
               {stepNumber}
             </div>
-            <h3 className="text-xl md:text-2xl font-bold text-foreground leading-tight pt-1">{title}</h3>
+            <h3 className="text-lg md:text-2xl font-bold text-foreground leading-tight pt-0.5 md:pt-1">{title}</h3>
           </div>
         </div>
       </div>
