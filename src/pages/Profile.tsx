@@ -207,9 +207,12 @@ export default function Profile() {
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold text-foreground">Mi cuenta</h2>
                 <div className="border border-border rounded-lg divide-y divide-border">
-                  <button className="w-full px-4 py-3 text-left hover:bg-muted/30 transition-colors">
+                  <button 
+                    onClick={() => navigate('/profile/personal-info')}
+                    className="w-full px-4 py-3 text-left hover:bg-muted/30 transition-colors"
+                  >
                     <p className="font-medium text-foreground">Información personal</p>
-                    <p className="text-sm text-secondary">Editar nombre, apellido, fecha de nacimiento</p>
+                    <p className="text-sm text-secondary">Editar nombre, apellidos, teléfono y más</p>
                   </button>
                   <button className="w-full px-4 py-3 text-left hover:bg-muted/30 transition-colors">
                     <p className="font-medium text-foreground">Configuración</p>

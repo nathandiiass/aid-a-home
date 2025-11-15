@@ -21,6 +21,7 @@ import SpecialistRequestDetail from "./pages/SpecialistRequestDetail";
 import QuoteForm from "./pages/QuoteForm";
 import SpecialistProfile from "./pages/SpecialistProfile";
 import UserProfile from "./pages/UserProfile";
+import UserPersonalInfoPage from "./pages/UserPersonalInfoPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/success" element={<Success />} />
           <Route path="/inbox" element={<Inbox />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/personal-info" element={<UserPersonalInfoPage />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/locations" element={<Locations />} />
           <Route path="/specialist-registration" element={<SpecialistRegistration />} />
