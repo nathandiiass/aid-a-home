@@ -60,8 +60,8 @@ const Index = () => {
       </div>
 
       {/* How it works */}
-      <div className="container max-w-2xl mx-auto px-4 pb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-6">
+      <div className="container max-w-6xl mx-auto px-4 py-12 md:py-16">
+        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">
           ¿Cómo funciona?
         </h2>
         
