@@ -6,7 +6,6 @@ import ServiceSelector from "@/components/request/ServiceSelector";
 import BudgetStep from "@/components/request/BudgetStep";
 import DateTimeStep from "@/components/request/DateTimeStep";
 import LocationStep from "@/components/request/LocationStep";
-import EvidenceStep from "@/components/request/EvidenceStep";
 import SummaryStep from "@/components/request/SummaryStep";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
@@ -103,8 +102,8 @@ const CreateRequest = () => {
             evidence: [],
           });
           
-          // Start at summary step (step 5)
-          setStep(5);
+          // Start at summary step (step 4)
+          setStep(4);
         }
       } catch (error) {
         console.error('Error loading order:', error);
@@ -131,7 +130,7 @@ const CreateRequest = () => {
         data.date = new Date(data.date);
       }
       setRequestData(data);
-      setStep(5); // Go to summary
+      setStep(4); // Go to summary
     }
   }, []);
 
@@ -150,7 +149,7 @@ const CreateRequest = () => {
         return;
       }
     }
-    if (step < 5) setStep(step + 1);
+    if (step < 4) setStep(step + 1);
   };
 
   const prevStep = () => {
@@ -197,7 +196,7 @@ const CreateRequest = () => {
           
           {/* Progress bar */}
           <div className="flex gap-2 mt-4">
-            {[0, 1, 2, 3, 4, 5].map((s) => (
+            {[0, 1, 2, 3, 4].map((s) => (
               <div
                 key={s}
                 className={`h-1 flex-1 rounded-full transition-colors ${
@@ -219,10 +218,12 @@ const CreateRequest = () => {
               serviceTitle={requestData.serviceTitle}
               serviceDescription={requestData.serviceDescription}
               categoria={initialCategoria}
+              evidence={requestData.evidence}
               onEspecialistaChange={(value) => updateData({ especialista: value })}
               onActividadChange={(value) => updateData({ actividad: value })}
               onServiceTitleChange={(value) => updateData({ serviceTitle: value })}
               onServiceDescriptionChange={(value) => updateData({ serviceDescription: value })}
+              onEvidenceChange={(files) => updateData({ evidence: files })}
             />
             <Button
               onClick={nextStep}
@@ -250,9 +251,6 @@ const CreateRequest = () => {
           <LocationStep data={requestData} updateData={updateData} onNext={nextStep} />
         )}
         {step === 4 && (
-          <EvidenceStep data={requestData} updateData={updateData} onNext={nextStep} />
-        )}
-        {step === 5 && (
           <SummaryStep data={requestData} goToStep={goToStep} />
         )}
       </div>
