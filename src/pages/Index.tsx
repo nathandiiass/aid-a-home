@@ -31,7 +31,7 @@ const howItWorksSteps = [
     stepNumber: 4, 
     title: "Elige al mejor y agenda tu servicio", 
     imageSrc: step4Image,
-    imagePosition: "left" as const
+    imagePosition: "right" as const
   },
 ];
 
@@ -60,8 +60,8 @@ const Index = () => {
       </div>
 
       {/* How it works */}
-      <div className="container max-w-6xl mx-auto px-4 py-8 md:py-16">
-        <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-8 md:mb-12 text-center">
+      <div className="container max-w-md mx-auto px-4 py-8">
+        <h2 className="text-2xl font-bold text-foreground mb-8 text-center">
           ¿Cómo funciona?
         </h2>
         
