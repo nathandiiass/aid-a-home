@@ -193,16 +193,19 @@ export default function SpecialistHome() {
                     </div>
                   )}
 
+                  {/* Price in bottom right */}
                   {(request.price_min || request.price_max) && (
-                    <div className="flex items-center gap-2 text-primary font-semibold text-base">
-                      <DollarSign className="w-5 h-5" />
-                      <span>
-                        {request.price_min && request.price_max
-                          ? `$${request.price_min} - $${request.price_max} MXN`
-                          : request.price_min
-                          ? `Desde $${request.price_min} MXN`
-                          : `Hasta $${request.price_max} MXN`}
-                      </span>
+                    <div className="flex justify-end pt-2 border-t">
+                      <div className="flex items-center gap-2 text-primary font-semibold text-base">
+                        <DollarSign className="w-5 h-5" />
+                        <span>
+                          {request.price_min && request.price_max
+                            ? `$${request.price_min.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - $${request.price_max.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`
+                            : request.price_min
+                            ? `Desde $${request.price_min.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`
+                            : `Hasta $${request.price_max.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`}
+                        </span>
+                      </div>
                     </div>
                   )}
                 </div>
