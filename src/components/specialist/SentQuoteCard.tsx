@@ -11,8 +11,13 @@ interface SentQuoteCardProps {
 
 export const SentQuoteCard = ({ quote }: SentQuoteCardProps) => {
   const navigate = useNavigate();
-  const request = quote.service_requests;
-  const location = request?.locations;
+  // Handle both single object and array format from Supabase
+  const request = Array.isArray(quote.service_requests) 
+    ? quote.service_requests[0] 
+    : quote.service_requests;
+  const location = Array.isArray(request?.locations)
+    ? request?.locations[0]
+    : request?.locations;
 
   const getStatusBadge = (status: string) => {
     switch (status) {
