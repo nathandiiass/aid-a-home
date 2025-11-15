@@ -55,7 +55,7 @@ const ServiceSearch = () => {
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
         <Input
           type="text"
-          placeholder="¿Qué servicio necesitas?"
+          placeholder="¿A qué especialista necesitas?"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-12 h-14 text-base bg-card border-border focus-visible:ring-primary"
