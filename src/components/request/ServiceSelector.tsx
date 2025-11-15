@@ -12,7 +12,6 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface Service {
   id: number;
@@ -46,9 +45,11 @@ const ServiceSelector = ({
 }: ServiceSelectorProps) => {
   const [allServices, setAllServices] = useState<Service[]>([]);
   const [especialistas, setEspecialistas] = useState<string[]>([]);
-  const [filteredActividades, setFilteredActividades] = useState<Service[]>([]);
-  const [filterCategory, setFilterCategory] = useState<string>(categoria || "");
-  const [searchFilter, setSearchFilter] = useState<"especialista" | "actividad" | "categoria">("especialista");
+  const [allEspecialistas, setAllEspecialistas] = useState<string[]>([]);
+  const [actividades, setActividades] = useState<string[]>([]);
+  const [categorias, setCategorias] = useState<string[]>([]);
+  const [selectedActividad, setSelectedActividad] = useState<string>("");
+  const [selectedCategoria, setSelectedCategoria] = useState<string>(categoria || "");
   const [errors, setErrors] = useState<{ title?: string; description?: string }>({});
 
   useEffect(() => {
@@ -60,43 +61,53 @@ const ServiceSelector = ({
 
       if (data) {
         setAllServices(data);
-        const unique = Array.from(new Set(data.map((s) => s.especialista)));
-        setEspecialistas(unique);
+        const uniqueEsp = Array.from(new Set(data.map((s) => s.especialista)));
+        const uniqueAct = Array.from(new Set(data.map((s) => s.actividad)));
+        const uniqueCat = Array.from(new Set(data.map((s) => s.categoria)));
+        
+        setAllEspecialistas(uniqueEsp);
+        setEspecialistas(uniqueEsp);
+        setActividades(uniqueAct);
+        setCategorias(uniqueCat);
       }
     };
     loadServices();
   }, []);
 
+  // Filter especialistas based on selected actividad or categoria
   useEffect(() => {
-    if (categoria && !especialista) {
-      const filtered = allServices.filter((s) => s.categoria === categoria);
-      setFilteredActividades(filtered);
-      const uniqueEsp = Array.from(new Set(filtered.map((s) => s.especialista)));
-      setEspecialistas(uniqueEsp);
-      setFilterCategory(categoria);
-    } else if (especialista) {
-      const filtered = allServices.filter((s) => s.especialista === especialista);
-      setFilteredActividades(filtered);
-      if (filtered.length > 0) {
-        setFilterCategory(filtered[0].categoria);
-      }
-    } else {
-      setFilteredActividades(allServices);
-      setFilterCategory("");
-    }
-  }, [especialista, categoria, allServices]);
+    let filteredEspecialistas = [...allEspecialistas];
 
-  const handleActividadChange = (value: string) => {
-    onActividadChange(value);
-    const service = allServices.find((s) => s.actividad === value);
-    if (service && service.especialista !== especialista) {
-      onEspecialistaChange(service.especialista);
+    if (selectedActividad) {
+      const filtered = allServices.filter((s) => s.actividad === selectedActividad);
+      filteredEspecialistas = Array.from(new Set(filtered.map((s) => s.especialista)));
+    } else if (selectedCategoria) {
+      const filtered = allServices.filter((s) => s.categoria === selectedCategoria);
+      filteredEspecialistas = Array.from(new Set(filtered.map((s) => s.especialista)));
     }
+
+    setEspecialistas(filteredEspecialistas);
+    
+    // Clear especialista if it's not in the filtered list
+    if (especialista && !filteredEspecialistas.includes(especialista)) {
+      onEspecialistaChange("");
+    }
+  }, [selectedActividad, selectedCategoria, allServices, allEspecialistas]);
+
+  const handleActividadFilterChange = (value: string) => {
+    setSelectedActividad(value);
+    setSelectedCategoria(""); // Clear categoria filter
   };
 
-  const clearFilter = () => {
-    onEspecialistaChange("");
-    setFilterCategory("");
+  const handleCategoriaFilterChange = (value: string) => {
+    setSelectedCategoria(value);
+    setSelectedActividad(""); // Clear actividad filter
+  };
+
+  const clearFilters = () => {
+    setSelectedActividad("");
+    setSelectedCategoria("");
+    setEspecialistas(allEspecialistas);
   };
 
   const validateTitle = (value: string) => {
@@ -148,35 +159,48 @@ const ServiceSelector = ({
         </p>
       </div>
 
-      <div className="space-y-3">
-        <Label>Filtrar búsqueda por:</Label>
-        <RadioGroup value={searchFilter} onValueChange={(value: any) => setSearchFilter(value)}>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="especialista" id="filter-especialista" />
-            <Label htmlFor="filter-especialista" className="font-normal cursor-pointer">
-              Especialista
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="actividad" id="filter-actividad" />
-            <Label htmlFor="filter-actividad" className="font-normal cursor-pointer">
-              Actividad
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="categoria" id="filter-categoria" />
-            <Label htmlFor="filter-categoria" className="font-normal cursor-pointer">
-              Categoría
-            </Label>
-          </div>
-        </RadioGroup>
+      {/* Filter dropdowns */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="filter-actividad">Filtrar por actividad</Label>
+          <Select value={selectedActividad} onValueChange={handleActividadFilterChange}>
+            <SelectTrigger id="filter-actividad" className="h-12 bg-background">
+              <SelectValue placeholder="Todas las actividades" />
+            </SelectTrigger>
+            <SelectContent className="bg-background z-50">
+              <SelectItem value="">Todas las actividades</SelectItem>
+              {actividades.map((act) => (
+                <SelectItem key={act} value={act}>
+                  {act}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="filter-categoria">Filtrar por categoría</Label>
+          <Select value={selectedCategoria} onValueChange={handleCategoriaFilterChange}>
+            <SelectTrigger id="filter-categoria" className="h-12 bg-background">
+              <SelectValue placeholder="Todas las categorías" />
+            </SelectTrigger>
+            <SelectContent className="bg-background z-50">
+              <SelectItem value="">Todas las categorías</SelectItem>
+              {categorias.map((cat) => (
+                <SelectItem key={cat} value={cat}>
+                  {cat}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      {filterCategory && (
+      {(selectedActividad || selectedCategoria) && (
         <Badge variant="secondary" className="gap-2 py-2 px-3">
-          Filtrado por: {filterCategory}
+          Filtrado por: {selectedActividad || selectedCategoria}
           <button
-            onClick={clearFilter}
+            onClick={clearFilters}
             className="ml-1 hover:bg-muted rounded-full p-0.5"
           >
             <X className="w-3 h-3" />
@@ -187,10 +211,10 @@ const ServiceSelector = ({
       <div className="space-y-2">
         <Label htmlFor="especialista">Especialista *</Label>
         <Select value={especialista} onValueChange={onEspecialistaChange}>
-          <SelectTrigger id="especialista" className="h-12">
+          <SelectTrigger id="especialista" className="h-12 bg-background">
             <SelectValue placeholder="Selecciona un especialista" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background z-50">
             {especialistas.map((esp) => (
               <SelectItem key={esp} value={esp}>
                 {esp}
