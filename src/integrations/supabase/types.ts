@@ -472,37 +472,85 @@ export type Database = {
       }
       specialist_profiles: {
         Row: {
+          accepted_terms_at: string | null
+          address_proof_url: string | null
+          birth_or_constitution_date: string | null
+          city: string | null
           created_at: string
+          csf_document_url: string | null
+          email: string | null
           id: string
           id_document_url: string
+          licenses_certifications: string | null
           materials_policy: boolean | null
+          neighborhood: string | null
+          person_type: string | null
           phone: string
+          postal_code: string | null
+          professional_description: string | null
+          profile_photo_url: string | null
+          razon_social: string | null
           rfc: string
+          state: string | null
           status: string
+          street: string | null
+          street_number: string | null
           updated_at: string
           user_id: string
           warranty_days: number | null
         }
         Insert: {
+          accepted_terms_at?: string | null
+          address_proof_url?: string | null
+          birth_or_constitution_date?: string | null
+          city?: string | null
           created_at?: string
+          csf_document_url?: string | null
+          email?: string | null
           id?: string
           id_document_url: string
+          licenses_certifications?: string | null
           materials_policy?: boolean | null
+          neighborhood?: string | null
+          person_type?: string | null
           phone: string
+          postal_code?: string | null
+          professional_description?: string | null
+          profile_photo_url?: string | null
+          razon_social?: string | null
           rfc: string
+          state?: string | null
           status?: string
+          street?: string | null
+          street_number?: string | null
           updated_at?: string
           user_id: string
           warranty_days?: number | null
         }
         Update: {
+          accepted_terms_at?: string | null
+          address_proof_url?: string | null
+          birth_or_constitution_date?: string | null
+          city?: string | null
           created_at?: string
+          csf_document_url?: string | null
+          email?: string | null
           id?: string
           id_document_url?: string
+          licenses_certifications?: string | null
           materials_policy?: boolean | null
+          neighborhood?: string | null
+          person_type?: string | null
           phone?: string
+          postal_code?: string | null
+          professional_description?: string | null
+          profile_photo_url?: string | null
+          razon_social?: string | null
           rfc?: string
+          state?: string | null
           status?: string
+          street?: string | null
+          street_number?: string | null
           updated_at?: string
           user_id?: string
           warranty_days?: number | null
@@ -520,6 +568,7 @@ export type Database = {
       specialist_specialties: {
         Row: {
           created_at: string
+          experience_years: number | null
           id: string
           role_label: string
           specialist_id: string
@@ -527,6 +576,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          experience_years?: number | null
           id?: string
           role_label: string
           specialist_id: string
@@ -534,6 +584,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          experience_years?: number | null
           id?: string
           role_label?: string
           specialist_id?: string
@@ -552,6 +603,7 @@ export type Database = {
       specialist_work_zones: {
         Row: {
           cities: string[]
+          coverage_municipalities: string[] | null
           created_at: string
           id: string
           specialist_id: string
@@ -559,6 +611,7 @@ export type Database = {
         }
         Insert: {
           cities: string[]
+          coverage_municipalities?: string[] | null
           created_at?: string
           id?: string
           specialist_id: string
@@ -566,6 +619,7 @@ export type Database = {
         }
         Update: {
           cities?: string[]
+          coverage_municipalities?: string[] | null
           created_at?: string
           id?: string
           specialist_id?: string
