@@ -314,13 +314,36 @@ export default function Chat() {
           <Card className="bg-background border-secondary/30 p-4 space-y-3 shadow-subtle">
             <h4 className="font-bold text-foreground text-base mb-3">📋 Propuesta de servicio</h4>
             
+            {/* 1. ¿Qué incluye el servicio? */}
+            {quoteData.scope && (
+              <div className="flex gap-2 text-sm">
+                <FileText className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-foreground">¿Qué incluye el servicio? </span>
+                  <span className="text-secondary">{quoteData.scope}</span>
+                </div>
+              </div>
+            )}
+
+            {/* 2. ¿Qué no incluye? */}
+            {quoteData.exclusions && (
+              <div className="flex gap-2 text-sm">
+                <Ban className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-foreground">¿Qué no incluye? </span>
+                  <span className="text-secondary">{quoteData.exclusions}</span>
+                </div>
+              </div>
+            )}
+
+            {/* 3. ¿Puedes en la fecha y hora solicitada? */}
             {quoteData.proposed_date && (
               <div className="flex gap-2 text-sm">
                 <Clock className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
                 <div>
                   <span className="font-semibold text-foreground">Disponibilidad: </span>
                   <span className="text-secondary">
-                    {quoteData.proposed_date ? format(new Date(quoteData.proposed_date), 'dd MMM yyyy', { locale: es }) : 'Sí'}
+                    {format(new Date(quoteData.proposed_date), 'dd MMM yyyy', { locale: es })}
                     {quoteData.proposed_time_start && ` · ${quoteData.proposed_time_start.slice(0, 5)}`}
                     {quoteData.proposed_time_end && `–${quoteData.proposed_time_end.slice(0, 5)}`}
                   </span>
@@ -328,6 +351,7 @@ export default function Chat() {
               </div>
             )}
 
+            {/* 4. Precio */}
             <div className="flex gap-2 text-sm">
               <DollarSign className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
               <div>
@@ -338,6 +362,7 @@ export default function Chat() {
               </div>
             </div>
 
+            {/* 5. ¿Incluye materiales? */}
             <div className="flex gap-2 text-sm">
               <Package className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
               <div>
@@ -349,49 +374,18 @@ export default function Chat() {
               </div>
             </div>
 
-            {quoteData.scope && (
-              <div className="flex gap-2 text-sm">
-                <FileText className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-semibold text-foreground">Alcance: </span>
-                  <span className="text-secondary">{quoteData.scope}</span>
-                </div>
-              </div>
-            )}
-
-            {quoteData.exclusions && (
-              <div className="flex gap-2 text-sm">
-                <Ban className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-semibold text-foreground">No incluye: </span>
-                  <span className="text-secondary">{quoteData.exclusions}</span>
-                </div>
-              </div>
-            )}
-
+            {/* 6. Duración estimada */}
             {quoteData.estimated_duration_hours && (
               <div className="flex gap-2 text-sm">
                 <Timer className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-semibold text-foreground">Duración: </span>
+                  <span className="font-semibold text-foreground">Duración estimada: </span>
                   <span className="text-secondary">{quoteData.estimated_duration_hours}h</span>
                 </div>
               </div>
             )}
 
-            {quoteData.has_warranty && (
-              <div className="flex gap-2 text-sm">
-                <Shield className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-semibold text-foreground">Garantía: </span>
-                  <span className="text-secondary">
-                    {quoteData.warranty_days} días
-                    {quoteData.warranty_description && ` · ${quoteData.warranty_description}`}
-                  </span>
-                </div>
-              </div>
-            )}
-
+            {/* 7. ¿Requiere visita previa? */}
             {quoteData.requires_visit && (
               <div className="flex gap-2 text-sm">
                 <Eye className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
@@ -404,10 +398,11 @@ export default function Chat() {
               </div>
             )}
 
+            {/* 8. Detalles adicionales */}
             {quoteData.additional_notes && (
               <div className="pt-2 border-t border-border/50">
                 <p className="text-sm text-secondary">
-                  <span className="font-semibold text-foreground">Notas: </span>
+                  <span className="font-semibold text-foreground">Detalles adicionales: </span>
                   {quoteData.additional_notes}
                 </p>
               </div>
