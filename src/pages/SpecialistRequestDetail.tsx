@@ -12,6 +12,8 @@ interface RequestDetail {
   id: string;
   activity: string;
   category: string;
+  service_title: string | null;
+  service_description: string | null;
   description: string | null;
   scheduled_date: string | null;
   time_start: string | null;
@@ -103,44 +105,62 @@ export default function SpecialistRequestDetail() {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-xl font-bold text-foreground">{request.activity}</h1>
+          <h1 className="text-xl font-bold text-foreground">
+            {request.service_title || request.activity}
+          </h1>
         </div>
 
         <div className="p-6 space-y-6">
-          {/* Map placeholder */}
-          {request.locations?.lat && request.locations?.lng && (
-            <Card className="p-4 bg-muted/30 h-48 flex items-center justify-center">
-              <div className="text-center text-secondary">
-                <MapPin className="w-8 h-8 mx-auto mb-2" />
-                <p className="text-sm">Zona aproximada</p>
-                <p className="text-xs">{request.locations.neighborhood}, {request.locations.city}</p>
-              </div>
-            </Card>
-          )}
-
           {/* Details */}
           <div className="space-y-4">
-            <div>
-              <Badge variant="secondary" className="mb-2">{request.category}</Badge>
-              <h2 className="text-2xl font-bold text-foreground">{request.activity}</h2>
-            </div>
+            {/* Especialista necesario */}
+            <Card className="p-4">
+              <h3 className="text-sm font-medium text-muted-foreground mb-1">Especialista necesario</h3>
+              <p className="text-lg font-semibold text-foreground">{request.category}</p>
+            </Card>
 
-            {request.description && (
+            {/* Título del servicio */}
+            <Card className="p-4">
+              <h3 className="text-sm font-medium text-muted-foreground mb-1">Título del servicio</h3>
+              <p className="text-lg font-semibold text-foreground">
+                {request.service_title || request.activity}
+              </p>
+            </Card>
+
+            {/* Descripción del servicio */}
+            {(request.service_description || request.description) && (
               <Card className="p-4">
-                <h3 className="font-semibold text-foreground mb-2">Descripción</h3>
-                <p className="text-secondary text-sm">{request.description}</p>
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">Descripción del servicio</h3>
+                <p className="text-foreground">{request.service_description || request.description}</p>
               </Card>
             )}
 
+            {/* Presupuesto */}
+            <Card className="p-4">
+              <h3 className="text-sm font-medium text-muted-foreground mb-2">Presupuesto</h3>
+              <div className="flex items-center gap-2 text-primary font-semibold text-lg">
+                <DollarSign className="w-5 h-5" />
+                <span>
+                  {request.price_min && request.price_max
+                    ? `$${request.price_min} - $${request.price_max} MXN`
+                    : request.price_min
+                    ? `Desde $${request.price_min} MXN`
+                    : request.price_max
+                    ? `Hasta $${request.price_max} MXN`
+                    : 'Sin presupuesto, que proponga'}
+                </span>
+              </div>
+            </Card>
+
+            {/* Fecha y Horario */}
             <Card className="p-4 space-y-3">
-              <h3 className="font-semibold text-foreground">Detalles del servicio</h3>
+              <h3 className="text-sm font-medium text-muted-foreground mb-2">Fecha y horario</h3>
               
               {request.scheduled_date && (
-                <div className="flex items-center gap-3 text-sm">
-                  <Calendar className="w-5 h-5 text-accent" />
+                <div className="flex items-center gap-3">
+                  <Calendar className="w-5 h-5 text-primary" />
                   <div>
-                    <p className="font-medium text-foreground">Fecha deseada</p>
-                    <p className="text-secondary">
+                    <p className="font-medium text-foreground">
                       {new Date(request.scheduled_date).toLocaleDateString('es-MX', {
                         weekday: 'long',
                         day: 'numeric',
@@ -153,45 +173,27 @@ export default function SpecialistRequestDetail() {
               )}
 
               {request.time_start && request.time_end && (
-                <div className="flex items-center gap-3 text-sm">
-                  <Clock className="w-5 h-5 text-accent" />
+                <div className="flex items-center gap-3">
+                  <Clock className="w-5 h-5 text-primary" />
                   <div>
-                    <p className="font-medium text-foreground">Horario deseado</p>
-                    <p className="text-secondary">{request.time_start} - {request.time_end}</p>
-                  </div>
-                </div>
-              )}
-
-              {(request.price_min || request.price_max) && (
-                <div className="flex items-center gap-3 text-sm">
-                  <DollarSign className="w-5 h-5 text-accent" />
-                  <div>
-                    <p className="font-medium text-foreground">Presupuesto del cliente</p>
-                    <p className="text-secondary">
-                      {request.price_min && request.price_max
-                        ? `$${request.price_min} - $${request.price_max}`
-                        : request.price_min
-                        ? `Desde $${request.price_min}`
-                        : request.price_max
-                        ? `Hasta $${request.price_max}`
-                        : 'Sin presupuesto'}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {request.locations && (
-                <div className="flex items-center gap-3 text-sm">
-                  <MapPin className="w-5 h-5 text-accent" />
-                  <div>
-                    <p className="font-medium text-foreground">Ubicación aproximada</p>
-                    <p className="text-secondary">
-                      {request.locations.neighborhood}, {request.locations.city}, {request.locations.state}
-                    </p>
+                    <p className="font-medium text-foreground">{request.time_start} - {request.time_end}</p>
                   </div>
                 </div>
               )}
             </Card>
+
+            {/* Ubicación aproximada */}
+            {request.locations && (
+              <Card className="p-4">
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">Ubicación aproximada</h3>
+                <div className="flex items-center gap-3">
+                  <MapPin className="w-5 h-5 text-primary" />
+                  <p className="font-medium text-foreground">
+                    {request.locations.neighborhood}, {request.locations.city}
+                  </p>
+                </div>
+              </Card>
+            )}
 
             {request.evidence_urls && request.evidence_urls.length > 0 && (
               <Card className="p-4">
@@ -212,9 +214,9 @@ export default function SpecialistRequestDetail() {
               </Card>
             )}
 
-            <Card className="p-4 bg-muted/20">
-              <p className="text-sm text-secondary italic">
-                Los datos exactos del cliente se mostrarán solo al ser contratado.
+            <Card className="p-4 bg-muted/20 border-l-4 border-primary">
+              <p className="text-sm text-foreground">
+                Los datos exactos del cliente se mostrarán al enviar la cotización.
               </p>
             </Card>
           </div>
