@@ -143,7 +143,7 @@ export function InProgressWorks() {
                 <h3 className="font-semibold text-foreground text-lg pr-2">
                   {work.service_title || work.activity}
                 </h3>
-                <Badge className="bg-accent text-accent-foreground flex-shrink-0">
+                <Badge className="bg-green-500 text-white flex-shrink-0">
                   En curso
                 </Badge>
               </div>
