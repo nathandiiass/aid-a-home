@@ -219,7 +219,46 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
               </Button>
             </div>
             <p className="text-muted-foreground mb-2">{data.especialista}</p>
-            <p className="text-sm text-muted-foreground line-clamp-2">{data.serviceDescription}</p>
+            <p className="text-sm text-muted-foreground mb-3">{data.serviceDescription}</p>
+            
+            {/* Evidence section */}
+            {data.evidence && data.evidence.filter((file): file is File => file instanceof File).length > 0 && (
+              <div className="mt-4 pt-4 border-t border-border">
+                <p className="font-medium text-sm mb-3">Evidencias</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {data.evidence.filter((file): file is File => file instanceof File).map((file, index) => {
+                    const isImage = file.type.startsWith('image/');
+                    const isVideo = file.type.startsWith('video/');
+                    const preview = URL.createObjectURL(file);
+                    
+                    return (
+                      <div 
+                        key={index} 
+                        className="relative aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => {
+                          if (isImage) {
+                            window.open(preview, '_blank');
+                          }
+                        }}
+                      >
+                        {isImage && (
+                          <img 
+                            src={preview} 
+                            alt={`Evidencia ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                        {isVideo && (
+                          <div className="w-full h-full flex items-center justify-center bg-muted">
+                            <Camera className="w-6 h-6 text-muted-foreground" />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </Card>
@@ -306,34 +345,6 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
         </div>
       </Card>
 
-      {/* Evidence */}
-      <Card className="p-4 border-border">
-        <div className="flex items-start justify-between">
-          <div className="flex items-start gap-3 flex-1">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-              <Camera className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <p className="font-medium mb-1">Evidencias</p>
-              <p className="text-muted-foreground">
-                {data.evidence.filter((file): file is File => file instanceof File).length > 0
-                  ? `${data.evidence.filter((file): file is File => file instanceof File).length} archivo${
-                      data.evidence.filter((file): file is File => file instanceof File).length !== 1 ? "s" : ""
-                    } adjunto${data.evidence.filter((file): file is File => file instanceof File).length !== 1 ? "s" : ""}`
-                  : "Sin archivos"}
-              </p>
-            </div>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => goToStep(4)}
-            className="shrink-0"
-          >
-            <Edit className="w-4 h-4" />
-          </Button>
-        </div>
-      </Card>
 
       <Button
         onClick={handlePublish}
