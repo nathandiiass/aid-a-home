@@ -9,6 +9,14 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface LocationStepProps {
   data: RequestData;
@@ -29,18 +37,53 @@ interface SavedLocation {
   lng?: number;
 }
 
+const ESTADOS_MEXICO = [
+  "Aguascalientes",
+  "Baja California",
+  "Baja California Sur",
+  "Campeche",
+  "Chiapas",
+  "Chihuahua",
+  "Ciudad de México",
+  "Coahuila",
+  "Colima",
+  "Durango",
+  "Estado de México",
+  "Guanajuato",
+  "Guerrero",
+  "Hidalgo",
+  "Jalisco",
+  "Michoacán",
+  "Morelos",
+  "Nayarit",
+  "Nuevo León",
+  "Oaxaca",
+  "Puebla",
+  "Querétaro",
+  "Quintana Roo",
+  "San Luis Potosí",
+  "Sinaloa",
+  "Sonora",
+  "Tabasco",
+  "Tamaulipas",
+  "Tlaxcala",
+  "Veracruz",
+  "Yucatán",
+  "Zacatecas",
+];
+
 const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [savedLocations, setSavedLocations] = useState<SavedLocation[]>([]);
   const [loading, setLoading] = useState(false);
-  const [street, setStreet] = useState(data.location?.address.split(',')[0] || "");
+  const [street, setStreet] = useState("");
   const [extNumber, setExtNumber] = useState("");
   const [intNumber, setIntNumber] = useState("");
   const [neighborhood, setNeighborhood] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
-  const [label, setLabel] = useState(data.location?.label || "");
+  const [label, setLabel] = useState("");
   const [error, setError] = useState("");
   const [saveLocation, setSaveLocation] = useState(false);
 
@@ -87,8 +130,8 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
   };
 
   const handleContinue = async () => {
-    if (!street.trim() || !city.trim() || !state.trim()) {
-      setError("Completa los campos obligatorios (calle, ciudad, estado)");
+    if (!street.trim() || !extNumber.trim() || !neighborhood.trim() || !city.trim() || !state.trim()) {
+      setError("Completa los campos obligatorios: Estado, Ciudad/Municipio, Colonia, Calle y Número exterior");
       return;
     }
 
@@ -97,7 +140,7 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
 
     const fullAddress = [
       street,
-      extNumber && `#${extNumber}`,
+      `#${extNumber}`,
       intNumber && `Int. ${intNumber}`,
       neighborhood,
       `${city}, ${state}`
@@ -106,7 +149,6 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
     try {
       let locationId: string | undefined = undefined;
 
-      // Save to database if user is logged in and checkbox is checked
       if (user && saveLocation) {
         const { data: insertedLocation, error } = await supabase
           .from('locations')
@@ -114,24 +156,23 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
             user_id: user.id,
             label: label.trim() || 'Sin etiqueta',
             street: street.trim(),
-            neighborhood: neighborhood.trim() || null,
-            ext_number: extNumber.trim() || null,
+            neighborhood: neighborhood.trim(),
+            ext_number: extNumber.trim(),
             int_number: intNumber.trim() || null,
             city: city.trim(),
             state: state.trim(),
-            lat: 19.4326, // Mock - in real app, geocode
-            lng: -99.1332  // Mock - in real app, geocode
+            lat: 19.4326,
+            lng: -99.1332,
           }])
           .select()
           .single();
 
         if (error) throw error;
-        
-        locationId = insertedLocation?.id;
-        
+        locationId = insertedLocation.id;
+
         toast({
           title: "Ubicación guardada",
-          description: "La dirección se agregó a tus ubicaciones"
+          description: "La ubicación se guardó para futuras solicitudes",
         });
       }
 
@@ -141,25 +182,21 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
           lat: 19.4326,
           lng: -99.1332,
           address: fullAddress,
-          label: label.trim() || "Sin etiqueta",
+          label: label.trim() || 'Sin etiqueta',
         },
       });
+
       onNext();
     } catch (error: any) {
+      console.error('Error saving location:', error);
       toast({
+        variant: "destructive",
         title: "Error",
-        description: error.message,
-        variant: "destructive"
+        description: error.message || "No se pudo guardar la ubicación",
       });
     } finally {
       setLoading(false);
     }
-  };
-
-  const getIconForLabel = (labelText: string) => {
-    if (labelText.toLowerCase().includes("casa")) return Home;
-    if (labelText.toLowerCase().includes("oficina")) return Briefcase;
-    return MapPin;
   };
 
   return (
@@ -167,175 +204,176 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
       <div>
         <h2 className="text-2xl font-bold mb-2">Ubicación</h2>
         <p className="text-muted-foreground">
-          ¿Dónde necesitas el servicio?
+          Selecciona dónde necesitas el servicio
         </p>
       </div>
 
-      {/* Map placeholder */}
-      <Card className="h-48 bg-muted/50 border-border flex items-center justify-center">
-        <div className="text-center p-4">
-          <MapPin className="w-12 h-12 mx-auto mb-2 text-primary" />
-          <p className="text-sm text-muted-foreground">
-            Mapa con ubicación GPS
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            (Requiere integración de mapas)
-          </p>
-        </div>
-      </Card>
-
-      <Tabs defaultValue={savedLocations.length > 0 && user ? "saved" : "new"} className="w-full">
+      <Tabs defaultValue={savedLocations.length > 0 ? "saved" : "new"} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          {user && savedLocations.length > 0 && (
-            <TabsTrigger value="saved">Mis ubicaciones</TabsTrigger>
-          )}
+          <TabsTrigger value="saved" disabled={savedLocations.length === 0}>
+            Ubicaciones guardadas
+          </TabsTrigger>
           <TabsTrigger value="new">Nueva ubicación</TabsTrigger>
         </TabsList>
 
-        {user && savedLocations.length > 0 && (
-          <TabsContent value="saved" className="space-y-3 mt-4">
-            {savedLocations.map((saved) => {
-              const Icon = getIconForLabel(saved.label);
-              const fullAddress = [
-                saved.street,
-                saved.ext_number && `#${saved.ext_number}`,
-                saved.int_number && `Int. ${saved.int_number}`,
-                saved.neighborhood,
-                `${saved.city}, ${saved.state}`
-              ].filter(Boolean).join(', ');
-
-              return (
+        <TabsContent value="saved" className="space-y-4 mt-4">
+          {savedLocations.length === 0 ? (
+            <Card className="p-8 text-center">
+              <MapPin className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground">
+                No tienes ubicaciones guardadas
+              </p>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {savedLocations.map((location) => (
                 <Card
-                  key={saved.id}
-                  className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
-                  onClick={() => handleSelectSaved(saved)}
+                  key={location.id}
+                  className="p-4 cursor-pointer hover:border-primary transition-colors"
+                  onClick={() => handleSelectSaved(location)}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <Icon className="w-5 h-5 text-primary" />
-                    </div>
+                    {location.label.toLowerCase().includes('casa') ? (
+                      <Home className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    ) : location.label.toLowerCase().includes('trabajo') ? (
+                      <Briefcase className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    ) : (
+                      <MapPin className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    )}
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground">{saved.label}</p>
+                      <p className="font-semibold">{location.label}</p>
+                      <p className="text-sm text-muted-foreground truncate">
+                        {location.street}
+                        {location.ext_number && ` #${location.ext_number}`}
+                        {location.int_number && ` Int. ${location.int_number}`}
+                      </p>
                       <p className="text-sm text-muted-foreground">
-                        {fullAddress}
+                        {location.neighborhood && `${location.neighborhood}, `}
+                        {location.city}, {location.state}
                       </p>
                     </div>
                   </div>
                 </Card>
-              );
-            })}
-          </TabsContent>
-        )}
+              ))}
+            </div>
+          )}
+        </TabsContent>
 
         <TabsContent value="new" className="space-y-4 mt-4">
-          <div className="space-y-3">
-            <div className="space-y-2">
-              <Label htmlFor="street">Calle*</Label>
-              <Input
-                id="street"
-                placeholder="Nombre de la calle"
-                value={street}
-                onChange={(e) => {
-                  setStreet(e.target.value);
-                  setError("");
-                }}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="extNumber">Número exterior</Label>
-                <Input
-                  id="extNumber"
-                  placeholder="123"
-                  value={extNumber}
-                  onChange={(e) => setExtNumber(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="intNumber">Número interior</Label>
-                <Input
-                  id="intNumber"
-                  placeholder="A"
-                  value={intNumber}
-                  onChange={(e) => setIntNumber(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="neighborhood">Colonia</Label>
-              <Input
-                id="neighborhood"
-                placeholder="Nombre de la colonia"
-                value={neighborhood}
-                onChange={(e) => setNeighborhood(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="city">Ciudad*</Label>
-              <Input
-                id="city"
-                placeholder="Ciudad"
-                value={city}
-                onChange={(e) => {
-                  setCity(e.target.value);
-                  setError("");
-                }}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="state">Estado*</Label>
-              <Input
-                id="state"
-                placeholder="Estado"
-                value={state}
-                onChange={(e) => {
-                  setState(e.target.value);
-                  setError("");
-                }}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="label">Etiqueta (opcional)</Label>
-              <Input
-                id="label"
-                placeholder="Ej: Casa, Oficina, Taller"
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
-              />
-            </div>
-
-            {user && (
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="saveLocation"
-                  checked={saveLocation}
-                  onChange={(e) => setSaveLocation(e.target.checked)}
-                  className="rounded border-border"
-                />
-                <label htmlFor="saveLocation" className="text-sm text-secondary">
-                  Guardar esta ubicación para futuras solicitudes
-                </label>
-              </div>
-            )}
+          <div className="space-y-2">
+            <Label htmlFor="label">Etiqueta (opcional)</Label>
+            <Input
+              id="label"
+              placeholder="Ej: Casa, Trabajo, Casa de mamá"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+            />
           </div>
-          {error && <p className="text-sm text-destructive">{error}</p>}
+
+          <div className="space-y-2">
+            <Label htmlFor="state">Estado *</Label>
+            <Select value={state} onValueChange={setState}>
+              <SelectTrigger id="state">
+                <SelectValue placeholder="Selecciona un estado" />
+              </SelectTrigger>
+              <SelectContent>
+                {ESTADOS_MEXICO.map((estado) => (
+                  <SelectItem key={estado} value={estado}>
+                    {estado}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="city">Ciudad / Municipio *</Label>
+            <Input
+              id="city"
+              placeholder="Ej: Guadalajara"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="neighborhood">Colonia *</Label>
+            <Input
+              id="neighborhood"
+              placeholder="Ej: Centro"
+              value={neighborhood}
+              onChange={(e) => setNeighborhood(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="street">Calle *</Label>
+            <Input
+              id="street"
+              placeholder="Ej: Av. Juárez"
+              value={street}
+              onChange={(e) => setStreet(e.target.value)}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="ext-number">Número exterior *</Label>
+              <Input
+                id="ext-number"
+                placeholder="123"
+                value={extNumber}
+                onChange={(e) => setExtNumber(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="int-number">Número interior</Label>
+              <Input
+                id="int-number"
+                placeholder="A"
+                value={intNumber}
+                onChange={(e) => setIntNumber(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {user && (
+            <Card className="p-4 bg-accent/10 border-accent">
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="save-location"
+                  checked={saveLocation}
+                  onCheckedChange={(checked) => setSaveLocation(checked as boolean)}
+                />
+                <div className="space-y-1 flex-1">
+                  <Label
+                    htmlFor="save-location"
+                    className="text-base font-semibold cursor-pointer leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Guardar esta ubicación para futuras solicitudes
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Podrás usarla rápidamente en tus próximas solicitudes de servicio
+                  </p>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {error && (
+            <p className="text-sm text-destructive">{error}</p>
+          )}
+
+          <Button
+            onClick={handleContinue}
+            disabled={loading}
+            className="w-full h-12 text-base"
+            size="lg"
+          >
+            {loading ? "Guardando..." : "Continuar"}
+          </Button>
         </TabsContent>
       </Tabs>
-
-      <Button
-        onClick={handleContinue}
-        disabled={loading}
-        className="w-full h-12 text-base bg-primary hover:bg-primary/90"
-        size="lg"
-      >
-        {loading ? 'Guardando...' : 'Continuar'}
-      </Button>
     </div>
   );
 };

@@ -301,6 +301,8 @@ export type Database = {
           price_max: number | null
           price_min: number | null
           scheduled_date: string | null
+          service_description: string | null
+          service_title: string | null
           status: Database["public"]["Enums"]["service_request_status"]
           time_end: string | null
           time_start: string | null
@@ -318,6 +320,8 @@ export type Database = {
           price_max?: number | null
           price_min?: number | null
           scheduled_date?: string | null
+          service_description?: string | null
+          service_title?: string | null
           status?: Database["public"]["Enums"]["service_request_status"]
           time_end?: string | null
           time_start?: string | null
@@ -335,6 +339,8 @@ export type Database = {
           price_max?: number | null
           price_min?: number | null
           scheduled_date?: string | null
+          service_description?: string | null
+          service_title?: string | null
           status?: Database["public"]["Enums"]["service_request_status"]
           time_end?: string | null
           time_start?: string | null

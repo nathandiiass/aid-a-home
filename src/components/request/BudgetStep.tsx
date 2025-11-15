@@ -18,12 +18,6 @@ const BudgetStep = ({ data, updateData, onNext }: BudgetStepProps) => {
   const [noBudget, setNoBudget] = useState(data.noBudget);
   const [error, setError] = useState("");
 
-  // Mock market prices - in real app, fetch from database
-  const marketPrices = {
-    min: 300,
-    avg: 500,
-    max: 800,
-  };
 
   const handleContinue = () => {
     if (noBudget) {
@@ -62,27 +56,6 @@ const BudgetStep = ({ data, updateData, onNext }: BudgetStepProps) => {
           Establece tu rango de presupuesto o deja que los especialistas propongan
         </p>
       </div>
-
-      {/* Market reference */}
-      <Card className="p-4 bg-gradient-card border-border">
-        <p className="text-sm text-muted-foreground mb-3">
-          Precios de referencia del mercado
-        </p>
-        <div className="grid grid-cols-3 gap-3">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-primary">${marketPrices.min}</p>
-            <p className="text-xs text-muted-foreground mt-1">Mínimo</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-accent">${marketPrices.avg}</p>
-            <p className="text-xs text-muted-foreground mt-1">Promedio</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-primary">${marketPrices.max}</p>
-            <p className="text-xs text-muted-foreground mt-1">Máximo</p>
-          </div>
-        </div>
-      </Card>
 
       {/* Budget range */}
       <div className="space-y-4">

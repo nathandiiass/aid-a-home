@@ -39,6 +39,8 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
     const requestSchema = z.object({
       actividad: z.string().min(1, "Actividad requerida").max(200),
       especialista: z.string().min(1, "Especialista requerido").max(200),
+      serviceTitle: z.string().min(10, "Título debe tener al menos 10 caracteres").max(200),
+      serviceDescription: z.string().min(20, "Descripción debe tener al menos 20 caracteres").max(2000),
       budgetMin: z.number().positive().optional(),
       budgetMax: z.number().positive().optional(),
       date: z.date().optional(),
@@ -50,6 +52,8 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
       const validatedData = requestSchema.parse({
         actividad: data.actividad,
         especialista: data.especialista,
+        serviceTitle: data.serviceTitle,
+        serviceDescription: data.serviceDescription,
         budgetMin: data.budgetMin,
         budgetMax: data.budgetMax,
         date: data.date,
@@ -95,6 +99,8 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
           user_id: user.id,
           activity: validatedData.actividad,
           category: validatedData.especialista,
+          service_title: validatedData.serviceTitle,
+          service_description: validatedData.serviceDescription,
           status: 'active',
           price_min: validatedData.budgetMin || null,
           price_max: validatedData.budgetMax || null,
@@ -164,13 +170,22 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
       <Card className="p-4 bg-gradient-card border-border">
         <div className="flex items-start gap-3">
           <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-            <span className="text-primary font-bold text-lg">
-              {data.actividad.charAt(0)}
-            </span>
+            <Edit className="w-6 h-6 text-primary" />
           </div>
           <div className="flex-1">
-            <h3 className="font-semibold text-lg">{data.actividad}</h3>
-            <p className="text-muted-foreground">{data.especialista}</p>
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="font-semibold text-lg">{data.serviceTitle}</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => goToStep(0)}
+                className="h-7 text-xs"
+              >
+                Editar
+              </Button>
+            </div>
+            <p className="text-muted-foreground mb-2">{data.especialista}</p>
+            <p className="text-sm text-muted-foreground line-clamp-2">{data.serviceDescription}</p>
           </div>
         </div>
       </Card>
