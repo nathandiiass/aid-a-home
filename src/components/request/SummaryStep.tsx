@@ -40,14 +40,14 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
 
     // Validate required fields
     const requestSchema = z.object({
-      actividad: z.string().min(1, "Actividad requerida").max(200),
+      actividad: z.string().optional(),
       especialista: z.string().min(1, "Especialista requerido").max(200),
       serviceTitle: z.string().min(10, "Título debe tener al menos 10 caracteres").max(200),
       serviceDescription: z.string().min(20, "Descripción debe tener al menos 20 caracteres").max(2000),
       budgetMin: z.number().positive().optional(),
       budgetMax: z.number().positive().optional(),
       date: z.date().optional(),
-      locationId: z.string().uuid().optional(),
+      locationId: z.string().uuid("Debes seleccionar una ubicación").optional(),
     });
 
     try {
@@ -101,7 +101,7 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
         const { error: updateError } = await supabase
           .from('service_requests')
           .update({
-            activity: validatedData.actividad,
+            activity: validatedData.actividad || validatedData.serviceTitle,
             category: validatedData.especialista,
             service_title: validatedData.serviceTitle,
             service_description: validatedData.serviceDescription,
@@ -128,7 +128,7 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
           .from('service_requests')
           .insert({
             user_id: user.id,
-            activity: validatedData.actividad,
+            activity: validatedData.actividad || validatedData.serviceTitle,
             category: validatedData.especialista,
             service_title: validatedData.serviceTitle,
             service_description: validatedData.serviceDescription,
@@ -159,7 +159,13 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
       console.error('Error publishing request:', error);
       
       if (error instanceof z.ZodError) {
-        toast.error("Por favor completa todos los campos requeridos");
+        // Show specific validation errors
+        const firstError = error.errors[0];
+        if (firstError) {
+          toast.error(firstError.message);
+        } else {
+          toast.error("Por favor completa todos los campos requeridos");
+        }
       } else {
         toast.error(error.message || "Error al publicar la solicitud");
       }
