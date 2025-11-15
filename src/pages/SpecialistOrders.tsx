@@ -13,14 +13,19 @@ import { CompletedOrderCard } from '@/components/specialist/CompletedOrderCard';
 import { SentQuoteCard } from '@/components/specialist/SentQuoteCard';
 import { useSpecialistMode } from '@/hooks/use-specialist-mode';
 import { Logo } from '@/components/Logo';
-
 export default function SpecialistOrders() {
-  const { user, loading: authLoading } = useAuth();
+  const {
+    user,
+    loading: authLoading
+  } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { isSpecialistMode } = useSpecialistMode();
-  
+  const {
+    isSpecialistMode
+  } = useSpecialistMode();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'en-curso');
   const [inProgressOrders, setInProgressOrders] = useState<any[]>([]);
   const [completedOrders, setCompletedOrders] = useState<any[]>([]);
@@ -28,45 +33,41 @@ export default function SpecialistOrders() {
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('date_desc');
   const [specialistProfile, setSpecialistProfile] = useState<any>(null);
-
   useEffect(() => {
     if (!authLoading && !user) {
       navigate(`/auth?returnTo=/specialist/orders?tab=${activeTab}`);
       return;
     }
-
     if (user && !authLoading) {
       loadSpecialistOrders();
     }
   }, [user, authLoading, navigate]);
-
   useEffect(() => {
-    setSearchParams({ tab: activeTab });
+    setSearchParams({
+      tab: activeTab
+    });
   }, [activeTab, setSearchParams]);
-
   const loadSpecialistOrders = async () => {
     try {
       setLoading(true);
 
       // Get specialist profile
-      const { data: profile, error: profileError } = await supabase
-        .from('specialist_profiles')
-        .select('id')
-        .eq('user_id', user?.id)
-        .maybeSingle();
-
+      const {
+        data: profile,
+        error: profileError
+      } = await supabase.from('specialist_profiles').select('id').eq('user_id', user?.id).maybeSingle();
       if (profileError) throw profileError;
       if (!profile) {
         navigate('/specialist-registration');
         return;
       }
-
       setSpecialistProfile(profile);
 
       // Get in-progress orders (quotes that were accepted but not completed yet)
-      const { data: inProgressData, error: inProgressError } = await supabase
-        .from('quotes')
-        .select(`
+      const {
+        data: inProgressData,
+        error: inProgressError
+      } = await supabase.from('quotes').select(`
           id,
           price_fixed,
           price_min,
@@ -95,18 +96,16 @@ export default function SpecialistOrders() {
               state
             )
           )
-        `)
-        .eq('specialist_id', profile.id)
-        .eq('status', 'accepted')
-        .is('attachments', null)
-        .order('created_at', { ascending: false });
-
+        `).eq('specialist_id', profile.id).eq('status', 'accepted').is('attachments', null).order('created_at', {
+        ascending: false
+      });
       if (inProgressError) throw inProgressError;
 
       // Get completed orders (have attachments from completion form)
-      const { data: completedData, error: completedError } = await supabase
-        .from('quotes')
-        .select(`
+      const {
+        data: completedData,
+        error: completedError
+      } = await supabase.from('quotes').select(`
           id,
           price_fixed,
           price_min,
@@ -135,18 +134,16 @@ export default function SpecialistOrders() {
               state
             )
           )
-        `)
-        .eq('specialist_id', profile.id)
-        .eq('status', 'accepted')
-        .not('attachments', 'is', null)
-        .order('created_at', { ascending: false });
-
+        `).eq('specialist_id', profile.id).eq('status', 'accepted').not('attachments', 'is', null).order('created_at', {
+        ascending: false
+      });
       if (completedError) throw completedError;
 
       // Get all sent quotes
-      const { data: sentData, error: sentError } = await supabase
-        .from('quotes')
-        .select(`
+      const {
+        data: sentData,
+        error: sentError
+      } = await supabase.from('quotes').select(`
           id,
           price_fixed,
           price_min,
@@ -174,12 +171,10 @@ export default function SpecialistOrders() {
               state
             )
           )
-        `)
-        .eq('specialist_id', profile.id)
-        .order('created_at', { ascending: false });
-
+        `).eq('specialist_id', profile.id).order('created_at', {
+        ascending: false
+      });
       if (sentError) throw sentError;
-
       setInProgressOrders(inProgressData || []);
       setCompletedOrders(completedData || []);
       setSentQuotes(sentData || []);
@@ -194,7 +189,6 @@ export default function SpecialistOrders() {
       setLoading(false);
     }
   };
-
   const sortOrders = (orders: any[]) => {
     const sorted = [...orders];
     switch (sortBy) {
@@ -206,24 +200,20 @@ export default function SpecialistOrders() {
         return sorted;
     }
   };
-
   if (authLoading || loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center pb-20">
+    return <div className="min-h-screen bg-background flex items-center justify-center pb-20">
         <div className="text-foreground">Cargando...</div>
-      </div>
-    );
+      </div>;
   }
-
   const sortedInProgress = sortOrders(inProgressOrders);
   const sortedCompleted = sortOrders(completedOrders);
   const sortedSent = sortOrders(sentQuotes);
-
-  return (
-    <div className="min-h-screen bg-background pb-20">
-      <Logo className="pt-4 pb-2" />
+  return <div className="min-h-screen bg-background pb-20">
+      
       <div className="container max-w-4xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold mb-6" style={{ color: '#003049' }}>Órdenes</h1>
+        <h1 className="text-2xl font-bold mb-6" style={{
+        color: '#003049'
+      }}>Órdenes</h1>
 
         <div className="mb-4">
           <Select value={sortBy} onValueChange={setSortBy}>
@@ -246,48 +236,25 @@ export default function SpecialistOrders() {
           </TabsList>
 
           <TabsContent value="en-curso" className="space-y-4">
-            {sortedInProgress.length === 0 ? (
-              <Card className="p-8 text-center">
+            {sortedInProgress.length === 0 ? <Card className="p-8 text-center">
                 <p className="text-muted-foreground">No tienes órdenes en curso</p>
-              </Card>
-            ) : (
-              sortedInProgress.map((order) => (
-                <InProgressOrderCard 
-                  key={order.id} 
-                  order={order} 
-                  onUpdate={loadSpecialistOrders}
-                />
-              ))
-            )}
+              </Card> : sortedInProgress.map(order => <InProgressOrderCard key={order.id} order={order} onUpdate={loadSpecialistOrders} />)}
           </TabsContent>
 
           <TabsContent value="completadas" className="space-y-4">
-            {sortedCompleted.length === 0 ? (
-              <Card className="p-8 text-center">
+            {sortedCompleted.length === 0 ? <Card className="p-8 text-center">
                 <p className="text-muted-foreground">No tienes órdenes completadas</p>
-              </Card>
-            ) : (
-              sortedCompleted.map((order) => (
-                <CompletedOrderCard key={order.id} order={order} />
-              ))
-            )}
+              </Card> : sortedCompleted.map(order => <CompletedOrderCard key={order.id} order={order} />)}
           </TabsContent>
 
           <TabsContent value="enviadas" className="space-y-4">
-            {sortedSent.length === 0 ? (
-              <Card className="p-8 text-center">
+            {sortedSent.length === 0 ? <Card className="p-8 text-center">
                 <p className="text-muted-foreground">No has enviado cotizaciones</p>
-              </Card>
-            ) : (
-              sortedSent.map((quote) => (
-                <SentQuoteCard key={quote.id} quote={quote} />
-              ))
-            )}
+              </Card> : sortedSent.map(quote => <SentQuoteCard key={quote.id} quote={quote} />)}
           </TabsContent>
         </Tabs>
       </div>
 
       <BottomNavSpecialist />
-    </div>
-  );
+    </div>;
 }
