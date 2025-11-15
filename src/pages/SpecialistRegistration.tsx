@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Plus, X, Upload, Check } from 'lucide-react';
+import { ChevronLeft, Plus, X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,21 +9,16 @@ import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Logo } from '@/components/Logo';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import confetti from 'canvas-confetti';
 
 interface Specialty {
   id: string;
   specialty: string;
   roleLabel: string;
+  experienceYears: string;
   activities: Activity[];
 }
 
@@ -42,6 +37,27 @@ const MEXICAN_STATES = [
   "Tabasco", "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas"
 ];
 
+const YUCATAN_MUNICIPALITIES = [
+  "Abalá", "Acanceh", "Akil", "Baca", "Bokobá", "Buctzotz", "Cacalchén",
+  "Calotmul", "Cansahcab", "Cantamayec", "Celestún", "Cenotillo", "Chankom",
+  "Chapab", "Chemax", "Chichimilá", "Chicxulub Pueblo", "Chikindzonot",
+  "Chocholá", "Chumayel", "Conkal", "Cuncunul", "Cuzamá", "Dzán",
+  "Dzemul", "Dzidzantún", "Dzilam de Bravo", "Dzilam González", "Dzitás",
+  "Dzoncauich", "Espita", "Halachó", "Hocabá", "Hoctún", "Homún",
+  "Huhí", "Hunucmá", "Ixil", "Izamal", "Kanasín", "Kantunil", "Kaua",
+  "Kinchil", "Kopomá", "Mama", "Maní", "Maxcanú", "Mayapán", "Mérida",
+  "Mocochá", "Motul", "Muna", "Muxupip", "Opichén", "Oxkutzcab",
+  "Panabá", "Peto", "Progreso", "Quintana Roo", "Río Lagartos",
+  "Sacalum", "Samahil", "San Felipe", "Sanahcat", "Santa Elena",
+  "Seyé", "Sinanché", "Sotuta", "Sucilá", "Sudzal", "Suma",
+  "Tahdziú", "Tahmek", "Teabo", "Tecoh", "Tekal de Venegas", "Tekantó",
+  "Tekax", "Tekit", "Tekom", "Telchac Pueblo", "Telchac Puerto", "Temax",
+  "Temozón", "Tepakán", "Tetiz", "Teya", "Ticul", "Timucuy",
+  "Tinum", "Tixcacalcupul", "Tixkokob", "Tixmehuac", "Tixpéhual", "Tizimín",
+  "Tunkás", "Tzucacab", "Uayma", "Ucú", "Umán", "Valladolid",
+  "Xocchel", "Yaxcabá", "Yaxkukul", "Yobaín"
+];
+
 export default function SpecialistRegistration() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -50,29 +66,47 @@ export default function SpecialistRegistration() {
   const [loading, setLoading] = useState(false);
   const [services, setServices] = useState<any[]>([]);
   
-  // Personal data
+  // Section 1: Personal Data
+  const [personType, setPersonType] = useState<'fisica' | 'moral'>('fisica');
   const [personalData, setPersonalData] = useState({
-    firstName: user?.user_metadata?.first_name || '',
-    lastName: user?.user_metadata?.last_name || '',
-    birthDate: '',
-    gender: user?.user_metadata?.gender || '',
-    nationality: user?.user_metadata?.nationality || 'Mexicana',
+    firstName: '',
+    lastName: '',
+    razonSocial: '',
+    birthOrConstitutionDate: '',
+    gender: '',
     phone: '',
+    email: user?.email || '',
     rfc: '',
-    idDocument: null as File | null,
+    city: '',
+    state: '',
+    postalCode: '',
+    street: '',
+    streetNumber: '',
+    neighborhood: '',
+    profilePhoto: null as File | null,
+    acceptedTerms: false,
   });
 
-  // Specialties
+  // Section 2: Professional Data
   const [specialties, setSpecialties] = useState<Specialty[]>([{
     id: '1',
     specialty: '',
     roleLabel: '',
+    experienceYears: '',
     activities: []
   }]);
+  const [professionalDescription, setProfessionalDescription] = useState('');
+  const [licensesCertifications, setLicensesCertifications] = useState('');
 
-  // Work zones
-  const [selectedStates, setSelectedStates] = useState<string[]>([]);
-  const [citiesByState, setCitiesByState] = useState<Record<string, string[]>>({});
+  // Section 2: Coverage Zone (only Yucatán)
+  const [selectedMunicipalities, setSelectedMunicipalities] = useState<string[]>([]);
+
+  // Section 3: Documentation
+  const [documents, setDocuments] = useState({
+    idDocument: null as File | null,
+    csfDocument: null as File | null,
+    addressProof: null as File | null,
+  });
 
   useEffect(() => {
     if (!authLoading) {
@@ -101,32 +135,38 @@ export default function SpecialistRegistration() {
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "Error",
-          description: "El archivo no debe superar los 5MB",
-          variant: "destructive"
-        });
-        return;
-      }
-      setPersonalData({ ...personalData, idDocument: file });
+  const handleFileUpload = (field: 'profilePhoto' | 'idDocument' | 'csfDocument' | 'addressProof', file: File) => {
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Error",
+        description: "El archivo no debe superar los 5MB",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (field === 'profilePhoto') {
+      setPersonalData({ ...personalData, profilePhoto: file });
+    } else {
+      setDocuments({ ...documents, [field]: file });
     }
   };
 
+  // Specialty management
   const addSpecialty = () => {
     setSpecialties([...specialties, {
       id: Date.now().toString(),
       specialty: '',
       roleLabel: '',
+      experienceYears: '',
       activities: []
     }]);
   };
 
   const removeSpecialty = (id: string) => {
-    setSpecialties(specialties.filter(s => s.id !== id));
+    if (specialties.length > 1) {
+      setSpecialties(specialties.filter(s => s.id !== id));
+    }
   };
 
   const updateSpecialty = (id: string, field: string, value: any) => {
@@ -167,75 +207,132 @@ export default function SpecialistRegistration() {
     }));
   };
 
-  const toggleState = (state: string) => {
-    if (selectedStates.includes(state)) {
-      setSelectedStates(selectedStates.filter(s => s !== state));
-      const newCities = { ...citiesByState };
-      delete newCities[state];
-      setCitiesByState(newCities);
+  const toggleMunicipality = (municipality: string) => {
+    if (selectedMunicipalities.includes(municipality)) {
+      setSelectedMunicipalities(selectedMunicipalities.filter(m => m !== municipality));
     } else {
-      setSelectedStates([...selectedStates, state]);
+      setSelectedMunicipalities([...selectedMunicipalities, municipality]);
     }
   };
 
-  const addCity = (state: string, city: string) => {
-    if (!city.trim()) return;
-    
-    setCitiesByState({
-      ...citiesByState,
-      [state]: [...(citiesByState[state] || []), city.trim()]
-    });
-  };
-
-  const removeCity = (state: string, city: string) => {
-    setCitiesByState({
-      ...citiesByState,
-      [state]: citiesByState[state].filter(c => c !== city)
-    });
-  };
-
+  // Validation functions
   const validateStep1 = () => {
-    return personalData.firstName && personalData.lastName && 
-           personalData.phone && personalData.rfc && personalData.idDocument;
+    const baseValidation = 
+      personalData.phone &&
+      personalData.email &&
+      personalData.rfc &&
+      personalData.city &&
+      personalData.state &&
+      personalData.postalCode &&
+      personalData.street &&
+      personalData.streetNumber &&
+      personalData.neighborhood &&
+      personalData.profilePhoto &&
+      personalData.birthOrConstitutionDate &&
+      personalData.acceptedTerms;
+
+    if (personType === 'fisica') {
+      return baseValidation &&
+        personalData.firstName &&
+        personalData.lastName &&
+        personalData.gender;
+    } else {
+      return baseValidation && personalData.razonSocial;
+    }
   };
 
   const validateStep2 = () => {
-    return specialties.every(s => s.specialty && s.roleLabel && s.activities.length > 0);
+    const specialtiesValid = specialties.every(s => 
+      s.specialty && 
+      s.roleLabel && 
+      s.experienceYears && 
+      parseInt(s.experienceYears) >= 0 &&
+      s.activities.length >= 3
+    );
+    
+    return specialtiesValid &&
+      professionalDescription &&
+      professionalDescription.length <= 200 &&
+      selectedMunicipalities.length > 0;
   };
 
   const validateStep3 = () => {
-    return selectedStates.length > 0 && selectedStates.every(state => 
-      citiesByState[state] && citiesByState[state].length > 0
-    );
+    return documents.idDocument && 
+           documents.csfDocument && 
+           documents.addressProof;
   };
 
   const handleSubmit = async () => {
+    if (!validateStep3()) {
+      toast({
+        title: "Error",
+        description: "Debes completar todos los documentos requeridos",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      // Upload ID document
-      const fileExt = personalData.idDocument!.name.split('.').pop();
-      const fileName = `${user!.id}/${Date.now()}.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('specialist-documents')
-        .upload(fileName, personalData.idDocument!);
+      // Upload all documents
+      const uploadDocument = async (file: File, folder: string) => {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user!.id}/${folder}/${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('specialist-documents')
+          .upload(fileName, file);
 
-      if (uploadError) throw uploadError;
+        if (uploadError) throw uploadError;
 
-      const { data, error: urlError } = await supabase.storage
-        .from('specialist-documents')
-        .createSignedUrl(fileName, 31536000); // 1 year expiry
+        const { data, error: urlError } = await supabase.storage
+          .from('specialist-documents')
+          .createSignedUrl(fileName, 31536000); // 1 year
 
-      if (urlError) throw urlError;
+        if (urlError) throw urlError;
+        return data.signedUrl;
+      };
+
+      const [profilePhotoUrl, idDocumentUrl, csfDocumentUrl, addressProofUrl] = await Promise.all([
+        uploadDocument(personalData.profilePhoto!, 'profile'),
+        uploadDocument(documents.idDocument!, 'id'),
+        uploadDocument(documents.csfDocument!, 'csf'),
+        uploadDocument(documents.addressProof!, 'address')
+      ]);
+
+      // Update profile with gender
+      if (personType === 'fisica' && personalData.gender) {
+        await supabase
+          .from('profiles')
+          .update({ gender: personalData.gender })
+          .eq('id', user!.id);
+      }
 
       // Create specialist profile
       const { data: profile, error: profileError } = await supabase
         .from('specialist_profiles')
         .insert([{
           user_id: user!.id,
+          person_type: personType,
           phone: personalData.phone,
+          email: personalData.email,
           rfc: personalData.rfc,
-          id_document_url: data.signedUrl
+          razon_social: personType === 'moral' ? personalData.razonSocial : null,
+          birth_or_constitution_date: personalData.birthOrConstitutionDate,
+          city: personalData.city,
+          state: personalData.state,
+          postal_code: personalData.postalCode,
+          street: personalData.street,
+          street_number: personalData.streetNumber,
+          neighborhood: personalData.neighborhood,
+          profile_photo_url: profilePhotoUrl,
+          professional_description: professionalDescription,
+          licenses_certifications: licensesCertifications || null,
+          id_document_url: idDocumentUrl,
+          csf_document_url: csfDocumentUrl,
+          address_proof_url: addressProofUrl,
+          accepted_terms_at: new Date().toISOString(),
+          status: 'pending'
         }])
         .select()
         .single();
@@ -249,41 +346,39 @@ export default function SpecialistRegistration() {
           .insert([{
             specialist_id: profile.id,
             specialty: specialty.specialty,
-            role_label: specialty.roleLabel
+            role_label: specialty.roleLabel,
+            experience_years: parseInt(specialty.experienceYears)
           }])
           .select()
           .single();
 
         if (specialtyError) throw specialtyError;
 
-        if (specialty.activities.length > 0) {
-          const activities = specialty.activities.map(a => ({
-            specialty_id: specialtyData.id,
-            activity: a.activity,
-            price_min: a.priceMin ? parseFloat(a.priceMin) : null,
-            price_max: a.priceMax ? parseFloat(a.priceMax) : null
-          }));
+        // Insert activities
+        const activitiesData = specialty.activities.map(activity => ({
+          specialty_id: specialtyData.id,
+          activity: activity.activity,
+          price_min: activity.priceMin ? parseFloat(activity.priceMin) : null,
+          price_max: activity.priceMax ? parseFloat(activity.priceMax) : null
+        }));
 
-          const { error: activitiesError } = await supabase
-            .from('specialist_activities')
-            .insert(activities);
+        const { error: activitiesError } = await supabase
+          .from('specialist_activities')
+          .insert(activitiesData);
 
-          if (activitiesError) throw activitiesError;
-        }
+        if (activitiesError) throw activitiesError;
       }
 
-      // Create work zones
-      const workZones = selectedStates.map(state => ({
-        specialist_id: profile.id,
-        state,
-        cities: citiesByState[state] || []
-      }));
-
-      const { error: zonesError } = await supabase
+      // Create work zone (only Yucatán)
+      const { error: workZoneError } = await supabase
         .from('specialist_work_zones')
-        .insert(workZones);
+        .insert([{
+          specialist_id: profile.id,
+          state: 'Yucatán',
+          cities: selectedMunicipalities
+        }]);
 
-      if (zonesError) throw zonesError;
+      if (workZoneError) throw workZoneError;
 
       // Success!
       confetti({
@@ -293,8 +388,8 @@ export default function SpecialistRegistration() {
       });
 
       toast({
-        title: "¡Felicidades!",
-        description: "Bienvenido(a) al equipo"
+        title: "¡Registro exitoso!",
+        description: "Hemos recibido tu registro, revisaremos tu información."
       });
 
       setTimeout(() => {
@@ -302,6 +397,7 @@ export default function SpecialistRegistration() {
       }, 2000);
 
     } catch (error: any) {
+      console.error('Error:', error);
       toast({
         title: "Error",
         description: error.message,
@@ -312,428 +408,596 @@ export default function SpecialistRegistration() {
     }
   };
 
-  const uniqueSpecialists = [...new Set(services.map(s => s.especialista))];
-
-  if (authLoading || loading) {
+  if (authLoading || !user) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-foreground">Cargando...</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">Cargando...</div>
       </div>
     );
   }
 
+  const uniqueSpecialties = [...new Set(services.map(s => s.especialista))];
+
   return (
     <div className="min-h-screen bg-background pb-20">
-      <Logo className="pt-4 pb-2" />
-      
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-card border-b border-border">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => step === 1 ? navigate('/profile') : setStep(step - 1)}
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </Button>
-            <div className="flex-1">
-              <h1 className="text-lg font-semibold">Registro de especialista</h1>
-              <p className="text-sm text-muted-foreground">Paso {step} de 4</p>
-            </div>
-          </div>
-          <div className="flex gap-2 mt-4">
-            {[1, 2, 3, 4].map((s) => (
-              <div
-                key={s}
-                className={`h-1 flex-1 rounded-full transition-colors ${
-                  s <= step ? "bg-primary" : "bg-muted"
-                }`}
-              />
+      <div className="max-w-2xl mx-auto p-4">
+        <div className="mb-6">
+          <Logo className="mb-4" />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/profile')}
+            className="mb-4"
+          >
+            <ChevronLeft className="h-4 w-4 mr-2" />
+            Volver
+          </Button>
+        </div>
+
+        <div className="bg-card rounded-lg p-6 shadow-lg mb-6">
+          <h1 className="text-2xl font-bold mb-2">Registro de Especialista</h1>
+          <p className="text-muted-foreground mb-6">
+            Completa la información en {step === 1 ? 'Datos Personales' : step === 2 ? 'Datos Profesionales' : 'Documentación'}
+          </p>
+
+          {/* Progress indicator */}
+          <div className="flex items-center justify-between mb-8">
+            {[1, 2, 3].map((s) => (
+              <div key={s} className="flex items-center flex-1">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  step >= s ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                }`}>
+                  {step > s ? <Check className="h-4 w-4" /> : s}
+                </div>
+                {s < 3 && (
+                  <div className={`flex-1 h-1 mx-2 ${
+                    step > s ? 'bg-primary' : 'bg-muted'
+                  }`} />
+                )}
+              </div>
             ))}
           </div>
-        </div>
-      </div>
 
-      {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-6">
-        {/* Step 1: Personal Data */}
-        {step === 1 && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-semibold text-foreground mb-2">Datos personales</h2>
-              <p className="text-secondary text-sm">Completa tu información básica</p>
-            </div>
+          {/* Step 1: Personal Data */}
+          {step === 1 && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold mb-4">Sección 1 - Datos Personales</h2>
 
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="firstName">Nombre(s)*</Label>
+              {/* Person Type */}
+              <div className="space-y-2">
+                <Label>Tipo de Persona *</Label>
+                <RadioGroup value={personType} onValueChange={(v) => setPersonType(v as 'fisica' | 'moral')}>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="fisica" id="fisica" />
+                    <Label htmlFor="fisica" className="font-normal cursor-pointer">
+                      Persona Física
+                      <span className="block text-xs text-muted-foreground">
+                        Persona que trabaja como profesional independiente
+                      </span>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="moral" id="moral" />
+                    <Label htmlFor="moral" className="font-normal cursor-pointer">
+                      Persona Moral
+                      <span className="block text-xs text-muted-foreground">
+                        Empresa o razón social registrada que ofrece servicios
+                      </span>
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              {/* Conditional fields based on person type */}
+              {personType === 'fisica' ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">Nombre(s) *</Label>
+                      <Input
+                        id="firstName"
+                        value={personalData.firstName}
+                        onChange={(e) => setPersonalData({ ...personalData, firstName: e.target.value })}
+                        placeholder="Nombre(s)"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Apellidos *</Label>
+                      <Input
+                        id="lastName"
+                        value={personalData.lastName}
+                        onChange={(e) => setPersonalData({ ...personalData, lastName: e.target.value })}
+                        placeholder="Apellidos"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="birthDate">Fecha de Nacimiento *</Label>
+                    <Input
+                      id="birthDate"
+                      type="date"
+                      value={personalData.birthOrConstitutionDate}
+                      onChange={(e) => setPersonalData({ ...personalData, birthOrConstitutionDate: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="gender">Género *</Label>
+                    <Select value={personalData.gender} onValueChange={(v) => setPersonalData({ ...personalData, gender: v })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona tu género" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="hombre">Hombre</SelectItem>
+                        <SelectItem value="mujer">Mujer</SelectItem>
+                        <SelectItem value="otro">Otro</SelectItem>
+                        <SelectItem value="prefiero_no_decir">Prefiero no decir</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="razonSocial">Razón Social *</Label>
+                    <Input
+                      id="razonSocial"
+                      value={personalData.razonSocial}
+                      onChange={(e) => setPersonalData({ ...personalData, razonSocial: e.target.value })}
+                      placeholder="Razón Social de la empresa"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="constitutionDate">Fecha de Constitución *</Label>
+                    <Input
+                      id="constitutionDate"
+                      type="date"
+                      value={personalData.birthOrConstitutionDate}
+                      onChange={(e) => setPersonalData({ ...personalData, birthOrConstitutionDate: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="gender">Género (Opcional)</Label>
+                    <Select value={personalData.gender} onValueChange={(v) => setPersonalData({ ...personalData, gender: v })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona género (opcional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="hombre">Hombre</SelectItem>
+                        <SelectItem value="mujer">Mujer</SelectItem>
+                        <SelectItem value="otro">Otro</SelectItem>
+                        <SelectItem value="prefiero_no_decir">Prefiero no decir</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Teléfono Móvil *</Label>
                   <Input
-                    id="firstName"
-                    value={personalData.firstName}
-                    onChange={(e) => setPersonalData({...personalData, firstName: e.target.value})}
+                    id="phone"
+                    type="tel"
+                    value={personalData.phone}
+                    onChange={(e) => setPersonalData({ ...personalData, phone: e.target.value })}
+                    placeholder="10 dígitos"
+                    maxLength={10}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="lastName">Apellido(s)*</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Correo Electrónico *</Label>
                   <Input
-                    id="lastName"
-                    value={personalData.lastName}
-                    onChange={(e) => setPersonalData({...personalData, lastName: e.target.value})}
+                    id="email"
+                    type="email"
+                    value={personalData.email}
+                    onChange={(e) => setPersonalData({ ...personalData, email: e.target.value })}
+                    placeholder="correo@ejemplo.com"
                   />
                 </div>
               </div>
 
-              <div>
-                <Label htmlFor="phone">Teléfono*</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="10 dígitos"
-                  value={personalData.phone}
-                  onChange={(e) => setPersonalData({...personalData, phone: e.target.value})}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="rfc">RFC*</Label>
+              <div className="space-y-2">
+                <Label htmlFor="rfc">RFC *</Label>
                 <Input
                   id="rfc"
-                  placeholder="13 caracteres"
                   value={personalData.rfc}
-                  onChange={(e) => setPersonalData({...personalData, rfc: e.target.value.toUpperCase()})}
+                  onChange={(e) => setPersonalData({ ...personalData, rfc: e.target.value.toUpperCase() })}
+                  placeholder="RFC"
                   maxLength={13}
                 />
               </div>
 
-              <div>
-                <Label htmlFor="idDocument">Identificación oficial* (INE o Pasaporte)</Label>
-                <div className="mt-2">
-                  <label className="flex items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-muted/30 transition-colors">
-                    <input
-                      id="idDocument"
-                      type="file"
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      className="hidden"
-                      onChange={handleFileUpload}
-                    />
-                    {personalData.idDocument ? (
-                      <div className="text-center">
-                        <Check className="w-8 h-8 text-primary mx-auto mb-2" />
-                        <p className="text-sm text-foreground font-medium">
-                          {personalData.idDocument.name}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="text-center">
-                        <Upload className="w-8 h-8 text-muted mx-auto mb-2" />
-                        <p className="text-sm text-secondary">
-                          Sube tu identificación (máx. 5MB)
-                        </p>
-                      </div>
-                    )}
-                  </label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="city">Ciudad *</Label>
+                  <Input
+                    id="city"
+                    value={personalData.city}
+                    onChange={(e) => setPersonalData({ ...personalData, city: e.target.value })}
+                    placeholder="Ciudad"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="state">Estado *</Label>
+                  <Select value={personalData.state} onValueChange={(v) => setPersonalData({ ...personalData, state: v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MEXICAN_STATES.map(state => (
+                        <SelectItem key={state} value={state}>{state}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="postalCode">Código Postal *</Label>
+                  <Input
+                    id="postalCode"
+                    value={personalData.postalCode}
+                    onChange={(e) => setPersonalData({ ...personalData, postalCode: e.target.value })}
+                    placeholder="CP"
+                    maxLength={5}
+                  />
                 </div>
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="street">Calle *</Label>
+                <Input
+                  id="street"
+                  value={personalData.street}
+                  onChange={(e) => setPersonalData({ ...personalData, street: e.target.value })}
+                  placeholder="Calle"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="streetNumber">Número *</Label>
+                  <Input
+                    id="streetNumber"
+                    value={personalData.streetNumber}
+                    onChange={(e) => setPersonalData({ ...personalData, streetNumber: e.target.value })}
+                    placeholder="Número"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="neighborhood">Colonia *</Label>
+                  <Input
+                    id="neighborhood"
+                    value={personalData.neighborhood}
+                    onChange={(e) => setPersonalData({ ...personalData, neighborhood: e.target.value })}
+                    placeholder="Colonia"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="profilePhoto">Foto de Perfil Profesional *</Label>
+                <Input
+                  id="profilePhoto"
+                  type="file"
+                  accept="image/jpeg,image/png"
+                  onChange={(e) => e.target.files?.[0] && handleFileUpload('profilePhoto', e.target.files[0])}
+                />
+                {personalData.profilePhoto && (
+                  <p className="text-sm text-muted-foreground">✓ {personalData.profilePhoto.name}</p>
+                )}
+              </div>
+
+              <div className="flex items-start space-x-2">
+                <Checkbox
+                  id="terms"
+                  checked={personalData.acceptedTerms}
+                  onCheckedChange={(checked) => setPersonalData({ ...personalData, acceptedTerms: checked as boolean })}
+                />
+                <Label htmlFor="terms" className="text-sm font-normal cursor-pointer">
+                  He leído y acepto los{' '}
+                  <a href="#" className="text-primary underline">Términos</a>,{' '}
+                  <a href="#" className="text-primary underline">Aviso de Privacidad</a> y{' '}
+                  <a href="#" className="text-primary underline">Condiciones para Proveedores</a> *
+                </Label>
+              </div>
             </div>
+          )}
 
-            <Button
-              onClick={() => setStep(2)}
-              disabled={!validateStep1()}
-              className="w-full h-12 text-base"
-            >
-              Continuar
-            </Button>
-          </div>
-        )}
-
-        {/* Step 2: Specialties */}
-        {step === 2 && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-semibold text-foreground mb-2">Especialidades y actividades</h2>
-              <p className="text-secondary text-sm">Define tus servicios y precios</p>
-            </div>
-
+          {/* Step 2: Professional Data */}
+          {step === 2 && (
             <div className="space-y-6">
-              {specialties.map((specialty, index) => (
-                <div key={specialty.id} className="border border-border rounded-lg p-4 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-foreground">Especialidad {index + 1}</h3>
-                    {specialties.length > 1 && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeSpecialty(specialty.id)}
+              <h2 className="text-xl font-semibold mb-4">Sección 2 - Datos Profesionales</h2>
+
+              {/* Specialties */}
+              <div className="space-y-4">
+                <Label>Especialista en: * (Selecciona al menos una especialidad)</Label>
+                {specialties.map((specialty, index) => (
+                  <div key={specialty.id} className="border rounded-lg p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">Especialidad {index + 1}</h3>
+                      {specialties.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeSpecialty(specialty.id)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Selecciona especialidad *</Label>
+                      <Select
+                        value={specialty.specialty}
+                        onValueChange={(v) => {
+                          updateSpecialty(specialty.id, 'specialty', v);
+                          updateSpecialty(specialty.id, 'roleLabel', v);
+                          updateSpecialty(specialty.id, 'activities', []);
+                        }}
                       >
-                        <X className="w-4 h-4" />
-                      </Button>
-                    )}
-                  </div>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecciona una especialidad" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {uniqueSpecialties.map(spec => (
+                            <SelectItem key={spec} value={spec}>{spec}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                  <div>
-                    <Label>Especialidad*</Label>
-                    <Select
-                      value={specialty.specialty}
-                      onValueChange={(value) => updateSpecialty(specialty.id, 'specialty', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {uniqueSpecialists.map((spec) => (
-                          <SelectItem key={spec} value={spec}>{spec}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                    <div className="space-y-2">
+                      <Label>Años de experiencia *</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        value={specialty.experienceYears}
+                        onChange={(e) => updateSpecialty(specialty.id, 'experienceYears', e.target.value)}
+                        placeholder="Años de experiencia"
+                      />
+                    </div>
 
-                  <div>
-                    <Label htmlFor={`role-${specialty.id}`}>Rol/Etiqueta*</Label>
-                    <Input
-                      id={`role-${specialty.id}`}
-                      placeholder="Ej: Jardinero profesional"
-                      value={specialty.roleLabel}
-                      onChange={(e) => updateSpecialty(specialty.id, 'roleLabel', e.target.value)}
-                    />
-                  </div>
-
-                  {specialty.specialty && (
-                    <div>
-                      <Label>Actividades*</Label>
-                      <div className="mt-2 space-y-3">
-                        {getActivitiesForSpecialty(specialty.specialty).map((activity) => {
-                          const activityData = specialty.activities.find(a => a.activity === activity);
-                          const isSelected = !!activityData;
-
-                          return (
-                            <div key={activity} className="space-y-2">
-                              <div className="flex items-center space-x-2">
-                                <Checkbox
-                                  id={`${specialty.id}-${activity}`}
-                                  checked={isSelected}
-                                  onCheckedChange={() => toggleActivity(specialty.id, activity)}
-                                />
-                                <label
-                                  htmlFor={`${specialty.id}-${activity}`}
-                                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                  {activity}
-                                </label>
-                              </div>
-                              
-                              {isSelected && (
-                                <div className="ml-6 grid grid-cols-2 gap-2">
-                                  <div>
+                    {specialty.specialty && (
+                      <div className="space-y-2">
+                        <Label>Servicios que ofreces * (Mínimo 3)</Label>
+                        <div className="space-y-2 max-h-64 overflow-y-auto border rounded p-3">
+                          {getActivitiesForSpecialty(specialty.specialty).map(activity => {
+                            const isSelected = specialty.activities.find(a => a.activity === activity);
+                            return (
+                              <div key={activity} className="space-y-2">
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox
+                                    checked={!!isSelected}
+                                    onCheckedChange={() => toggleActivity(specialty.id, activity)}
+                                  />
+                                  <Label className="font-normal cursor-pointer">{activity}</Label>
+                                </div>
+                                {isSelected && (
+                                  <div className="ml-6 grid grid-cols-2 gap-2">
                                     <Input
                                       type="number"
-                                      placeholder="Precio mín."
-                                      value={activityData?.priceMin || ''}
+                                      placeholder="Precio mín (opcional)"
+                                      value={isSelected.priceMin || ''}
                                       onChange={(e) => updateActivityPrice(specialty.id, activity, 'priceMin', e.target.value)}
                                     />
-                                  </div>
-                                  <div>
                                     <Input
                                       type="number"
-                                      placeholder="Precio máx."
-                                      value={activityData?.priceMax || ''}
+                                      placeholder="Precio máx (opcional)"
+                                      value={isSelected.priceMax || ''}
                                       onChange={(e) => updateActivityPrice(specialty.id, activity, 'priceMax', e.target.value)}
                                     />
                                   </div>
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Servicios seleccionados: {specialty.activities.length} 
+                          {specialty.activities.length < 3 && ' (Mínimo 3 requeridos)'}
+                        </p>
                       </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-
-              <Button
-                variant="outline"
-                onClick={addSpecialty}
-                className="w-full"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Agregar otra especialidad
-              </Button>
-            </div>
-
-            <Button
-              onClick={() => setStep(3)}
-              disabled={!validateStep2()}
-              className="w-full h-12 text-base"
-            >
-              Continuar
-            </Button>
-          </div>
-        )}
-
-        {/* Step 3: Work Zones */}
-        {step === 3 && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-semibold text-foreground mb-2">Zonas de trabajo</h2>
-              <p className="text-secondary text-sm">Selecciona dónde ofreces tus servicios</p>
-            </div>
-
-            <div>
-              <Label>Estados*</Label>
-              <div className="mt-2 grid grid-cols-2 gap-2 max-h-64 overflow-y-auto border border-border rounded-lg p-4">
-                {MEXICAN_STATES.map((state) => (
-                  <div key={state} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={state}
-                      checked={selectedStates.includes(state)}
-                      onCheckedChange={() => toggleState(state)}
-                    />
-                    <label
-                      htmlFor={state}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      {state}
-                    </label>
+                    )}
                   </div>
                 ))}
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={addSpecialty}
+                  className="w-full"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Agregar otra especialidad
+                </Button>
               </div>
-            </div>
 
-            {selectedStates.length > 0 && (
-              <div className="space-y-4">
-                <Label>Ciudades por estado*</Label>
-                {selectedStates.map((state) => (
-                  <div key={state} className="border border-border rounded-lg p-4 space-y-3">
-                    <p className="font-medium text-foreground">{state}</p>
-                    
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Agregar ciudad"
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            addCity(state, e.currentTarget.value);
-                            e.currentTarget.value = '';
-                          }
-                        }}
-                      />
-                      <Button
-                        type="button"
-                        size="icon"
-                        onClick={(e) => {
-                          const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-                          addCity(state, input.value);
-                          input.value = '';
-                        }}
-                      >
-                        <Plus className="w-4 h-4" />
-                      </Button>
-                    </div>
+              <div className="space-y-2">
+                <Label htmlFor="description">Descripción Profesional * (Máximo 200 caracteres)</Label>
+                <Textarea
+                  id="description"
+                  value={professionalDescription}
+                  onChange={(e) => setProfessionalDescription(e.target.value)}
+                  placeholder="Describe brevemente tu experiencia y tipo de trabajos que realizas"
+                  maxLength={200}
+                  rows={4}
+                />
+                <p className="text-sm text-muted-foreground text-right">
+                  {professionalDescription.length}/200
+                </p>
+              </div>
 
-                    <div className="flex flex-wrap gap-2">
-                      {citiesByState[state]?.map((city) => (
-                        <Badge key={city} variant="secondary" className="gap-1">
-                          {city}
-                          <X
-                            className="w-3 h-3 cursor-pointer"
-                            onClick={() => removeCity(state, city)}
+              <div className="space-y-2">
+                <Label htmlFor="licenses">Licencias / Certificaciones (Opcional)</Label>
+                <Textarea
+                  id="licenses"
+                  value={licensesCertifications}
+                  onChange={(e) => setLicensesCertifications(e.target.value)}
+                  placeholder="Licencias, certificaciones o permisos relevantes (opcional)"
+                  rows={3}
+                />
+              </div>
+
+              {/* Coverage Zone */}
+              <div className="space-y-2">
+                <Label>Zona de Cobertura *</Label>
+                <div className="border rounded-lg p-4 space-y-4">
+                  <div className="space-y-2">
+                    <Label>Estado</Label>
+                    <Select value="Yucatán" disabled>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Yucatán" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Yucatán">Yucatán</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Actualmente solo disponible para Yucatán
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Municipios de Yucatán * (Selecciona al menos uno)</Label>
+                    <div className="border rounded p-3 max-h-64 overflow-y-auto space-y-2">
+                      {YUCATAN_MUNICIPALITIES.map(municipality => (
+                        <div key={municipality} className="flex items-center space-x-2">
+                          <Checkbox
+                            checked={selectedMunicipalities.includes(municipality)}
+                            onCheckedChange={() => toggleMunicipality(municipality)}
                           />
-                        </Badge>
+                          <Label className="font-normal cursor-pointer">{municipality}</Label>
+                        </div>
                       ))}
                     </div>
+                    <p className="text-sm text-muted-foreground">
+                      Municipios seleccionados: {selectedMunicipalities.length}
+                    </p>
                   </div>
-                ))}
+                </div>
               </div>
+            </div>
+          )}
+
+          {/* Step 3: Documentation */}
+          {step === 3 && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold mb-4">Sección 3 - Documentación para Validación</h2>
+              <p className="text-muted-foreground mb-4">
+                Todos los documentos son obligatorios y serán utilizados para validar tu registro.
+              </p>
+
+              <div className="space-y-2">
+                <Label htmlFor="idDocument">Identificación Oficial * (INE/IFE/Pasaporte)</Label>
+                <Input
+                  id="idDocument"
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={(e) => e.target.files?.[0] && handleFileUpload('idDocument', e.target.files[0])}
+                />
+                {documents.idDocument && (
+                  <p className="text-sm text-muted-foreground">✓ {documents.idDocument.name}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="csfDocument">Constancia de Situación Fiscal (CSF) *</Label>
+                <Input
+                  id="csfDocument"
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={(e) => e.target.files?.[0] && handleFileUpload('csfDocument', e.target.files[0])}
+                />
+                {documents.csfDocument && (
+                  <p className="text-sm text-muted-foreground">✓ {documents.csfDocument.name}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="addressProof">Comprobante de Domicilio *</Label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Recibo de luz, agua, teléfono o estado de cuenta (no mayor a 3 meses)
+                </p>
+                <Input
+                  id="addressProof"
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={(e) => e.target.files?.[0] && handleFileUpload('addressProof', e.target.files[0])}
+                />
+                {documents.addressProof && (
+                  <p className="text-sm text-muted-foreground">✓ {documents.addressProof.name}</p>
+                )}
+              </div>
+
+              <div className="bg-muted p-4 rounded-lg">
+                <h3 className="font-semibold mb-2">Resumen de tu registro</h3>
+                <div className="space-y-1 text-sm">
+                  <p>• Tipo: {personType === 'fisica' ? 'Persona Física' : 'Persona Moral'}</p>
+                  <p>• Especialidades: {specialties.length}</p>
+                  <p>• Servicios totales: {specialties.reduce((acc, s) => acc + s.activities.length, 0)}</p>
+                  <p>• Municipios de cobertura: {selectedMunicipalities.length}</p>
+                  <p>• Documentos adjuntos: {Object.values(documents).filter(d => d !== null).length}/3</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between mt-8">
+            {step > 1 && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setStep(step - 1)}
+                disabled={loading}
+              >
+                Anterior
+              </Button>
             )}
-
-            <Button
-              onClick={() => setStep(4)}
-              disabled={!validateStep3()}
-              className="w-full h-12 text-base"
-            >
-              Continuar
-            </Button>
+            
+            {step < 3 ? (
+              <Button
+                type="button"
+                onClick={() => {
+                  if (step === 1 && !validateStep1()) {
+                    toast({
+                      title: "Campos incompletos",
+                      description: "Por favor completa todos los campos obligatorios",
+                      variant: "destructive"
+                    });
+                    return;
+                  }
+                  if (step === 2 && !validateStep2()) {
+                    toast({
+                      title: "Campos incompletos",
+                      description: "Asegúrate de completar todas las especialidades con mínimo 3 servicios y seleccionar al menos un municipio",
+                      variant: "destructive"
+                    });
+                    return;
+                  }
+                  setStep(step + 1);
+                }}
+                className="ml-auto"
+              >
+                Siguiente
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={handleSubmit}
+                disabled={loading || !validateStep3()}
+                className="ml-auto"
+              >
+                {loading ? 'Enviando...' : 'Completar Registro'}
+              </Button>
+            )}
           </div>
-        )}
-
-        {/* Step 4: Summary */}
-        {step === 4 && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-semibold text-foreground mb-2">Resumen</h2>
-              <p className="text-secondary text-sm">Revisa tu información antes de enviar</p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="border border-border rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold text-foreground">Datos personales</h3>
-                  <Button variant="ghost" size="sm" onClick={() => setStep(1)}>
-                    Editar
-                  </Button>
-                </div>
-                <div className="space-y-1 text-sm text-secondary">
-                  <p><strong>Nombre:</strong> {personalData.firstName} {personalData.lastName}</p>
-                  <p><strong>Teléfono:</strong> {personalData.phone}</p>
-                  <p><strong>RFC:</strong> {personalData.rfc}</p>
-                  <p><strong>ID:</strong> {personalData.idDocument?.name}</p>
-                </div>
-              </div>
-
-              <div className="border border-border rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold text-foreground">Especialidades</h3>
-                  <Button variant="ghost" size="sm" onClick={() => setStep(2)}>
-                    Editar
-                  </Button>
-                </div>
-                <div className="space-y-3">
-                  {specialties.map((specialty, index) => (
-                    <div key={specialty.id} className="text-sm">
-                      <p className="font-medium text-foreground">
-                        {index + 1}. {specialty.specialty} - {specialty.roleLabel}
-                      </p>
-                      <p className="text-secondary">
-                        {specialty.activities.length} actividades
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="border border-border rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold text-foreground">Zonas de trabajo</h3>
-                  <Button variant="ghost" size="sm" onClick={() => setStep(3)}>
-                    Editar
-                  </Button>
-                </div>
-                <div className="space-y-1 text-sm text-secondary">
-                  <p><strong>Estados:</strong> {selectedStates.length}</p>
-                  <p><strong>Ciudades totales:</strong> {
-                    Object.values(citiesByState).reduce((acc, cities) => acc + cities.length, 0)
-                  }</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="text-xs text-secondary">
-              Al completar el registro, aceptas nuestros{' '}
-              <a href="#" className="text-primary underline">Términos y Condiciones</a>
-              {' '}y{' '}
-              <a href="#" className="text-primary underline">Política de Privacidad</a>
-            </div>
-
-            <Button
-              onClick={handleSubmit}
-              disabled={loading}
-              className="w-full h-12 text-base"
-            >
-              {loading ? 'Procesando...' : 'Completar registro'}
-            </Button>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
