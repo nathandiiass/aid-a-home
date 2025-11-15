@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 interface HowItWorksStepProps {
@@ -35,10 +34,10 @@ export const HowItWorksStep = ({ stepNumber, title, imageSrc, imagePosition }: H
   }, []);
 
   return (
-    <Card className="p-6 bg-card border border-border shadow-subtle mb-6">
+    <div className="mb-12 md:mb-16">
       <div className={cn(
-        "flex flex-col gap-4",
-        "md:flex-row md:items-center md:gap-8",
+        "flex flex-col gap-6",
+        "md:flex-row md:items-center md:gap-12",
         imagePosition === "right" && "md:flex-row-reverse"
       )}>
         {/* Image */}
@@ -46,26 +45,27 @@ export const HowItWorksStep = ({ stepNumber, title, imageSrc, imagePosition }: H
           ref={imageRef}
           className={cn(
             "flex-shrink-0 transition-transform duration-300 ease-out",
+            "w-full md:w-1/2",
             isInView && "scale-105"
           )}
         >
           <img 
             src={imageSrc} 
             alt={title}
-            className="w-full md:w-48 h-auto object-contain"
+            className="w-full h-auto object-contain"
           />
         </div>
 
         {/* Content */}
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold text-lg">
+        <div className="flex-1 md:w-1/2">
+          <div className="flex items-start gap-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-bold text-xl flex-shrink-0">
               {stepNumber}
             </div>
-            <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+            <h3 className="text-xl md:text-2xl font-bold text-foreground leading-tight pt-1">{title}</h3>
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 };
