@@ -88,11 +88,18 @@ export const SentQuoteCard = ({ quote }: SentQuoteCardProps) => {
     >
       <div className="space-y-3">
         {/* Header with title and status */}
-        <div className="flex justify-between items-start gap-2">
-          <h3 className="font-semibold text-foreground text-lg">
-            {request?.service_title || request?.activity}
-          </h3>
-          {getStatusBadge(quote.status)}
+        <div className="flex justify-between items-start gap-3">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-foreground text-lg">
+              {request?.service_title || request?.activity}
+            </h3>
+            {getStatusBadge(quote.status)}
+          </div>
+          {/* Price in the right side */}
+          <div className="flex flex-col items-end gap-1 flex-shrink-0">
+            <DollarSign className="w-5 h-5 text-accent" />
+            <span className="font-bold text-accent text-base whitespace-nowrap">{formatPrice()}</span>
+          </div>
         </div>
 
         {/* Date */}
@@ -130,14 +137,8 @@ export const SentQuoteCard = ({ quote }: SentQuoteCardProps) => {
           </div>
         )}
 
-        {/* Price - highlighted */}
-        <div className="flex items-center gap-2 pt-2 border-t">
-          <DollarSign className="w-5 h-5 text-accent flex-shrink-0" />
-          <span className="font-bold text-accent text-lg">{formatPrice()}</span>
-        </div>
-
         {/* Sent date */}
-        <div className="text-xs text-muted-foreground">
+        <div className="text-xs text-muted-foreground pt-2 border-t">
           Enviada el {format(new Date(quote.created_at), "d 'de' MMM, yyyy", { locale: es })}
         </div>
       </div>
