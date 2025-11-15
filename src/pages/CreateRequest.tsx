@@ -13,6 +13,8 @@ import { Logo } from "@/components/Logo";
 export interface RequestData {
   especialista: string;
   actividad: string;
+  serviceTitle: string;
+  serviceDescription: string;
   budgetMin?: number;
   budgetMax?: number;
   noBudget: boolean;
@@ -40,6 +42,8 @@ const CreateRequest = () => {
   const [requestData, setRequestData] = useState<RequestData>({
     especialista: initialEspecialista || "",
     actividad: initialActividad || "",
+    serviceTitle: "",
+    serviceDescription: "",
     noBudget: false,
     isUrgent: false,
     evidence: [],
@@ -126,13 +130,23 @@ const CreateRequest = () => {
             <ServiceSelector
               especialista={requestData.especialista}
               actividad={requestData.actividad}
+              serviceTitle={requestData.serviceTitle}
+              serviceDescription={requestData.serviceDescription}
               categoria={initialCategoria}
               onEspecialistaChange={(value) => updateData({ especialista: value })}
               onActividadChange={(value) => updateData({ actividad: value })}
+              onServiceTitleChange={(value) => updateData({ serviceTitle: value })}
+              onServiceDescriptionChange={(value) => updateData({ serviceDescription: value })}
             />
             <Button
               onClick={nextStep}
-              disabled={!requestData.especialista || !requestData.actividad}
+              disabled={
+                !requestData.especialista || 
+                !requestData.serviceTitle?.trim() || 
+                requestData.serviceTitle.trim().length < 10 ||
+                !requestData.serviceDescription?.trim() ||
+                requestData.serviceDescription.trim().length < 20
+              }
               className="w-full h-12 text-base"
               size="lg"
             >
