@@ -87,14 +87,12 @@ export const SentQuoteCard = ({ quote }: SentQuoteCardProps) => {
       onClick={handleClick}
     >
       <div className="space-y-3">
-        {/* Header with title and status */}
+        {/* Header with title and status badge on top right */}
         <div className="flex justify-between items-start gap-3">
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground text-lg">
-              {request?.service_title || request?.activity}
-            </h3>
-            {getStatusBadge(quote.status)}
-          </div>
+          <h3 className="font-semibold text-foreground text-lg flex-1">
+            {request?.service_title || request?.activity}
+          </h3>
+          {getStatusBadge(quote.status)}
         </div>
 
         {/* Date */}
