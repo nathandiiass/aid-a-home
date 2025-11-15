@@ -29,10 +29,10 @@ export const SentQuoteCard = ({ quote }: SentQuoteCardProps) => {
 
   const formatPrice = () => {
     if (quote.price_fixed) {
-      return `$${quote.price_fixed.toLocaleString()} MXN`;
+      return `$${quote.price_fixed.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
     }
     if (quote.price_min && quote.price_max) {
-      return `$${quote.price_min.toLocaleString()}-$${quote.price_max.toLocaleString()} MXN`;
+      return `$${quote.price_min.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - $${quote.price_max.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
     }
     return 'Precio no especificado';
   };

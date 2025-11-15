@@ -79,11 +79,6 @@ export function QuoteCard({ quote, orderId, unreadCount = 0 }: QuoteCardProps) {
 
   const getQuoteSummary = () => {
     const parts = [];
-    if (quote.price_fixed) {
-      parts.push(`$${quote.price_fixed}`);
-    } else {
-      parts.push(`$${quote.price_min}–$${quote.price_max}`);
-    }
     if (quote.includes_materials) {
       parts.push('Incluye materiales');
     }
@@ -91,6 +86,13 @@ export function QuoteCard({ quote, orderId, unreadCount = 0 }: QuoteCardProps) {
       parts.push(`${quote.estimated_duration_hours}h estimadas`);
     }
     return parts.join(' • ');
+  };
+
+  const formatPrice = () => {
+    if (quote.price_fixed) {
+      return `$${quote.price_fixed.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
+    }
+    return `$${quote.price_min.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - $${quote.price_max.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
   };
 
   return (
@@ -141,7 +143,14 @@ export function QuoteCard({ quote, orderId, unreadCount = 0 }: QuoteCardProps) {
             {getQuoteSummary()}
           </p>
 
-          <div className="flex flex-wrap gap-2">
+          {/* Price in bottom right */}
+          <div className="flex justify-end pt-2 border-t">
+            <span className="text-base font-bold text-primary">
+              {formatPrice()}
+            </span>
+          </div>
+
+          <div className="flex flex-wrap gap-2 mt-3">
             {quote.includes_materials && (
               <Badge variant="secondary" className="text-xs bg-muted text-muted-foreground border-0">
                 <Package className="w-3 h-3 mr-1" />

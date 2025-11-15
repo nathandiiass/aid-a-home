@@ -21,9 +21,9 @@ export function InProgressOrderCard({ order, onUpdate }: InProgressOrderCardProp
 
   const getPrice = () => {
     if (order.price_fixed) {
-      return `$${order.price_fixed}`;
+      return `$${order.price_fixed.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
     }
-    return `$${order.price_min}–$${order.price_max}`;
+    return `$${order.price_min.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - $${order.price_max.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
   };
 
   const getZone = () => {
@@ -78,15 +78,18 @@ export function InProgressOrderCard({ order, onUpdate }: InProgressOrderCardProp
             )}
 
             <div className="flex items-center gap-2 text-muted-foreground">
-              <DollarSign className="w-4 h-4" />
-              <span className="font-semibold" style={{ color: '#003049' }}>
-                {getPrice()}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2 text-muted-foreground">
               <MapPin className="w-4 h-4" />
               <span>{getZone()}</span>
+            </div>
+
+            {/* Price in bottom right */}
+            <div className="flex justify-end pt-2 border-t">
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-4 h-4" />
+                <span className="font-semibold" style={{ color: '#003049' }}>
+                  {getPrice()}
+                </span>
+              </div>
             </div>
           </div>
 

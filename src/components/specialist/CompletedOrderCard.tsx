@@ -14,9 +14,9 @@ export function CompletedOrderCard({ order }: CompletedOrderCardProps) {
 
   const getPrice = () => {
     if (order.price_fixed) {
-      return `$${order.price_fixed}`;
+      return `$${order.price_fixed.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
     }
-    return `$${order.price_min}–$${order.price_max}`;
+    return `$${order.price_min.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - $${order.price_max.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
   };
 
   return (
@@ -41,16 +41,19 @@ export function CompletedOrderCard({ order }: CompletedOrderCardProps) {
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <DollarSign className="w-4 h-4 text-muted-foreground" />
-            <span className="font-semibold text-lg" style={{ color: '#C1121F' }}>
-              {getPrice()}
-            </span>
-          </div>
-
           <div className="flex items-center gap-2 text-muted-foreground">
             <Star className="w-4 h-4" />
             <span className="text-xs">Esperando calificación del cliente</span>
+          </div>
+
+          {/* Price in bottom right */}
+          <div className="flex justify-end pt-2 border-t">
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-muted-foreground" />
+              <span className="font-semibold text-lg" style={{ color: '#C1121F' }}>
+                {getPrice()}
+              </span>
+            </div>
           </div>
         </div>
 

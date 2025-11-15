@@ -251,14 +251,17 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
                 </div>
               )}
               
-              <div className="flex items-center gap-3 pt-1">
-                <DollarSign className="w-5 h-5 text-primary" />
-                <span className="text-base font-bold text-primary">
-                  {order.price_min && order.price_max 
-                    ? `$${order.price_min}–$${order.price_max} MXN`
-                    : 'Sin presupuesto, que propongan'
-                  }
-                </span>
+              {/* Price in bottom right */}
+              <div className="flex justify-end pt-2 border-t">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-primary" />
+                  <span className="text-base font-bold text-primary">
+                    {order.price_min && order.price_max 
+                      ? `$${order.price_min.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - $${order.price_max.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`
+                      : 'Sin presupuesto, que propongan'
+                    }
+                  </span>
+                </div>
               </div>
             </div>
           </Card>
