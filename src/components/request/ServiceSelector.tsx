@@ -48,7 +48,7 @@ const ServiceSelector = ({
   const [allEspecialistas, setAllEspecialistas] = useState<string[]>([]);
   const [actividades, setActividades] = useState<string[]>([]);
   const [categorias, setCategorias] = useState<string[]>([]);
-  const [selectedActividad, setSelectedActividad] = useState<string>("");
+  const [selectedActividad, setSelectedActividad] = useState<string>(actividad || "");
   const [selectedCategoria, setSelectedCategoria] = useState<string>(categoria || "");
   const [errors, setErrors] = useState<{ title?: string; description?: string }>({});
 
