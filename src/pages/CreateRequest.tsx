@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ServiceSelector from "@/components/request/ServiceSelector";
@@ -9,6 +9,8 @@ import LocationStep from "@/components/request/LocationStep";
 import EvidenceStep from "@/components/request/EvidenceStep";
 import SummaryStep from "@/components/request/SummaryStep";
 import { Logo } from "@/components/Logo";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export interface RequestData {
   especialista: string;
@@ -36,9 +38,13 @@ export interface RequestData {
 const CreateRequest = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { toast } = useToast();
+  const editOrderId = searchParams.get('edit');
   const { especialista: initialEspecialista, actividad: initialActividad, categoria: initialCategoria } = location.state || {};
   
   const [step, setStep] = useState(0);
+  const [loading, setLoading] = useState(!!editOrderId);
   const [requestData, setRequestData] = useState<RequestData>({
     especialista: initialEspecialista || "",
     actividad: initialActividad || "",
@@ -48,6 +54,66 @@ const CreateRequest = () => {
     isUrgent: false,
     evidence: [],
   });
+
+  // Load order data for editing
+  useEffect(() => {
+    const loadOrderForEdit = async () => {
+      if (!editOrderId) return;
+
+      try {
+        const { data: order, error } = await supabase
+          .from('service_requests')
+          .select(`
+            *,
+            locations(*)
+          `)
+          .eq('id', editOrderId)
+          .single();
+
+        if (error) throw error;
+
+        if (order) {
+          // Map order data to request data format
+          setRequestData({
+            especialista: order.category || "",
+            actividad: order.activity || "",
+            serviceTitle: order.service_title || "",
+            serviceDescription: order.service_description || "",
+            budgetMin: order.price_min || undefined,
+            budgetMax: order.price_max || undefined,
+            noBudget: !order.price_min && !order.price_max,
+            date: order.scheduled_date ? new Date(order.scheduled_date) : undefined,
+            timeOption: order.time_start && order.time_end ? 'specific' : undefined,
+            timeStart: order.time_start || undefined,
+            timeEnd: order.time_end || undefined,
+            isUrgent: false,
+            location: order.locations ? {
+              id: order.location_id || undefined,
+              lat: order.locations.lat || 0,
+              lng: order.locations.lng || 0,
+              address: `${order.locations.street} ${order.locations.ext_number || ''}, ${order.locations.neighborhood || ''}, ${order.locations.city}, ${order.locations.state}`.trim(),
+              label: order.locations.label || ""
+            } : undefined,
+            evidence: [],
+          });
+          
+          // Start at summary step (step 5)
+          setStep(5);
+        }
+      } catch (error) {
+        console.error('Error loading order:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'No se pudo cargar la solicitud para editar'
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadOrderForEdit();
+  }, [editOrderId, toast]);
 
   // Check for pending request after login
   useEffect(() => {
@@ -82,6 +148,14 @@ const CreateRequest = () => {
   const goToStep = (targetStep: number) => {
     setStep(targetStep);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground">Cargando...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-20">

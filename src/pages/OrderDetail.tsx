@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ArrowLeft, Filter, ArrowUpDown } from 'lucide-react';
+import { ArrowLeft, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { QuoteCard } from '@/components/orders/QuoteCard';
 import {
   Select,
@@ -14,6 +14,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export default function OrderDetail() {
   const { id } = useParams();
@@ -24,6 +40,7 @@ export default function OrderDetail() {
   const [quotes, setQuotes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('best_match');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -115,6 +132,37 @@ export default function OrderDetail() {
     }
   };
 
+  const handleEdit = () => {
+    navigate(`/create-request?edit=${id}`);
+  };
+
+  const handleDelete = async () => {
+    try {
+      const { error } = await supabase
+        .from('service_requests')
+        .update({ status: 'cancelled' })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Solicitud eliminada',
+        description: 'La solicitud ha sido eliminada correctamente',
+      });
+
+      navigate('/orders');
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'No se pudo eliminar la solicitud'
+      });
+    } finally {
+      setShowDeleteDialog(false);
+    }
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -155,7 +203,6 @@ export default function OrderDetail() {
         <div className="flex gap-2 mb-6">
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-[200px]">
-              <ArrowUpDown className="w-4 h-4 mr-2" />
               <SelectValue placeholder="Ordenar por" />
             </SelectTrigger>
             <SelectContent>
@@ -182,6 +229,26 @@ export default function OrderDetail() {
           </div>
         )}
       </div>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar esta solicitud?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Los especialistas ya no podrán cotizarla.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
