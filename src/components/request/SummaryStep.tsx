@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { RequestData } from "@/pages/CreateRequest";
@@ -24,6 +24,9 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
   const [isPublishing, setIsPublishing] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const editOrderId = searchParams.get('edit');
+  const isEditMode = !!editOrderId;
 
   const handlePublish = async () => {
     // Check if user is logged in
@@ -92,34 +95,61 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
         evidenceUrls = await Promise.all(uploadPromises);
       }
 
-      // Insert service request
-      const { data: insertedRequest, error: insertError } = await supabase
-        .from('service_requests')
-        .insert({
-          user_id: user.id,
-          activity: validatedData.actividad,
-          category: validatedData.especialista,
-          service_title: validatedData.serviceTitle,
-          service_description: validatedData.serviceDescription,
-          status: 'active',
-          price_min: validatedData.budgetMin || null,
-          price_max: validatedData.budgetMax || null,
-          scheduled_date: validatedData.date ? validatedData.date.toISOString().split('T')[0] : null,
-          time_start: data.timeStart || null,
-          time_end: data.timeEnd || null,
-          location_id: validatedData.locationId || null,
-          description: null,
-          evidence_urls: evidenceUrls.length > 0 ? evidenceUrls : null,
-        })
-        .select()
-        .single();
+      // Insert or update service request
+      if (isEditMode) {
+        // Update existing request
+        const { error: updateError } = await supabase
+          .from('service_requests')
+          .update({
+            activity: validatedData.actividad,
+            category: validatedData.especialista,
+            service_title: validatedData.serviceTitle,
+            service_description: validatedData.serviceDescription,
+            status: 'active',
+            price_min: validatedData.budgetMin || null,
+            price_max: validatedData.budgetMax || null,
+            scheduled_date: validatedData.date ? validatedData.date.toISOString().split('T')[0] : null,
+            time_start: data.timeStart || null,
+            time_end: data.timeEnd || null,
+            location_id: validatedData.locationId || null,
+            description: null,
+            evidence_urls: evidenceUrls.length > 0 ? evidenceUrls : null,
+          })
+          .eq('id', editOrderId);
 
-      if (insertError) throw insertError;
+        if (updateError) throw updateError;
 
+        toast.success("¡Solicitud actualizada exitosamente!");
+      } else {
+        // Create new request
+        const { error: insertError } = await supabase
+          .from('service_requests')
+          .insert({
+            user_id: user.id,
+            activity: validatedData.actividad,
+            category: validatedData.especialista,
+            service_title: validatedData.serviceTitle,
+            service_description: validatedData.serviceDescription,
+            status: 'active',
+            price_min: validatedData.budgetMin || null,
+            price_max: validatedData.budgetMax || null,
+            scheduled_date: validatedData.date ? validatedData.date.toISOString().split('T')[0] : null,
+            time_start: data.timeStart || null,
+            time_end: data.timeEnd || null,
+            location_id: validatedData.locationId || null,
+            description: null,
+            evidence_urls: evidenceUrls.length > 0 ? evidenceUrls : null,
+          })
+          .select()
+          .single();
+
+        if (insertError) throw insertError;
+
+        toast.success("¡Solicitud publicada exitosamente!");
+      }
       // Clear pending request
       localStorage.removeItem('pendingRequest');
 
-      toast.success("¡Solicitud publicada exitosamente!");
       navigate("/orders?tab=active");
     } catch (error: any) {
       console.error('Error publishing request:', error);
@@ -307,7 +337,7 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
         className="w-full h-12 text-base bg-primary hover:bg-primary/90"
         size="lg"
       >
-        {isPublishing ? "Publicando..." : "Publicar solicitud"}
+        {isPublishing ? "Guardando..." : isEditMode ? "Guardar cambios" : "Publicar solicitud"}
       </Button>
     </div>
   );

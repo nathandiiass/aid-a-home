@@ -1,13 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, MapPin, DollarSign, Eye, Edit, X } from 'lucide-react';
+import { Calendar, Clock, MapPin, DollarSign, Edit, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface ActiveOrdersProps {
   searchQuery: string;
@@ -18,6 +33,10 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
   const { toast } = useToast();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
+  const [longPressOrder, setLongPressOrder] = useState<string | null>(null);
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     fetchActiveOrders();
@@ -37,7 +56,8 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
         .from('service_requests')
         .select(`
           *,
-          quotes(id, status)
+          quotes(id, status),
+          locations(street, neighborhood, city, state, ext_number)
         `)
         .eq('user_id', user.id)
         .eq('status', 'active')
@@ -67,8 +87,65 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
   };
 
   const filteredOrders = orders.filter(order =>
-    order.activity.toLowerCase().includes(searchQuery.toLowerCase())
+    order.service_title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    order.activity?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleLongPressStart = (orderId: string) => {
+    longPressTimer.current = setTimeout(() => {
+      setLongPressOrder(orderId);
+    }, 800); // 800ms for long press
+  };
+
+  const handleLongPressEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
+  const handleEdit = (orderId: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    navigate(`/create-request?edit=${orderId}`);
+    setLongPressOrder(null);
+  };
+
+  const handleDeleteClick = (orderId: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setOrderToDelete(orderId);
+    setShowDeleteDialog(true);
+    setLongPressOrder(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!orderToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from('service_requests')
+        .update({ status: 'cancelled' })
+        .eq('id', orderToDelete);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Solicitud eliminada',
+        description: 'La solicitud ha sido eliminada correctamente',
+      });
+
+      fetchActiveOrders();
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'No se pudo eliminar la solicitud'
+      });
+    } finally {
+      setShowDeleteDialog(false);
+      setOrderToDelete(null);
+    }
+  };
 
   if (loading) {
     return <div className="text-center py-8 text-muted-foreground">Cargando...</div>;
@@ -86,72 +163,123 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
   }
 
   return (
-    <div className="space-y-4">
-      {filteredOrders.map((order) => (
-        <Card
-          key={order.id}
-          className="p-4 hover:shadow-md transition-shadow cursor-pointer relative"
-          onClick={() => navigate(`/orders/${order.id}`)}
-        >
-          {order.quotes && order.quotes.length > 0 && (
-            <Badge 
-              className="absolute top-3 right-3 bg-accent text-accent-foreground rounded-full px-2 py-1"
-            >
-              {order.quotes.length}
-            </Badge>
-          )}
-          
-          <h3 className="font-semibold text-foreground text-lg mb-2">
-            {order.activity}
-          </h3>
-          
-          <div className="space-y-2 text-sm text-muted-foreground">
-            {order.scheduled_date && (
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                <span>
-                  {format(new Date(order.scheduled_date), 'dd MMM yyyy', { locale: es })}
-                  {order.time_start && order.time_end && 
-                    ` · ${order.time_start.slice(0, 5)}–${order.time_end.slice(0, 5)}`
-                  }
-                </span>
+    <>
+      <div className="space-y-4">
+        {filteredOrders.map((order) => (
+          <Card
+            key={order.id}
+            className="p-5 hover:shadow-lg transition-all cursor-pointer relative active:bg-accent/5"
+            onClick={() => navigate(`/orders/${order.id}`)}
+            onTouchStart={() => handleLongPressStart(order.id)}
+            onTouchEnd={handleLongPressEnd}
+            onMouseDown={() => handleLongPressStart(order.id)}
+            onMouseUp={handleLongPressEnd}
+            onMouseLeave={handleLongPressEnd}
+          >
+            {order.quotes && order.quotes.length > 0 && (
+              <div className="absolute top-4 right-4 bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-semibold">
+                {order.quotes.length}
               </div>
             )}
             
-            {order.price_min && order.price_max && (
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4" />
-                <span>${order.price_min}–${order.price_max}</span>
-              </div>
-            )}
-          </div>
+            <h3 className="font-semibold text-foreground text-lg mb-4 pr-8">
+              {order.service_title || order.activity}
+            </h3>
+            
+            <div className="space-y-3">
+              {order.scheduled_date && (
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <Calendar className="w-5 h-5 text-accent" />
+                  <span className="font-medium">
+                    {format(new Date(order.scheduled_date), "EEE dd MMM yyyy", { locale: es })}
+                  </span>
+                </div>
+              )}
+              
+              {order.time_start && order.time_end && (
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <Clock className="w-5 h-5 text-accent" />
+                  <span className="font-medium">
+                    {order.time_start.slice(0, 5)}–{order.time_end.slice(0, 5)}
+                  </span>
+                </div>
+              )}
 
-          <div className="flex gap-2 mt-4">
-            <Button 
-              size="sm" 
-              variant="outline"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/orders/${order.id}`);
-              }}
-            >
-              <Eye className="w-4 h-4 mr-1" />
-              Ver cotizaciones
-            </Button>
-            <Button 
-              size="sm" 
+              {order.locations && (
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <MapPin className="w-5 h-5 text-accent" />
+                  <span className="font-medium">
+                    {order.locations.neighborhood ? `${order.locations.neighborhood}, ` : ''}
+                    {order.locations.city}
+                  </span>
+                </div>
+              )}
+              
+              <div className="flex items-center gap-3 pt-1">
+                <DollarSign className="w-5 h-5 text-primary" />
+                <span className="text-base font-bold text-primary">
+                  {order.price_min && order.price_max 
+                    ? `$${order.price_min}–$${order.price_max} MXN`
+                    : 'Sin presupuesto, que propongan'
+                  }
+                </span>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {/* Long press contextual menu */}
+      {longPressOrder && (
+        <div className="fixed inset-0 bg-black/20 z-50 flex items-end" onClick={() => setLongPressOrder(null)}>
+          <div className="bg-background w-full rounded-t-2xl p-4 space-y-2 animate-in slide-in-from-bottom">
+            <Button
+              className="w-full justify-start text-base h-14"
               variant="ghost"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/create-request?edit=${order.id}`);
-              }}
+              onClick={() => handleEdit(longPressOrder)}
             >
-              <Edit className="w-4 h-4 mr-1" />
+              <Edit className="w-5 h-5 mr-3" />
               Editar
             </Button>
+            <Button
+              className="w-full justify-start text-base h-14 text-destructive hover:text-destructive"
+              variant="ghost"
+              onClick={() => handleDeleteClick(longPressOrder)}
+            >
+              <Trash2 className="w-5 h-5 mr-3" />
+              Eliminar
+            </Button>
+            <Button
+              className="w-full h-14 mt-2"
+              variant="outline"
+              onClick={() => setLongPressOrder(null)}
+            >
+              Cancelar
+            </Button>
           </div>
-        </Card>
-      ))}
-    </div>
+        </div>
+      )}
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar esta solicitud?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Los especialistas ya no podrán cotizarla.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
