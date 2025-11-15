@@ -22,7 +22,7 @@ export const HowItWorksStep = ({ stepNumber, title, imageSrc, imagePosition }: H
       },
       {
         threshold: 0.5,
-        rootMargin: "-20% 0px -20% 0px"
+        rootMargin: "-30% 0px -30% 0px"
       }
     );
 
@@ -43,8 +43,8 @@ export const HowItWorksStep = ({ stepNumber, title, imageSrc, imagePosition }: H
         <div 
           ref={imageRef}
           className={cn(
-            "flex-shrink-0 transition-transform duration-300 ease-out w-40",
-            isInView && "md:scale-105"
+            "flex-shrink-0 transition-all duration-500 ease-out w-40",
+            isInView ? "scale-110" : "scale-95"
           )}
         >
           <img 
