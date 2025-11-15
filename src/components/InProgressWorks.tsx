@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, User } from 'lucide-react';
+import { Clock, User, Calendar, MapPin, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -33,6 +33,7 @@ export function InProgressWorks() {
         .from('service_requests')
         .select(`
           *,
+          locations(neighborhood, city),
           quotes!inner(
             id,
             specialist_id,
@@ -120,46 +121,84 @@ export function InProgressWorks() {
         Trabajos en curso
       </h2>
       
-      <div className="flex gap-6 overflow-x-auto py-6 px-2 -mx-4">
-        {works.map((work) => (
-          <div
-            key={work.id}
-            onClick={() => navigate(`/chat/${work.quote.id}`)}
-            className="flex-shrink-0 w-[280px] p-4 cursor-pointer transition-all hover:scale-105 animate-pulse-border rounded-2xl bg-card"
-          >
-            <div className="space-y-3">
-              <div>
-                <h3 className="font-semibold text-foreground text-base mb-1">
-                  {work.activity}
+      <div className="flex gap-4 overflow-x-auto py-2 px-2 -mx-4">
+        {works.map((work) => {
+          const getPrice = () => {
+            if (work.quote.price_fixed) {
+              return `$${work.quote.price_fixed.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
+            }
+            if (work.quote.price_min && work.quote.price_max) {
+              return `$${work.quote.price_min.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - $${work.quote.price_max.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
+            }
+            return 'Precio por definir';
+          };
+
+          return (
+            <Card
+              key={work.id}
+              onClick={() => navigate(`/chat/${work.quote.id}`)}
+              className="flex-shrink-0 w-[320px] p-5 hover:shadow-lg transition-all cursor-pointer"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <h3 className="font-semibold text-foreground text-lg pr-2">
+                  {work.service_title || work.activity}
                 </h3>
-                <Badge className="bg-accent text-accent-foreground">
+                <Badge className="bg-accent text-accent-foreground flex-shrink-0">
                   En curso
                 </Badge>
               </div>
 
-              {work.specialist && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <User className="w-4 h-4" />
-                  <span>
-                    {work.specialist.first_name} {work.specialist.last_name_paterno}
-                  </span>
-                </div>
-              )}
+              <div className="space-y-3">
+                {work.specialist && (
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                    <User className="w-5 h-5 text-accent" />
+                    <span className="font-medium">
+                      {work.specialist.first_name} {work.specialist.last_name_paterno}
+                    </span>
+                  </div>
+                )}
 
-              {work.quote.proposed_date && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="w-4 h-4" />
-                  <span>
-                    {format(new Date(work.quote.proposed_date), 'dd MMM', { locale: es })}
-                    {work.quote.proposed_time_start && work.quote.proposed_time_end && 
-                      ` · ${work.quote.proposed_time_start.slice(0, 5)}–${work.quote.proposed_time_end.slice(0, 5)}`
-                    }
-                  </span>
+                {work.quote.proposed_date && (
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                    <Calendar className="w-5 h-5 text-accent" />
+                    <span className="font-medium">
+                      {format(new Date(work.quote.proposed_date), 'EEE dd MMM yyyy', { locale: es })}
+                    </span>
+                  </div>
+                )}
+
+                {work.quote.proposed_time_start && work.quote.proposed_time_end && (
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                    <Clock className="w-5 h-5 text-accent" />
+                    <span className="font-medium">
+                      {work.quote.proposed_time_start.slice(0, 5)}–{work.quote.proposed_time_end.slice(0, 5)}
+                    </span>
+                  </div>
+                )}
+
+                {work.locations && (
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                    <MapPin className="w-5 h-5 text-accent" />
+                    <span className="font-medium">
+                      {work.locations.neighborhood ? `${work.locations.neighborhood}, ` : ''}
+                      {work.locations.city}
+                    </span>
+                  </div>
+                )}
+
+                {/* Price in bottom right */}
+                <div className="flex justify-end pt-2 border-t">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-5 h-5 text-foreground" />
+                    <span className="text-base font-bold text-foreground">
+                      {getPrice()}
+                    </span>
+                  </div>
                 </div>
-              )}
-            </div>
-          </div>
-        ))}
+              </div>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
