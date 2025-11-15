@@ -22,6 +22,7 @@ interface Service {
 interface ServiceSelectorProps {
   especialista: string;
   actividad: string;
+  categoria?: string;
   onEspecialistaChange: (value: string) => void;
   onActividadChange: (value: string) => void;
 }
@@ -29,13 +30,14 @@ interface ServiceSelectorProps {
 const ServiceSelector = ({
   especialista,
   actividad,
+  categoria,
   onEspecialistaChange,
   onActividadChange,
 }: ServiceSelectorProps) => {
   const [allServices, setAllServices] = useState<Service[]>([]);
   const [especialistas, setEspecialistas] = useState<string[]>([]);
   const [filteredActividades, setFilteredActividades] = useState<Service[]>([]);
-  const [filterCategory, setFilterCategory] = useState<string>("");
+  const [filterCategory, setFilterCategory] = useState<string>(categoria || "");
 
   // Load all services on mount
   useEffect(() => {
@@ -55,9 +57,19 @@ const ServiceSelector = ({
     loadServices();
   }, []);
 
-  // Update filtered activities when especialista changes
+  // Update filtered activities when especialista or category changes
   useEffect(() => {
-    if (especialista) {
+    if (categoria && !especialista) {
+      // Filter by category
+      const filtered = allServices.filter((s) => s.categoria === categoria);
+      setFilteredActividades(filtered);
+      
+      // Get unique especialistas for this category
+      const uniqueEsp = Array.from(new Set(filtered.map((s) => s.especialista)));
+      setEspecialistas(uniqueEsp);
+      setFilterCategory(categoria);
+    } else if (especialista) {
+      // Filter by especialista
       const filtered = allServices.filter((s) => s.especialista === especialista);
       setFilteredActividades(filtered);
       
@@ -69,7 +81,7 @@ const ServiceSelector = ({
       setFilteredActividades(allServices);
       setFilterCategory("");
     }
-  }, [especialista, allServices]);
+  }, [especialista, categoria, allServices]);
 
   // Auto-update especialista when actividad changes
   const handleActividadChange = (value: string) => {

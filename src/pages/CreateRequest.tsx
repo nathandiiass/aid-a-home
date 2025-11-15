@@ -34,7 +34,7 @@ export interface RequestData {
 const CreateRequest = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { especialista: initialEspecialista, actividad: initialActividad } = location.state || {};
+  const { especialista: initialEspecialista, actividad: initialActividad, categoria: initialCategoria } = location.state || {};
   
   const [step, setStep] = useState(0);
   const [requestData, setRequestData] = useState<RequestData>({
@@ -126,6 +126,7 @@ const CreateRequest = () => {
             <ServiceSelector
               especialista={requestData.especialista}
               actividad={requestData.actividad}
+              categoria={initialCategoria}
               onEspecialistaChange={(value) => updateData({ especialista: value })}
               onActividadChange={(value) => updateData({ actividad: value })}
             />
