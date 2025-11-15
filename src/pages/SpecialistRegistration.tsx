@@ -20,7 +20,14 @@ interface Specialty {
   customSpecialty?: string;
   roleLabel: string;
   experienceYears: string;
-  servicesOffered: string;
+  services: Service[];
+}
+
+interface Service {
+  id: string;
+  name: string;
+  priceMin: string;
+  priceMax: string;
 }
 
 interface License {
@@ -180,7 +187,7 @@ export default function SpecialistRegistration() {
         specialty,
         roleLabel: '',
         experienceYears: '',
-        servicesOffered: ''
+        services: []
       }]);
     }
   };
@@ -194,7 +201,7 @@ export default function SpecialistRegistration() {
         customSpecialty: otherSpecialtyText,
         roleLabel: '',
         experienceYears: '',
-        servicesOffered: ''
+        services: []
       }]);
     }
   };
@@ -203,6 +210,35 @@ export default function SpecialistRegistration() {
     setSpecialtiesData(specialtiesData.map(s => 
       s.specialty === specialty || s.customSpecialty === specialty
         ? { ...s, [field]: value }
+        : s
+    ));
+  };
+
+  const addServiceToSpecialty = (specialtyId: string) => {
+    setSpecialtiesData(specialtiesData.map(s => 
+      s.id === specialtyId
+        ? { ...s, services: [...s.services, { id: Date.now().toString(), name: '', priceMin: '', priceMax: '' }] }
+        : s
+    ));
+  };
+
+  const removeServiceFromSpecialty = (specialtyId: string, serviceId: string) => {
+    setSpecialtiesData(specialtiesData.map(s => 
+      s.id === specialtyId
+        ? { ...s, services: s.services.filter(srv => srv.id !== serviceId) }
+        : s
+    ));
+  };
+
+  const updateService = (specialtyId: string, serviceId: string, field: keyof Service, value: string) => {
+    setSpecialtiesData(specialtiesData.map(s => 
+      s.id === specialtyId
+        ? { 
+            ...s, 
+            services: s.services.map(srv => 
+              srv.id === serviceId ? { ...srv, [field]: value } : srv
+            ) 
+          }
         : s
     ));
   };
@@ -256,7 +292,18 @@ export default function SpecialistRegistration() {
     
     for (const specData of specialtiesData) {
       if (!specData.experienceYears || parseInt(specData.experienceYears) < 0) return false;
-      if (!specData.servicesOffered || specData.servicesOffered.trim().length === 0) return false;
+      if (specData.services.length === 0) return false;
+      
+      // Validate that all services have names
+      for (const service of specData.services) {
+        if (!service.name || service.name.trim().length === 0) return false;
+        // If prices are provided, validate min <= max
+        if (service.priceMin && service.priceMax) {
+          const min = parseFloat(service.priceMin);
+          const max = parseFloat(service.priceMax);
+          if (min > max) return false;
+        }
+      }
     }
 
     return professionalDescription.trim().length > 0 && 
@@ -383,6 +430,22 @@ export default function SpecialistRegistration() {
           .single();
 
         if (specialtyError) throw specialtyError;
+
+        // Insert services/activities for this specialty
+        if (specData.services.length > 0) {
+          const activitiesData = specData.services.map(service => ({
+            specialty_id: specialtyDataInserted.id,
+            activity: service.name,
+            price_min: service.priceMin ? parseFloat(service.priceMin) : null,
+            price_max: service.priceMax ? parseFloat(service.priceMax) : null
+          }));
+
+          const { error: activitiesError } = await supabase
+            .from('specialist_activities')
+            .insert(activitiesData);
+
+          if (activitiesError) throw activitiesError;
+        }
       }
 
       for (const licenseData of licenseUrls) {
@@ -773,17 +836,83 @@ export default function SpecialistRegistration() {
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label>Servicios que ofrece *</Label>
-                    <Textarea
-                      value={specData.servicesOffered}
-                      onChange={(e) => updateSpecialtyData(displayName, 'servicesOffered', e.target.value)}
-                      placeholder="Describe los servicios que ofreces para esta especialidad..."
-                      rows={4}
-                      className="resize-none"
-                    />
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Label>Servicios que ofrece *</Label>
+                      <Button 
+                        onClick={() => addServiceToSpecialty(specData.id)} 
+                        variant="outline" 
+                        size="sm"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Agregar Servicio
+                      </Button>
+                    </div>
+                    
+                    {specData.services.length === 0 && (
+                      <p className="text-sm text-muted-foreground">
+                        No hay servicios agregados. Agrega al menos un servicio.
+                      </p>
+                    )}
+                    
+                    <div className="space-y-3">
+                      {specData.services.map((service, idx) => (
+                        <div key={service.id} className="p-4 border rounded-lg space-y-3 bg-muted/20">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 space-y-2">
+                              <Label className="text-sm">Nombre del servicio *</Label>
+                              <Input
+                                value={service.name}
+                                onChange={(e) => updateService(specData.id, service.id, 'name', e.target.value)}
+                                placeholder="Ej: Instalación de minisplit"
+                              />
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeServiceFromSpecialty(specData.id, service.id)}
+                              className="mt-6"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-2">
+                              <Label className="text-sm">Precio Mínimo (opcional)</Label>
+                              <Input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={service.priceMin}
+                                onChange={(e) => updateService(specData.id, service.id, 'priceMin', e.target.value)}
+                                placeholder="$ 0.00"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-sm">Precio Máximo (opcional)</Label>
+                              <Input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={service.priceMax}
+                                onChange={(e) => updateService(specData.id, service.id, 'priceMax', e.target.value)}
+                                placeholder="$ 0.00"
+                              />
+                            </div>
+                          </div>
+                          
+                          {service.priceMin && service.priceMax && parseFloat(service.priceMin) > parseFloat(service.priceMax) && (
+                            <p className="text-sm text-destructive">
+                              El precio mínimo no puede ser mayor al precio máximo
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    
                     <p className="text-sm text-muted-foreground">
-                      Describe los servicios que ofreces para esta especialidad
+                      {specData.services.length} servicio(s) agregado(s)
                     </p>
                   </div>
                 </div>
