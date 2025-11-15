@@ -297,6 +297,7 @@ export type Database = {
           description: string | null
           evidence_urls: string[] | null
           id: string
+          is_urgent: boolean | null
           location_id: string | null
           price_max: number | null
           price_min: number | null
@@ -305,6 +306,7 @@ export type Database = {
           service_title: string | null
           status: Database["public"]["Enums"]["service_request_status"]
           time_end: string | null
+          time_preference: string | null
           time_start: string | null
           updated_at: string
           user_id: string
@@ -316,6 +318,7 @@ export type Database = {
           description?: string | null
           evidence_urls?: string[] | null
           id?: string
+          is_urgent?: boolean | null
           location_id?: string | null
           price_max?: number | null
           price_min?: number | null
@@ -324,6 +327,7 @@ export type Database = {
           service_title?: string | null
           status?: Database["public"]["Enums"]["service_request_status"]
           time_end?: string | null
+          time_preference?: string | null
           time_start?: string | null
           updated_at?: string
           user_id: string
@@ -335,6 +339,7 @@ export type Database = {
           description?: string | null
           evidence_urls?: string[] | null
           id?: string
+          is_urgent?: boolean | null
           location_id?: string | null
           price_max?: number | null
           price_min?: number | null
@@ -343,6 +348,7 @@ export type Database = {
           service_title?: string | null
           status?: Database["public"]["Enums"]["service_request_status"]
           time_end?: string | null
+          time_preference?: string | null
           time_start?: string | null
           updated_at?: string
           user_id?: string

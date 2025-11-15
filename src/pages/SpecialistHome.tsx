@@ -17,6 +17,8 @@ interface ServiceRequest {
   scheduled_date: string | null;
   time_start: string | null;
   time_end: string | null;
+  time_preference: string | null;
+  is_urgent: boolean | null;
   price_min: number | null;
   price_max: number | null;
   location_id: string | null;
@@ -113,6 +115,25 @@ export default function SpecialistHome() {
     }
   };
 
+  const formatTimeDisplay = (request: ServiceRequest) => {
+    if (request.is_urgent) {
+      return "¡Urgente!";
+    }
+    
+    if (request.time_start && request.time_end) {
+      return `${request.time_start} - ${request.time_end}`;
+    }
+
+    const timeOptions: Record<string, string> = {
+      morning: "Mañana (9:00-12:00)",
+      afternoon: "Tarde (12:00-17:00)",
+      evening: "Noche (17:00-21:00)",
+      anytime: "Cualquier hora",
+    };
+
+    return timeOptions[request.time_preference || ''] || "Por definir";
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center pb-20">
@@ -158,12 +179,12 @@ export default function SpecialistHome() {
                     </div>
                   )}
 
-                  {request.time_start && request.time_end && (
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Clock className="w-4 h-4" />
-                      <span>{request.time_start} - {request.time_end}</span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Clock className="w-4 h-4" />
+                    <span className={request.is_urgent ? "text-destructive font-semibold" : ""}>
+                      {formatTimeDisplay(request)}
+                    </span>
+                  </div>
 
                   {request.locations && (
                     <div className="flex items-center gap-2 text-muted-foreground">
