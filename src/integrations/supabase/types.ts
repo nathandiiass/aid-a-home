@@ -96,6 +96,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          accepted_privacy_at: string | null
+          accepted_terms_at: string | null
           avatar_url: string | null
           bio: string | null
           created_at: string
@@ -107,9 +109,12 @@ export type Database = {
           last_name_materno: string | null
           last_name_paterno: string | null
           nationality: string | null
+          phone: string | null
           updated_at: string
         }
         Insert: {
+          accepted_privacy_at?: string | null
+          accepted_terms_at?: string | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
@@ -121,9 +126,12 @@ export type Database = {
           last_name_materno?: string | null
           last_name_paterno?: string | null
           nationality?: string | null
+          phone?: string | null
           updated_at?: string
         }
         Update: {
+          accepted_privacy_at?: string | null
+          accepted_terms_at?: string | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
@@ -135,6 +143,7 @@ export type Database = {
           last_name_materno?: string | null
           last_name_paterno?: string | null
           nationality?: string | null
+          phone?: string | null
           updated_at?: string
         }
         Relationships: []
