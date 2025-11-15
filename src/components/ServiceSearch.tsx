@@ -89,7 +89,9 @@ const ServiceSearch = () => {
   const handleSelectEspecialista = (service: Service) => {
     navigate("/create-request", {
       state: {
+        selectedType: "especialista",
         especialista: service.especialista,
+        categoria: service.categoria,
         actividad: "",
       },
     });
@@ -98,8 +100,11 @@ const ServiceSearch = () => {
   const handleSelectActividad = (service: Service) => {
     navigate("/create-request", {
       state: {
+        selectedType: "actividad",
         especialista: service.especialista,
         actividad: service.actividad,
+        categoria: service.categoria,
+        serviceTitle: service.actividad, // Precargar título con la actividad
       },
     });
   };
@@ -107,6 +112,7 @@ const ServiceSearch = () => {
   const handleSelectCategoria = (categoria: string) => {
     navigate("/create-request", {
       state: {
+        selectedType: "categoria",
         categoria,
         especialista: "",
         actividad: "",

@@ -41,14 +41,20 @@ const CreateRequest = () => {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const editOrderId = searchParams.get('edit');
-  const { especialista: initialEspecialista, actividad: initialActividad, categoria: initialCategoria } = location.state || {};
+  const { 
+    selectedType,
+    especialista: initialEspecialista, 
+    actividad: initialActividad, 
+    categoria: initialCategoria,
+    serviceTitle: initialServiceTitle 
+  } = location.state || {};
   
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(!!editOrderId);
   const [requestData, setRequestData] = useState<RequestData>({
     especialista: initialEspecialista || "",
     actividad: initialActividad || "",
-    serviceTitle: "",
+    serviceTitle: initialServiceTitle || "",
     serviceDescription: "",
     noBudget: false,
     isUrgent: false,
@@ -134,9 +140,15 @@ const CreateRequest = () => {
   };
 
   const nextStep = () => {
-    // Validate service selection before moving forward
-    if (step === 0 && (!requestData.especialista || !requestData.actividad)) {
-      return;
+    // Validate required fields for step 0
+    if (step === 0) {
+      if (!requestData.especialista || 
+          !requestData.serviceTitle?.trim() || 
+          requestData.serviceTitle.trim().length < 10 ||
+          !requestData.serviceDescription?.trim() ||
+          requestData.serviceDescription.trim().length < 20) {
+        return;
+      }
     }
     if (step < 5) setStep(step + 1);
   };
