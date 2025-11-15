@@ -7,40 +7,31 @@ import step1Image from "@/assets/step-1-busca.png";
 import step2Image from "@/assets/step-2-completa.png";
 import step3Image from "@/assets/step-3-recibe.png";
 import step4Image from "@/assets/step-4-elige.png";
-
-const howItWorksSteps = [
-  { 
-    stepNumber: 1, 
-    title: "Busca al especialista que necesitas", 
-    imageSrc: step1Image,
-    imagePosition: "left" as const
-  },
-  { 
-    stepNumber: 2, 
-    title: "Completa los detalles", 
-    imageSrc: step2Image,
-    imagePosition: "right" as const
-  },
-  { 
-    stepNumber: 3, 
-    title: "Recibe cotizaciones", 
-    imageSrc: step3Image,
-    imagePosition: "left" as const
-  },
-  { 
-    stepNumber: 4, 
-    title: "Elige al mejor y agenda tu servicio", 
-    imageSrc: step4Image,
-    imagePosition: "right" as const
-  },
-];
-
+const howItWorksSteps = [{
+  stepNumber: 1,
+  title: "Busca al especialista que necesitas",
+  imageSrc: step1Image,
+  imagePosition: "left" as const
+}, {
+  stepNumber: 2,
+  title: "Completa los detalles",
+  imageSrc: step2Image,
+  imagePosition: "right" as const
+}, {
+  stepNumber: 3,
+  title: "Recibe cotizaciones",
+  imageSrc: step3Image,
+  imagePosition: "left" as const
+}, {
+  stepNumber: 4,
+  title: "Elige al mejor y agenda tu servicio",
+  imageSrc: step4Image,
+  imagePosition: "right" as const
+}];
 const Index = () => {
-
-  return (
-    <div className="min-h-screen bg-background pb-20">
+  return <div className="min-h-screen bg-background pb-20">
       {/* Logo */}
-      <Logo className="pt-4 pb-2" />
+      
       
       {/* Header with search - STICKY */}
       <div className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
@@ -67,20 +58,10 @@ const Index = () => {
           ¿Cómo funciona?
         </h2>
         
-        {howItWorksSteps.map((step) => (
-          <HowItWorksStep
-            key={step.stepNumber}
-            stepNumber={step.stepNumber}
-            title={step.title}
-            imageSrc={step.imageSrc}
-            imagePosition={step.imagePosition}
-          />
-        ))}
+        {howItWorksSteps.map(step => <HowItWorksStep key={step.stepNumber} stepNumber={step.stepNumber} title={step.title} imageSrc={step.imageSrc} imagePosition={step.imagePosition} />)}
       </div>
 
       <BottomNav />
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
