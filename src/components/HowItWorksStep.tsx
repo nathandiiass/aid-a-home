@@ -43,7 +43,7 @@ export const HowItWorksStep = ({ stepNumber, title, imageSrc, imagePosition }: H
         <div 
           ref={imageRef}
           className={cn(
-            "flex-shrink-0 transition-transform duration-300 ease-out w-32",
+            "flex-shrink-0 transition-transform duration-300 ease-out w-40",
             isInView && "md:scale-105"
           )}
         >
