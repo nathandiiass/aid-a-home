@@ -77,10 +77,17 @@ export default function SpecialistOrders() {
           status,
           created_at,
           attachments,
+          estimated_duration_hours,
           request:service_requests!inner(
             id,
             activity,
             category,
+            service_title,
+            scheduled_date,
+            time_start,
+            time_end,
+            time_preference,
+            is_urgent,
             user_id,
             location:locations(
               neighborhood,
@@ -110,10 +117,17 @@ export default function SpecialistOrders() {
           status,
           created_at,
           attachments,
+          estimated_duration_hours,
           request:service_requests!inner(
             id,
             activity,
             category,
+            service_title,
+            scheduled_date,
+            time_start,
+            time_end,
+            time_preference,
+            is_urgent,
             user_id,
             location:locations(
               neighborhood,
@@ -142,12 +156,19 @@ export default function SpecialistOrders() {
           proposed_time_end,
           status,
           created_at,
-          request:service_requests!inner(
+          estimated_duration_hours,
+          service_requests!inner(
             id,
             activity,
             category,
+            service_title,
+            scheduled_date,
+            time_start,
+            time_end,
+            time_preference,
+            is_urgent,
             user_id,
-            location:locations(
+            locations!inner(
               neighborhood,
               city,
               state
