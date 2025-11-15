@@ -42,16 +42,18 @@ const Index = () => {
       {/* Logo */}
       <Logo className="pt-4 pb-2" />
       
-      {/* Header with search */}
-      <div className="container max-w-2xl mx-auto px-4 py-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Aid a Home</h1>
-          <p className="text-muted-foreground text-sm">
-            Encuentra especialistas para tus servicios domésticos
-          </p>
+      {/* Header with search - STICKY */}
+      <div className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
+        <div className="container max-w-2xl mx-auto px-4 py-6">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-foreground mb-2">Aid a Home</h1>
+            <p className="text-muted-foreground text-sm">
+              Encuentra especialistas para tus servicios domésticos
+            </p>
+          </div>
+          
+          <ServiceSearch />
         </div>
-        
-        <ServiceSearch />
       </div>
 
       {/* In Progress Works */}
