@@ -10,8 +10,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { X } from "lucide-react";
+import { X, Camera, Upload } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 
 interface Service {
   id: number;
@@ -26,10 +27,12 @@ interface ServiceSelectorProps {
   serviceTitle: string;
   serviceDescription: string;
   categoria?: string;
+  evidence: File[];
   onEspecialistaChange: (value: string) => void;
   onActividadChange: (value: string) => void;
   onServiceTitleChange: (value: string) => void;
   onServiceDescriptionChange: (value: string) => void;
+  onEvidenceChange: (files: File[]) => void;
 }
 
 const ServiceSelector = ({
@@ -38,10 +41,12 @@ const ServiceSelector = ({
   serviceTitle,
   serviceDescription,
   categoria,
+  evidence,
   onEspecialistaChange,
   onActividadChange,
   onServiceTitleChange,
   onServiceDescriptionChange,
+  onEvidenceChange,
 }: ServiceSelectorProps) => {
   const [allServices, setAllServices] = useState<Service[]>([]);
   const [especialistas, setEspecialistas] = useState<string[]>([]);
@@ -51,6 +56,7 @@ const ServiceSelector = ({
   const [selectedActividad, setSelectedActividad] = useState<string>(actividad || "");
   const [selectedCategoria, setSelectedCategoria] = useState<string>(categoria || "");
   const [errors, setErrors] = useState<{ title?: string; description?: string }>({});
+  const [fileError, setFileError] = useState("");
 
   useEffect(() => {
     const loadServices = async () => {
@@ -148,6 +154,36 @@ const ServiceSelector = ({
     if (value.trim()) {
       validateDescription(value);
     }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(e.target.files || []);
+    const totalFiles = evidence.length + selectedFiles.length;
+
+    if (totalFiles > 5) {
+      setFileError("Máximo 5 archivos permitidos");
+      return;
+    }
+
+    // Validate file types and sizes
+    for (const file of selectedFiles) {
+      const validTypes = ["image/jpeg", "image/png", "video/mp4"];
+      if (!validTypes.includes(file.type)) {
+        setFileError("Solo se permiten archivos JPG, PNG o MP4");
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        setFileError("Cada archivo debe ser menor a 10MB");
+        return;
+      }
+    }
+
+    onEvidenceChange([...evidence, ...selectedFiles]);
+    setFileError("");
+  };
+
+  const removeFile = (index: number) => {
+    onEvidenceChange(evidence.filter((_, i) => i !== index));
   };
 
   return (
@@ -256,6 +292,89 @@ const ServiceSelector = ({
         <p className="text-xs text-muted-foreground">
           Ejemplos: "Pasto crecido en un patio de 6x4 m, acceso por cochera" o "Fuga debajo del lavabo del baño principal, tubería de PVC"
         </p>
+      </div>
+
+      {/* Evidencias section */}
+      <div className="space-y-3">
+        <div>
+          <Label className="text-base">Evidencias (opcional)</Label>
+          <p className="text-sm text-muted-foreground mt-1">
+            Adjunta fotos o videos relacionados con el trabajo que necesitas
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Ejemplo: Foto de la fuga, del jardín, del área a reparar, etc.
+          </p>
+        </div>
+
+        {/* Upload area */}
+        <Card className="border-2 border-dashed border-border hover:border-primary/50 transition-colors">
+          <label
+            htmlFor="file-upload-evidence"
+            className="flex flex-col items-center justify-center p-6 cursor-pointer"
+          >
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+              <Camera className="w-6 h-6 text-primary" />
+            </div>
+            <p className="font-medium text-foreground mb-1 text-sm">
+              Toca para subir archivos
+            </p>
+            <p className="text-xs text-muted-foreground text-center">
+              Máximo 5 fotos (JPG, PNG) o videos (MP4)
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Límite: 10MB por archivo
+            </p>
+            <input
+              id="file-upload-evidence"
+              type="file"
+              accept="image/jpeg,image/png,video/mp4"
+              multiple
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </label>
+        </Card>
+
+        {fileError && <p className="text-sm text-destructive">{fileError}</p>}
+
+        {/* File previews */}
+        {evidence.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-sm font-medium">
+              Archivos seleccionados ({evidence.length}/5)
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              {evidence.map((file, index) => (
+                <Card key={index} className="relative overflow-hidden">
+                  <div className="aspect-video bg-muted/50 flex items-center justify-center">
+                    {file.type.startsWith("image/") ? (
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <Upload className="w-8 h-8 text-muted-foreground" />
+                        <p className="text-xs text-muted-foreground">Video</p>
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeFile(index)}
+                    className="absolute top-2 right-2 w-6 h-6 bg-destructive/90 text-destructive-foreground rounded-full flex items-center justify-center hover:bg-destructive"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  <div className="p-2 bg-card/95">
+                    <p className="text-xs truncate">{file.name}</p>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
