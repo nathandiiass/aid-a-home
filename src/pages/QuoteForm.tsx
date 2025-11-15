@@ -14,6 +14,8 @@ import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 
 const quoteSchema = z.object({
+  scope: z.string().min(10, 'Describe qué incluye el servicio (mínimo 10 caracteres)'),
+  exclusions: z.string().optional(),
   canMakeIt: z.enum(['yes', 'no']),
   proposedDate: z.string().optional(),
   proposedTimeStart: z.string().optional(),
@@ -24,10 +26,7 @@ const quoteSchema = z.object({
   priceMax: z.number().positive().optional(),
   includesMaterials: z.enum(['yes', 'no']),
   materialsList: z.string().optional(),
-  scope: z.string().min(10, 'Describe qué incluye el servicio'),
-  exclusions: z.string().min(10, 'Describe qué NO incluye'),
   durationRange: z.string(),
-  warrantyDays: z.number().min(0),
   requiresVisit: z.enum(['yes', 'no']),
   visitCost: z.number().min(0).optional(),
   additionalNotes: z.string().optional(),
@@ -50,6 +49,8 @@ export default function QuoteForm() {
   const [specialistId, setSpecialistId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
+    scope: '',
+    exclusions: '',
     canMakeIt: 'yes',
     proposedDate: '',
     proposedTimeStart: '',
@@ -60,10 +61,7 @@ export default function QuoteForm() {
     priceMax: '',
     includesMaterials: 'no',
     materialsList: '',
-    scope: '',
-    exclusions: '',
-    durationRange: '1:00-1:30',
-    warrantyDays: '0',
+    durationRange: '1-2',
     requiresVisit: 'no',
     visitCost: '',
     additionalNotes: '',
@@ -112,6 +110,8 @@ export default function QuoteForm() {
     try {
       // Validate form data
       const validatedData = quoteSchema.parse({
+        scope: formData.scope,
+        exclusions: formData.exclusions || undefined,
         canMakeIt: formData.canMakeIt,
         proposedDate: formData.proposedDate || undefined,
         proposedTimeStart: formData.proposedTimeStart || undefined,
@@ -122,10 +122,7 @@ export default function QuoteForm() {
         priceMax: formData.priceMax ? parseFloat(formData.priceMax) : undefined,
         includesMaterials: formData.includesMaterials,
         materialsList: formData.materialsList || undefined,
-        scope: formData.scope,
-        exclusions: formData.exclusions,
         durationRange: formData.durationRange,
-        warrantyDays: parseInt(formData.warrantyDays),
         requiresVisit: formData.requiresVisit,
         visitCost: formData.visitCost ? parseFloat(formData.visitCost) : undefined,
         additionalNotes: formData.additionalNotes || undefined,
@@ -137,6 +134,8 @@ export default function QuoteForm() {
       const quoteData = {
         request_id: requestId,
         specialist_id: specialistId,
+        scope: validatedData.scope,
+        exclusions: validatedData.exclusions || null,
         price_fixed: validatedData.priceType === 'fixed' ? validatedData.priceFixed : null,
         price_min: validatedData.priceType === 'range' ? validatedData.priceMin : null,
         price_max: validatedData.priceType === 'range' ? validatedData.priceMax : null,
@@ -146,11 +145,6 @@ export default function QuoteForm() {
         estimated_duration_hours: parseFloat(durationMax || durationMin),
         includes_materials: validatedData.includesMaterials === 'yes',
         materials_list: validatedData.materialsList || null,
-        has_warranty: validatedData.warrantyDays > 0,
-        warranty_days: validatedData.warrantyDays,
-        warranty_description: validatedData.warrantyDays > 0 ? `Garantía de ${validatedData.warrantyDays} días` : null,
-        scope: validatedData.scope,
-        exclusions: validatedData.exclusions,
         requires_visit: validatedData.requiresVisit === 'yes',
         visit_cost: validatedData.visitCost || null,
         additional_notes: validatedData.additionalNotes || null,
@@ -205,9 +199,35 @@ export default function QuoteForm() {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* 1. Availability */}
+          {/* 1. ¿Qué incluye el servicio? */}
           <Card className="p-4 space-y-3">
-            <Label className="text-base font-semibold">¿Puedes en la fecha y hora solicitada?</Label>
+            <Label htmlFor="scope" className="text-base font-semibold">¿Qué incluye el servicio? *</Label>
+            <Textarea
+              id="scope"
+              placeholder="Ej: Corte de pasto, recolección y embolsado, limpieza de área de trabajo..."
+              value={formData.scope}
+              onChange={(e) => setFormData({ ...formData, scope: e.target.value })}
+              className="bg-muted/30 min-h-[100px]"
+              required
+            />
+            <p className="text-xs text-muted-foreground">Describe detalladamente qué incluye tu servicio (mínimo 10 caracteres)</p>
+          </Card>
+
+          {/* 2. ¿Qué no incluye? */}
+          <Card className="p-4 space-y-3">
+            <Label htmlFor="exclusions" className="text-base font-semibold">¿Qué no incluye el servicio? (opcional)</Label>
+            <Textarea
+              id="exclusions"
+              placeholder="Ej: No incluye fertilización ni retiro de basura fuera de la propiedad..."
+              value={formData.exclusions}
+              onChange={(e) => setFormData({ ...formData, exclusions: e.target.value })}
+              className="bg-muted/30"
+            />
+          </Card>
+
+          {/* 3. ¿Puedes en la fecha y hora solicitada? */}
+          <Card className="p-4 space-y-3">
+            <Label className="text-base font-semibold">¿Puedes en la fecha y hora solicitada? *</Label>
             <RadioGroup
               value={formData.canMakeIt}
               onValueChange={(value) => setFormData({ ...formData, canMakeIt: value })}
@@ -260,9 +280,9 @@ export default function QuoteForm() {
             )}
           </Card>
 
-          {/* 2. Price */}
+          {/* 4. Precio */}
           <Card className="p-4 space-y-3">
-            <Label className="text-base font-semibold">Precio</Label>
+            <Label className="text-base font-semibold">Precio *</Label>
             <RadioGroup
               value={formData.priceType}
               onValueChange={(value) => setFormData({ ...formData, priceType: value })}
@@ -320,9 +340,9 @@ export default function QuoteForm() {
             )}
           </Card>
 
-          {/* 3. Materials */}
+          {/* 5. ¿Incluye materiales? */}
           <Card className="p-4 space-y-3">
-            <Label className="text-base font-semibold">¿Incluye materiales?</Label>
+            <Label className="text-base font-semibold">¿Incluye materiales? *</Label>
             <RadioGroup
               value={formData.includesMaterials}
               onValueChange={(value) => setFormData({ ...formData, includesMaterials: value })}
@@ -339,7 +359,7 @@ export default function QuoteForm() {
 
             {formData.includesMaterials === 'yes' && (
               <div>
-                <Label htmlFor="materialsList">Materiales incluidos (opcional)</Label>
+                <Label htmlFor="materialsList">¿Qué materiales incluye? (opcional)</Label>
                 <Textarea
                   id="materialsList"
                   placeholder="Ej: Pintura, brochas, lija..."
@@ -351,36 +371,9 @@ export default function QuoteForm() {
             )}
           </Card>
 
-          {/* 4. Scope */}
+          {/* 6. Duración estimada */}
           <Card className="p-4 space-y-3">
-            <div>
-              <Label htmlFor="scope" className="text-base font-semibold">¿Qué incluye el servicio?</Label>
-              <Textarea
-                id="scope"
-                placeholder="Describe detalladamente qué incluye..."
-                value={formData.scope}
-                onChange={(e) => setFormData({ ...formData, scope: e.target.value })}
-                className="bg-muted/30 mt-2"
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="exclusions" className="text-base font-semibold">¿Qué NO incluye?</Label>
-              <Textarea
-                id="exclusions"
-                placeholder="Describe qué no está incluido..."
-                value={formData.exclusions}
-                onChange={(e) => setFormData({ ...formData, exclusions: e.target.value })}
-                className="bg-muted/30 mt-2"
-                required
-              />
-            </div>
-          </Card>
-
-          {/* 5. Duration */}
-          <Card className="p-4 space-y-3">
-            <Label htmlFor="durationRange" className="text-base font-semibold">Duración estimada</Label>
+            <Label htmlFor="durationRange" className="text-base font-semibold">Duración estimada *</Label>
             <select
               id="durationRange"
               value={formData.durationRange}
@@ -389,32 +382,16 @@ export default function QuoteForm() {
             >
               <option value="0-0.5">0-30 min</option>
               <option value="0.5-1">30-60 min</option>
-              <option value="1-1.5">1:00-1:30 h</option>
-              <option value="1.5-2">1:30-2:00 h</option>
-              <option value="2-3">2:00-3:00 h</option>
-              <option value="3-4">3:00-4:00 h</option>
-              <option value="4-8">4:00+ h</option>
+              <option value="1-2">1-2 h</option>
+              <option value="2-3">2-3 h</option>
+              <option value="3-4">3-4 h</option>
+              <option value="4-8">4 h o más</option>
             </select>
           </Card>
 
-          {/* 6. Warranty */}
+          {/* 7. ¿Requiere visita previa? */}
           <Card className="p-4 space-y-3">
-            <Label htmlFor="warrantyDays" className="text-base font-semibold">Garantía (días)</Label>
-            <Input
-              id="warrantyDays"
-              type="number"
-              placeholder="0 si no aplica"
-              value={formData.warrantyDays}
-              onChange={(e) => setFormData({ ...formData, warrantyDays: e.target.value })}
-              className="bg-muted/30"
-              min="0"
-              required
-            />
-          </Card>
-
-          {/* 7. Previous visit */}
-          <Card className="p-4 space-y-3">
-            <Label className="text-base font-semibold">¿Requiere visita previa?</Label>
+            <Label className="text-base font-semibold">¿Requiere visita previa? *</Label>
             <RadioGroup
               value={formData.requiresVisit}
               onValueChange={(value) => setFormData({ ...formData, requiresVisit: value })}
@@ -431,7 +408,7 @@ export default function QuoteForm() {
 
             {formData.requiresVisit === 'yes' && (
               <div>
-                <Label htmlFor="visitCost">Costo de la visita (opcional)</Label>
+                <Label htmlFor="visitCost">Costo de la visita (opcional, puede ser 0)</Label>
                 <Input
                   id="visitCost"
                   type="number"
@@ -445,12 +422,12 @@ export default function QuoteForm() {
             )}
           </Card>
 
-          {/* 8. Additional notes */}
+          {/* 8. Detalles adicionales */}
           <Card className="p-4 space-y-3">
             <Label htmlFor="additionalNotes" className="text-base font-semibold">Detalles adicionales (opcional)</Label>
             <Textarea
               id="additionalNotes"
-              placeholder="Observaciones o condiciones adicionales..."
+              placeholder="Ej: Prefiero pago en efectivo, tengo experiencia en jardines residenciales..."
               value={formData.additionalNotes}
               onChange={(e) => setFormData({ ...formData, additionalNotes: e.target.value })}
               className="bg-muted/30"
