@@ -95,11 +95,6 @@ export const SentQuoteCard = ({ quote }: SentQuoteCardProps) => {
             </h3>
             {getStatusBadge(quote.status)}
           </div>
-          {/* Price in the right side */}
-          <div className="flex flex-col items-end gap-1 flex-shrink-0">
-            <DollarSign className="w-5 h-5 text-accent" />
-            <span className="font-bold text-accent text-base whitespace-nowrap">{formatPrice()}</span>
-          </div>
         </div>
 
         {/* Date */}
@@ -137,8 +132,16 @@ export const SentQuoteCard = ({ quote }: SentQuoteCardProps) => {
           </div>
         )}
 
+        {/* Price - bottom right */}
+        <div className="flex justify-end pt-2 border-t">
+          <div className="flex items-center gap-2">
+            <DollarSign className="w-5 h-5 text-accent" />
+            <span className="font-bold text-accent text-base">{formatPrice()}</span>
+          </div>
+        </div>
+
         {/* Sent date */}
-        <div className="text-xs text-muted-foreground pt-2 border-t">
+        <div className="text-xs text-muted-foreground">
           Enviada el {format(new Date(quote.created_at), "d 'de' MMM, yyyy", { locale: es })}
         </div>
       </div>
