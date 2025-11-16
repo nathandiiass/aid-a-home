@@ -191,6 +191,7 @@ export const ClientReviewDialog = ({
           <Button
             onClick={handleSubmit}
             disabled={!isFormValid() || isSubmitting}
+            className="bg-rappi-green hover:bg-rappi-green/90 text-white"
           >
             {isSubmitting ? "Enviando..." : "Enviar evaluación"}
           </Button>
