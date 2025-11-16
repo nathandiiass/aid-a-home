@@ -25,6 +25,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Location {
   id: string;
@@ -38,6 +45,14 @@ interface Location {
   lat?: number;
   lng?: number;
 }
+
+const MEXICAN_STATES = [
+  "Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Chiapas",
+  "Chihuahua", "Ciudad de México", "Coahuila", "Colima", "Durango", "Estado de México",
+  "Guanajuato", "Guerrero", "Hidalgo", "Jalisco", "Michoacán", "Morelos", "Nayarit",
+  "Nuevo León", "Oaxaca", "Puebla", "Querétaro", "Quintana Roo", "San Luis Potosí",
+  "Sinaloa", "Sonora", "Tabasco", "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas"
+];
 
 export default function Locations() {
   const navigate = useNavigate();
@@ -141,7 +156,7 @@ export default function Locations() {
           .insert([{ ...formData, user_id: user?.id }]);
 
         if (error) throw error;
-        toast({ title: "Ubicación agregada" });
+        toast({ title: "Ubicación guardada" });
       }
 
       setIsDialogOpen(false);
@@ -179,99 +194,110 @@ export default function Locations() {
   };
 
   const getIcon = (label: string) => {
-    const lower = label.toLowerCase();
-    if (lower.includes('casa') || lower.includes('hogar')) return <Home className="w-5 h-5 text-primary" />;
-    if (lower.includes('oficina') || lower.includes('trabajo')) return <Briefcase className="w-5 h-5 text-primary" />;
-    return <MapPin className="w-5 h-5 text-primary" />;
+    if (label.toLowerCase().includes('casa') || label.toLowerCase().includes('hogar')) {
+      return Home;
+    }
+    if (label.toLowerCase().includes('trabajo') || label.toLowerCase().includes('oficina')) {
+      return Briefcase;
+    }
+    return MapPin;
   };
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-foreground">Cargando...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-muted-foreground">Cargando...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-card border-b border-border">
-        <div className="max-w-lg mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/profile')}
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </Button>
-            <h1 className="text-xl font-semibold text-foreground">Mis ubicaciones</h1>
-          </div>
+      <div className="sticky top-0 z-10 bg-white shadow-sm">
+        <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-3">
+          <button
+            onClick={() => navigate('/profile')}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <h1 className="text-xl font-bold">Mis ubicaciones</h1>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-lg mx-auto p-6 space-y-4">
+      <div className="max-w-lg mx-auto px-4 py-6 space-y-4">
         {locations.length === 0 ? (
-          <div className="text-center py-12 space-y-4">
-            <MapPin className="w-16 h-16 text-muted mx-auto" />
-            <p className="text-secondary">
-              Aún no tienes ubicaciones. Agrega una para usarla en tus solicitudes.
+          <div className="bg-white rounded-2xl shadow-lg border-0 p-8 text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <MapPin className="w-8 h-8 text-gray-400" />
+            </div>
+            <p className="text-foreground font-semibold mb-2">No tienes ubicaciones guardadas</p>
+            <p className="text-sm text-muted-foreground mb-6">
+              Agrega tus direcciones favoritas para solicitar servicios más rápido
             </p>
           </div>
         ) : (
           <div className="space-y-3">
-            {locations.map((location) => (
-              <div
-                key={location.id}
-                className="border border-border rounded-lg p-4 space-y-2"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    {getIcon(location.label)}
+            {locations.map((location) => {
+              const Icon = getIcon(location.label);
+              return (
+                <div
+                  key={location.id}
+                  className="bg-white rounded-2xl shadow-lg border-0 overflow-hidden"
+                >
+                  <div className="p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                        <Icon className="w-5 h-5 text-gray-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-foreground mb-1">{location.label}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {location.street}
+                          {location.ext_number && ` ${location.ext_number}`}
+                          {location.int_number && ` Int. ${location.int_number}`}
+                        </p>
+                        {location.neighborhood && (
+                          <p className="text-sm text-muted-foreground">{location.neighborhood}</p>
+                        )}
+                        <p className="text-sm text-muted-foreground">
+                          {location.city}, {location.state}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-foreground">{location.label}</p>
-                    <p className="text-sm text-secondary">
-                      {location.street}
-                      {location.ext_number && ` #${location.ext_number}`}
-                      {location.int_number && ` Int. ${location.int_number}`}
-                    </p>
-                    {location.neighborhood && (
-                      <p className="text-sm text-secondary">{location.neighborhood}</p>
-                    )}
-                    <p className="text-sm text-secondary">
-                      {location.city}, {location.state}
-                    </p>
+                  
+                  <div className="border-t border-gray-100 px-4 py-3 flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleOpenDialog(location)}
+                      className="flex-1 text-foreground hover:bg-gray-50"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Editar
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDeleteId(location.id)}
+                      className="flex-1 text-destructive hover:bg-red-50 hover:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Eliminar
+                    </Button>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => handleOpenDialog(location)}
-                  >
-                    <Edit className="w-4 h-4 mr-1" />
-                    Editar
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setDeleteId(location.id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
+        {/* Add Location Button */}
         <Button
           onClick={() => handleOpenDialog()}
-          className="w-full h-12 text-base"
+          className="w-full bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-12 font-semibold"
         >
           <Plus className="w-5 h-5 mr-2" />
           Agregar ubicación
@@ -280,27 +306,31 @@ export default function Locations() {
 
       {/* Add/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
               {editingLocation ? 'Editar ubicación' : 'Nueva ubicación'}
             </DialogTitle>
             <DialogDescription>
-              Completa los datos de tu ubicación
+              {editingLocation 
+                ? 'Modifica los datos de tu ubicación' 
+                : 'Completa los datos de tu nueva ubicación'}
             </DialogDescription>
           </DialogHeader>
+
           <div className="space-y-4 py-4">
-            <div>
-              <Label htmlFor="label">Etiqueta*</Label>
+            <div className="space-y-2">
+              <Label htmlFor="label">Etiqueta *</Label>
               <Input
                 id="label"
-                placeholder="Casa, Oficina, etc."
+                placeholder="Ej: Casa, Trabajo, Casa de mamá"
                 value={formData.label}
                 onChange={(e) => setFormData({ ...formData, label: e.target.value })}
               />
             </div>
-            <div>
-              <Label htmlFor="street">Calle*</Label>
+
+            <div className="space-y-2">
+              <Label htmlFor="street">Calle *</Label>
               <Input
                 id="street"
                 placeholder="Nombre de la calle"
@@ -308,9 +338,10 @@ export default function Locations() {
                 onChange={(e) => setFormData({ ...formData, street: e.target.value })}
               />
             </div>
+
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="ext_number">Número exterior</Label>
+              <div className="space-y-2">
+                <Label htmlFor="ext_number">No. Exterior</Label>
                 <Input
                   id="ext_number"
                   placeholder="123"
@@ -318,17 +349,18 @@ export default function Locations() {
                   onChange={(e) => setFormData({ ...formData, ext_number: e.target.value })}
                 />
               </div>
-              <div>
-                <Label htmlFor="int_number">Número interior</Label>
+              <div className="space-y-2">
+                <Label htmlFor="int_number">No. Interior</Label>
                 <Input
                   id="int_number"
-                  placeholder="A"
+                  placeholder="4B"
                   value={formData.int_number}
                   onChange={(e) => setFormData({ ...formData, int_number: e.target.value })}
                 />
               </div>
             </div>
-            <div>
+
+            <div className="space-y-2">
               <Label htmlFor="neighborhood">Colonia</Label>
               <Input
                 id="neighborhood"
@@ -337,48 +369,70 @@ export default function Locations() {
                 onChange={(e) => setFormData({ ...formData, neighborhood: e.target.value })}
               />
             </div>
-            <div>
-              <Label htmlFor="city">Ciudad*</Label>
+
+            <div className="space-y-2">
+              <Label htmlFor="city">Ciudad *</Label>
               <Input
                 id="city"
-                placeholder="Ciudad"
+                placeholder="Nombre de la ciudad"
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
               />
             </div>
-            <div>
-              <Label htmlFor="state">Estado*</Label>
-              <Input
-                id="state"
-                placeholder="Estado"
+
+            <div className="space-y-2">
+              <Label htmlFor="state">Estado *</Label>
+              <Select
                 value={formData.state}
-                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-              />
+                onValueChange={(value) => setFormData({ ...formData, state: value })}
+              >
+                <SelectTrigger id="state">
+                  <SelectValue placeholder="Selecciona un estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  {MEXICAN_STATES.map((state) => (
+                    <SelectItem key={state} value={state}>
+                      {state}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
+
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsDialogOpen(false)}
+              className="rounded-full"
+            >
               Cancelar
             </Button>
-            <Button onClick={handleSave}>
-              {editingLocation ? 'Actualizar' : 'Guardar'}
+            <Button
+              onClick={handleSave}
+              className="bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full"
+            >
+              {editingLocation ? 'Guardar cambios' : 'Agregar'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation */}
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar ubicación?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer.
+              Esta acción no se puede deshacer. La ubicación se eliminará permanentemente.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>
+            <AlertDialogCancel className="rounded-full">Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive hover:bg-destructive/90 text-white rounded-full"
+            >
               Eliminar
             </AlertDialogAction>
           </AlertDialogFooter>
