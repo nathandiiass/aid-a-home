@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Card } from '@/components/ui/card';
-import { Star } from 'lucide-react';
+import { Star, Calendar, User, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -97,42 +97,59 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
       {filteredCompleted.map((order) => (
         <Card 
           key={order.id} 
-          className="p-4 bg-white rounded-2xl border-0 shadow-lg"
+          className="p-4 hover:shadow-xl transition-all cursor-pointer bg-white rounded-2xl border-0 shadow-lg"
+          onClick={() => navigate(`/chat/${order.quotes[0].id}`)}
         >
-          <h3 className="font-bold text-foreground text-base mb-2">
+          <h3 className="font-bold text-foreground text-base mb-3">
             {order.activity}
           </h3>
           
-          <p className="text-xs text-muted-foreground mb-2">
-            Completado por: <span className="font-semibold text-foreground">{getSpecialistName(order)}</span>
-          </p>
-          
-          <p className="text-xs text-muted-foreground mb-3">
-            {format(new Date(order.updated_at), "dd MMM yyyy · HH:mm", { locale: es })}
-          </p>
-
-          {order.price_max && (
-            <p className="text-foreground font-semibold text-sm mb-3">
-              Precio final: ${order.price_max}
-            </p>
-          )}
-
-          {order.reviews && order.reviews.length > 0 && (
-            <div className="flex items-center gap-1.5 text-sm mb-3">
-              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              <span className="font-bold text-foreground">
-                {order.reviews[0].average_score?.toFixed(1) || order.reviews[0].rating}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <User className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="font-semibold text-foreground">
+                {getSpecialistName(order)}
               </span>
-              <span className="text-xs text-muted-foreground ml-1">Tu calificación</span>
             </div>
-          )}
 
-          <button
-            onClick={() => navigate(`/chat/${order.quotes[0].id}`)}
-            className="w-full bg-rappi-green hover:bg-rappi-green/90 text-white text-sm font-semibold py-2.5 rounded-full transition-colors"
-          >
-            Ver detalles
-          </button>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+              <span>
+                {format(new Date(order.updated_at), "EEE dd MMM yyyy", { locale: es })}
+              </span>
+            </div>
+
+            {order.price_max && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <DollarSign className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="font-bold text-foreground">
+                  ${order.price_max.toLocaleString('es-MX')}
+                </span>
+              </div>
+            )}
+
+            {order.reviews && order.reviews.length > 0 && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Star className="w-3.5 h-3.5 flex-shrink-0 fill-yellow-400 text-yellow-400" />
+                <span className="font-bold text-foreground">
+                  {order.reviews[0].average_score?.toFixed(1) || order.reviews[0].rating}
+                </span>
+                <span className="text-muted-foreground">Tu calificación</span>
+              </div>
+            )}
+
+            <div className="flex justify-between items-center pt-3 mt-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/chat/${order.quotes[0].id}`);
+                }}
+                className="bg-rappi-green hover:bg-rappi-green/90 text-white text-xs font-semibold px-6 py-2 rounded-full transition-colors"
+              >
+                Ver detalles
+              </button>
+            </div>
+          </div>
         </Card>
       ))}
 
