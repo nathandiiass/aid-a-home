@@ -69,6 +69,7 @@ export default function SpecialistOrders() {
         error: inProgressError
       } = await supabase.from('quotes').select(`
           id,
+          specialist_id,
           price_fixed,
           price_min,
           price_max,
@@ -107,6 +108,7 @@ export default function SpecialistOrders() {
         error: completedError
       } = await supabase.from('quotes').select(`
           id,
+          specialist_id,
           price_fixed,
           price_min,
           price_max,
@@ -128,6 +130,7 @@ export default function SpecialistOrders() {
             time_preference,
             is_urgent,
             user_id,
+            client_review_submitted,
             location:locations(
               neighborhood,
               city,
