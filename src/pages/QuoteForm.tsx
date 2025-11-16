@@ -177,102 +177,104 @@ export default function QuoteForm() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center pb-20">
-        <div className="text-foreground">Cargando...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center pb-20">
+        <div className="text-foreground font-semibold">Cargando...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <div className="max-w-lg mx-auto">
+    <div className="min-h-screen bg-gray-50 pb-20">
+      <div className="max-w-2xl mx-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-background border-b border-border p-4 flex items-center gap-3 z-10">
+        <div className="sticky top-0 bg-white shadow-sm border-b border-gray-200 p-4 flex items-center gap-3 z-10">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate(-1)}
+            className="hover:bg-gray-100"
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <h1 className="text-xl font-bold text-foreground">Enviar cotización</h1>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-4 space-y-5">
           {/* 1. ¿Qué incluye el servicio? */}
-          <Card className="p-4 space-y-3">
-            <Label htmlFor="scope" className="text-base font-semibold">¿Qué incluye el servicio? *</Label>
+          <Card className="bg-white rounded-2xl shadow-sm border-0 p-5 space-y-4">
+            <Label htmlFor="scope" className="text-base font-bold text-foreground">¿Qué incluye el servicio? *</Label>
             <Textarea
               id="scope"
               placeholder="Ej: Corte de pasto, recolección y embolsado, limpieza de área de trabajo..."
               value={formData.scope}
               onChange={(e) => setFormData({ ...formData, scope: e.target.value })}
-              className="bg-muted/30 min-h-[100px]"
+              className="bg-white border-gray-200 rounded-xl min-h-[100px] focus:border-rappi-green focus:ring-rappi-green"
               required
             />
-            <p className="text-xs text-muted-foreground">Describe detalladamente qué incluye tu servicio (mínimo 10 caracteres)</p>
+            <p className="text-xs text-foreground/50">Describe detalladamente qué incluye tu servicio (mínimo 10 caracteres)</p>
           </Card>
 
           {/* 2. ¿Qué no incluye? */}
-          <Card className="p-4 space-y-3">
-            <Label htmlFor="exclusions" className="text-base font-semibold">¿Qué no incluye el servicio? (opcional)</Label>
+          <Card className="bg-white rounded-2xl shadow-sm border-0 p-5 space-y-4">
+            <Label htmlFor="exclusions" className="text-base font-bold text-foreground">¿Qué no incluye el servicio? (opcional)</Label>
             <Textarea
               id="exclusions"
               placeholder="Ej: No incluye fertilización ni retiro de basura fuera de la propiedad..."
               value={formData.exclusions}
               onChange={(e) => setFormData({ ...formData, exclusions: e.target.value })}
-              className="bg-muted/30"
+              className="bg-white border-gray-200 rounded-xl focus:border-rappi-green focus:ring-rappi-green min-h-[80px]"
             />
           </Card>
 
           {/* 3. ¿Puedes en la fecha y hora solicitada? */}
-          <Card className="p-4 space-y-3">
-            <Label className="text-base font-semibold">¿Puedes en la fecha y hora solicitada? *</Label>
+          <Card className="bg-white rounded-2xl shadow-sm border-0 p-5 space-y-4">
+            <Label className="text-base font-bold text-foreground">¿Puedes en la fecha y hora solicitada? *</Label>
             <RadioGroup
               value={formData.canMakeIt}
               onValueChange={(value) => setFormData({ ...formData, canMakeIt: value })}
+              className="space-y-3"
             >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="yes" id="yes" />
-                <Label htmlFor="yes">Sí</Label>
+              <div className="flex items-center space-x-3">
+                <RadioGroupItem value="yes" id="yes" className="border-2 border-black rounded-md data-[state=checked]:bg-black data-[state=checked]:border-black" />
+                <Label htmlFor="yes" className="cursor-pointer font-normal">Sí</Label>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="no" id="no" />
-                <Label htmlFor="no">No, propongo otra fecha</Label>
+              <div className="flex items-center space-x-3">
+                <RadioGroupItem value="no" id="no" className="border-2 border-black rounded-md data-[state=checked]:bg-black data-[state=checked]:border-black" />
+                <Label htmlFor="no" className="cursor-pointer font-normal">No, propongo otra fecha</Label>
               </div>
             </RadioGroup>
 
             {formData.canMakeIt === 'no' && (
-              <div className="space-y-3 mt-3">
+              <div className="space-y-4 mt-4 pt-4 border-t border-gray-100">
                 <div>
-                  <Label htmlFor="proposedDate">Fecha propuesta</Label>
+                  <Label htmlFor="proposedDate" className="text-sm font-semibold mb-2 block">Fecha propuesta</Label>
                   <Input
                     id="proposedDate"
                     type="date"
                     value={formData.proposedDate}
                     onChange={(e) => setFormData({ ...formData, proposedDate: e.target.value })}
-                    className="bg-muted/30"
+                    className="bg-white border-gray-200 rounded-xl h-12 focus:border-rappi-green focus:ring-rappi-green"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="proposedTimeStart">Hora inicio</Label>
+                    <Label htmlFor="proposedTimeStart" className="text-sm font-semibold mb-2 block">Hora inicio</Label>
                     <Input
                       id="proposedTimeStart"
                       type="time"
                       value={formData.proposedTimeStart}
                       onChange={(e) => setFormData({ ...formData, proposedTimeStart: e.target.value })}
-                      className="bg-muted/30"
+                      className="bg-white border-gray-200 rounded-xl h-12 focus:border-rappi-green focus:ring-rappi-green"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="proposedTimeEnd">Hora fin</Label>
+                    <Label htmlFor="proposedTimeEnd" className="text-sm font-semibold mb-2 block">Hora fin</Label>
                     <Input
                       id="proposedTimeEnd"
                       type="time"
                       value={formData.proposedTimeEnd}
                       onChange={(e) => setFormData({ ...formData, proposedTimeEnd: e.target.value })}
-                      className="bg-muted/30"
+                      className="bg-white border-gray-200 rounded-xl h-12 focus:border-rappi-green focus:ring-rappi-green"
                     />
                   </div>
                 </div>
@@ -281,58 +283,59 @@ export default function QuoteForm() {
           </Card>
 
           {/* 4. Precio */}
-          <Card className="p-4 space-y-3">
-            <Label className="text-base font-semibold">Precio *</Label>
+          <Card className="bg-white rounded-2xl shadow-sm border-0 p-5 space-y-4">
+            <Label className="text-base font-bold text-foreground">Precio *</Label>
             <RadioGroup
               value={formData.priceType}
               onValueChange={(value) => setFormData({ ...formData, priceType: value })}
+              className="space-y-3"
             >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="fixed" id="fixed" />
-                <Label htmlFor="fixed">Precio fijo</Label>
+              <div className="flex items-center space-x-3">
+                <RadioGroupItem value="fixed" id="fixed" className="border-2 border-black rounded-md data-[state=checked]:bg-black data-[state=checked]:border-black" />
+                <Label htmlFor="fixed" className="cursor-pointer font-normal">Precio fijo</Label>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="range" id="range" />
-                <Label htmlFor="range">Rango de precios</Label>
+              <div className="flex items-center space-x-3">
+                <RadioGroupItem value="range" id="range" className="border-2 border-black rounded-md data-[state=checked]:bg-black data-[state=checked]:border-black" />
+                <Label htmlFor="range" className="cursor-pointer font-normal">Rango de precios</Label>
               </div>
             </RadioGroup>
 
             {formData.priceType === 'fixed' ? (
-              <div>
-                <Label htmlFor="priceFixed">Monto</Label>
+              <div className="pt-4">
+                <Label htmlFor="priceFixed" className="text-sm font-semibold mb-2 block">Monto</Label>
                 <Input
                   id="priceFixed"
                   type="number"
                   placeholder="$"
                   value={formData.priceFixed}
                   onChange={(e) => setFormData({ ...formData, priceFixed: e.target.value })}
-                  className="bg-muted/30"
+                  className="bg-white border-gray-200 rounded-xl h-12 focus:border-rappi-green focus:ring-rappi-green"
                   required
                 />
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 pt-4">
                 <div>
-                  <Label htmlFor="priceMin">Mínimo</Label>
+                  <Label htmlFor="priceMin" className="text-sm font-semibold mb-2 block">Mínimo</Label>
                   <Input
                     id="priceMin"
                     type="number"
                     placeholder="$"
                     value={formData.priceMin}
                     onChange={(e) => setFormData({ ...formData, priceMin: e.target.value })}
-                    className="bg-muted/30"
+                    className="bg-white border-gray-200 rounded-xl h-12 focus:border-rappi-green focus:ring-rappi-green"
                     required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="priceMax">Máximo</Label>
+                  <Label htmlFor="priceMax" className="text-sm font-semibold mb-2 block">Máximo</Label>
                   <Input
                     id="priceMax"
                     type="number"
                     placeholder="$"
                     value={formData.priceMax}
                     onChange={(e) => setFormData({ ...formData, priceMax: e.target.value })}
-                    className="bg-muted/30"
+                    className="bg-white border-gray-200 rounded-xl h-12 focus:border-rappi-green focus:ring-rappi-green"
                     required
                   />
                 </div>
@@ -341,44 +344,45 @@ export default function QuoteForm() {
           </Card>
 
           {/* 5. ¿Incluye materiales? */}
-          <Card className="p-4 space-y-3">
-            <Label className="text-base font-semibold">¿Incluye materiales? *</Label>
+          <Card className="bg-white rounded-2xl shadow-sm border-0 p-5 space-y-4">
+            <Label className="text-base font-bold text-foreground">¿Incluye materiales? *</Label>
             <RadioGroup
               value={formData.includesMaterials}
               onValueChange={(value) => setFormData({ ...formData, includesMaterials: value })}
+              className="space-y-3"
             >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="yes" id="mat-yes" />
-                <Label htmlFor="mat-yes">Sí</Label>
+              <div className="flex items-center space-x-3">
+                <RadioGroupItem value="yes" id="mat-yes" className="border-2 border-black rounded-md data-[state=checked]:bg-black data-[state=checked]:border-black" />
+                <Label htmlFor="mat-yes" className="cursor-pointer font-normal">Sí</Label>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="no" id="mat-no" />
-                <Label htmlFor="mat-no">No</Label>
+              <div className="flex items-center space-x-3">
+                <RadioGroupItem value="no" id="mat-no" className="border-2 border-black rounded-md data-[state=checked]:bg-black data-[state=checked]:border-black" />
+                <Label htmlFor="mat-no" className="cursor-pointer font-normal">No</Label>
               </div>
             </RadioGroup>
 
             {formData.includesMaterials === 'yes' && (
-              <div>
-                <Label htmlFor="materialsList">¿Qué materiales incluye? (opcional)</Label>
+              <div className="pt-4 border-t border-gray-100">
+                <Label htmlFor="materialsList" className="text-sm font-semibold mb-2 block">¿Qué materiales incluye? (opcional)</Label>
                 <Textarea
                   id="materialsList"
                   placeholder="Ej: Pintura, brochas, lija..."
                   value={formData.materialsList}
                   onChange={(e) => setFormData({ ...formData, materialsList: e.target.value })}
-                  className="bg-muted/30"
+                  className="bg-white border-gray-200 rounded-xl focus:border-rappi-green focus:ring-rappi-green min-h-[80px]"
                 />
               </div>
             )}
           </Card>
 
           {/* 6. Duración estimada */}
-          <Card className="p-4 space-y-3">
-            <Label htmlFor="durationRange" className="text-base font-semibold">Duración estimada *</Label>
+          <Card className="bg-white rounded-2xl shadow-sm border-0 p-5 space-y-4">
+            <Label htmlFor="durationRange" className="text-base font-bold text-foreground">Duración estimada *</Label>
             <select
               id="durationRange"
               value={formData.durationRange}
               onChange={(e) => setFormData({ ...formData, durationRange: e.target.value })}
-              className="w-full h-10 rounded-md border border-input bg-muted/30 px-3 py-2 text-sm"
+              className="w-full h-12 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm focus:border-rappi-green focus:ring-rappi-green focus:outline-none"
             >
               <option value="0-0.5">0-30 min</option>
               <option value="0.5-1">30-60 min</option>
@@ -390,32 +394,33 @@ export default function QuoteForm() {
           </Card>
 
           {/* 7. ¿Requiere visita previa? */}
-          <Card className="p-4 space-y-3">
-            <Label className="text-base font-semibold">¿Requiere visita previa? *</Label>
+          <Card className="bg-white rounded-2xl shadow-sm border-0 p-5 space-y-4">
+            <Label className="text-base font-bold text-foreground">¿Requiere visita previa? *</Label>
             <RadioGroup
               value={formData.requiresVisit}
               onValueChange={(value) => setFormData({ ...formData, requiresVisit: value })}
+              className="space-y-3"
             >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="yes" id="visit-yes" />
-                <Label htmlFor="visit-yes">Sí</Label>
+              <div className="flex items-center space-x-3">
+                <RadioGroupItem value="yes" id="visit-yes" className="border-2 border-black rounded-md data-[state=checked]:bg-black data-[state=checked]:border-black" />
+                <Label htmlFor="visit-yes" className="cursor-pointer font-normal">Sí</Label>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="no" id="visit-no" />
-                <Label htmlFor="visit-no">No</Label>
+              <div className="flex items-center space-x-3">
+                <RadioGroupItem value="no" id="visit-no" className="border-2 border-black rounded-md data-[state=checked]:bg-black data-[state=checked]:border-black" />
+                <Label htmlFor="visit-no" className="cursor-pointer font-normal">No</Label>
               </div>
             </RadioGroup>
 
             {formData.requiresVisit === 'yes' && (
-              <div>
-                <Label htmlFor="visitCost">Costo de la visita (opcional, puede ser 0)</Label>
+              <div className="pt-4 border-t border-gray-100">
+                <Label htmlFor="visitCost" className="text-sm font-semibold mb-2 block">Costo de la visita (opcional, puede ser 0)</Label>
                 <Input
                   id="visitCost"
                   type="number"
                   placeholder="$"
                   value={formData.visitCost}
                   onChange={(e) => setFormData({ ...formData, visitCost: e.target.value })}
-                  className="bg-muted/30"
+                  className="bg-white border-gray-200 rounded-xl h-12 focus:border-rappi-green focus:ring-rappi-green"
                   min="0"
                 />
               </div>
@@ -423,21 +428,21 @@ export default function QuoteForm() {
           </Card>
 
           {/* 8. Detalles adicionales */}
-          <Card className="p-4 space-y-3">
-            <Label htmlFor="additionalNotes" className="text-base font-semibold">Detalles adicionales (opcional)</Label>
+          <Card className="bg-white rounded-2xl shadow-sm border-0 p-5 space-y-4">
+            <Label htmlFor="additionalNotes" className="text-base font-bold text-foreground">Detalles adicionales (opcional)</Label>
             <Textarea
               id="additionalNotes"
               placeholder="Ej: Prefiero pago en efectivo, tengo experiencia en jardines residenciales..."
               value={formData.additionalNotes}
               onChange={(e) => setFormData({ ...formData, additionalNotes: e.target.value })}
-              className="bg-muted/30"
+              className="bg-white border-gray-200 rounded-xl focus:border-rappi-green focus:ring-rappi-green min-h-[80px]"
             />
           </Card>
 
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-12 bg-accent hover:bg-accent/90 text-white text-base"
+            className="w-full h-12 bg-rappi-green hover:bg-rappi-green/90 text-white text-base font-semibold rounded-full"
           >
             {loading ? 'Enviando...' : 'Enviar cotización'}
           </Button>
