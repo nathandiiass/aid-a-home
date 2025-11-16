@@ -21,7 +21,7 @@ export const BottomNavSpecialist = () => {
     {
       icon: User,
       label: 'Perfil',
-      path: '/profile'
+      path: '/specialist/profile'
     }
   ];
 
