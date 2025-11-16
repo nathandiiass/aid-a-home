@@ -63,7 +63,7 @@ export default function SpecialistOrders() {
       }
       setSpecialistProfile(profile);
 
-      // Get in-progress orders (quotes that were accepted but not completed yet)
+      // Get in-progress orders (accepted quotes where service_request is not completed)
       const {
         data: inProgressData,
         error: inProgressError
@@ -91,18 +91,19 @@ export default function SpecialistOrders() {
             time_preference,
             is_urgent,
             user_id,
+            status,
             location:locations(
               neighborhood,
               city,
               state
             )
           )
-        `).eq('specialist_id', profile.id).eq('status', 'accepted').is('attachments', null).order('created_at', {
+        `).eq('specialist_id', profile.id).eq('status', 'accepted').neq('request.status', 'completed').order('created_at', {
         ascending: false
       });
       if (inProgressError) throw inProgressError;
 
-      // Get completed orders (have attachments from completion form)
+      // Get completed orders (where service_request status is completed)
       const {
         data: completedData,
         error: completedError
@@ -130,6 +131,7 @@ export default function SpecialistOrders() {
             time_preference,
             is_urgent,
             user_id,
+            status,
             client_review_submitted,
             location:locations(
               neighborhood,
@@ -137,7 +139,7 @@ export default function SpecialistOrders() {
               state
             )
           )
-        `).eq('specialist_id', profile.id).eq('status', 'accepted').not('attachments', 'is', null).order('created_at', {
+        `).eq('specialist_id', profile.id).eq('status', 'accepted').eq('request.status', 'completed').order('created_at', {
         ascending: false
       });
       if (completedError) throw completedError;
