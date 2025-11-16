@@ -83,7 +83,7 @@ export function CancellationSurveyDialog({ open, onOpenChange, onSubmit }: Cance
                   <RadioGroupItem 
                     value={reason} 
                     id={reason} 
-                    className="mt-0.5 border-2 data-[state=checked]:border-rappi-green data-[state=checked]:bg-rappi-green" 
+                    className="mt-0.5 border-2 border-black rounded-md data-[state=checked]:bg-black data-[state=checked]:border-black" 
                   />
                   <Label
                     htmlFor={reason}
