@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/form';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 
 // Schema for Step 1 - Identity Data
@@ -131,35 +131,43 @@ export default function Auth() {
       ...data,
     };
 
-    const { error } = await signUpWithEmail(fullData.email, fullData.password, {
+    const metadata = {
       first_name: fullData.firstName,
       last_name_paterno: fullData.lastNamePaterno,
       last_name_materno: fullData.lastNameMaterno,
       phone: fullData.phone,
       date_of_birth: fullData.dateOfBirth,
-      gender: fullData.gender || '',
+      gender: fullData.gender,
       accepted_terms: fullData.acceptedTerms,
       accepted_privacy: fullData.acceptedPrivacy,
-    });
+    };
+
+    const { error } = await signUpWithEmail(
+      fullData.email,
+      fullData.password,
+      metadata
+    );
 
     if (error) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
+      if (error.message.includes('already registered')) {
+        toast({
+          title: 'Usuario existente',
+          description: 'Este correo electrónico ya está registrado. Por favor, inicia sesión.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: error.message,
+          variant: 'destructive',
+        });
+      }
     } else {
       toast({
-        title: '¡Cuenta creada!',
-        description: 'Revisa tu correo para confirmar tu cuenta.',
+        title: 'Cuenta creada',
+        description: 'Tu cuenta ha sido creada exitosamente.',
       });
-
-      const pendingRequest = localStorage.getItem('pendingRequest');
-      if (pendingRequest) {
-        navigate('/create-request');
-      } else {
-        navigate('/');
-      }
+      navigate('/');
     }
   };
 
@@ -169,75 +177,80 @@ export default function Auth() {
     if (error) {
       toast({
         title: 'Error',
-        description: error.message,
+        description: 'Credenciales incorrectas. Por favor, verifica tu correo y contraseña.',
         variant: 'destructive',
       });
     } else {
-      const pendingRequest = localStorage.getItem('pendingRequest');
-      if (pendingRequest) {
-        navigate('/create-request');
-      } else {
-        navigate('/');
-      }
+      navigate('/');
     }
   };
 
-  const toggleMode = () => {
-    setIsSignUp(!isSignUp);
+  const handleBackToHome = () => {
+    navigate('/');
+  };
+
+  const handleBackToStep1 = () => {
     setStep(1);
-    setStep1Data(null);
-    form1.reset();
-    form2.reset();
-    loginForm.reset();
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <Logo className="pt-4 pb-2" />
-      <div className="max-w-md mx-auto p-6">
-        <button
-          onClick={() => navigate('/')}
-          className="mb-6 text-foreground hover:text-accent transition-colors flex items-center gap-2"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Volver</span>
-        </button>
-
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            {isSignUp ? 'Crear cuenta' : 'Iniciar sesión'}
-          </h1>
-          <p className="text-muted-foreground">
-            {isSignUp
-              ? 'Registra tu cuenta para publicar solicitudes y administrar tu perfil.'
-              : 'Continúa con tu cuenta para publicar solicitudes y administrar tu perfil.'}
-          </p>
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Header */}
+      <div className="w-full px-4 py-6 border-b border-border/30">
+        <div className="max-w-md mx-auto flex items-center justify-between">
+          <button
+            onClick={handleBackToHome}
+            className="text-foreground hover:text-rappi-green transition-colors flex items-center gap-2"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <Logo />
+          <div className="w-9" />
         </div>
+      </div>
 
-        {/* Progress bar for signup */}
-        {isSignUp && (
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-muted-foreground">
-                Paso {step} de 2
-              </span>
-            </div>
-            <div className="w-full bg-muted rounded-full h-2">
-              <div
-                className="bg-primary h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(step / 2) * 100}%` }}
-              />
-            </div>
+      {/* Main Content */}
+      <div className="flex-1 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-md">
+          {/* Title */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              {isSignUp ? 'Crear cuenta' : 'Iniciar sesión'}
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              {isSignUp
+                ? 'Completa tu información para comenzar'
+                : 'Ingresa con tu cuenta'}
+            </p>
           </div>
-        )}
 
-        <div className="space-y-4 mb-6">
+          {/* Progress bar for signup */}
+          {isSignUp && (
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-muted-foreground">
+                  Paso {step} de 2
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {step === 1 ? 'Datos personales' : 'Información de contacto'}
+                </span>
+              </div>
+              <div className="w-full bg-muted rounded-full h-1.5">
+                <div
+                  className="bg-rappi-green h-1.5 rounded-full transition-all duration-300"
+                  style={{ width: `${(step / 2) * 100}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Google Sign In */}
           <Button
             onClick={handleGoogleSignIn}
             variant="outline"
-            className="w-full h-12 text-base"
+            className="w-full h-12 mb-6 border-2 hover:border-rappi-green hover:text-rappi-green transition-colors"
           >
-            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
               <path
                 fill="#4285F4"
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -257,278 +270,338 @@ export default function Auth() {
             </svg>
             Continuar con Google
           </Button>
-        </div>
 
-        <div className="relative mb-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-border"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-background text-muted-foreground">o</span>
-          </div>
-        </div>
-
-        {/* Login Form */}
-        {!isSignUp && (
-          <Form {...loginForm}>
-            <form onSubmit={loginForm.handleSubmit(handleLoginSubmit)} className="space-y-4">
-              <FormField
-                control={loginForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Correo electrónico</FormLabel>
-                    <FormControl>
-                      <Input type="email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={loginForm.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Contraseña</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <Button type="submit" className="w-full h-12 text-base">
-                Iniciar sesión
-              </Button>
-            </form>
-          </Form>
-        )}
-
-        {/* Signup Step 1 - Identity Data */}
-        {isSignUp && step === 1 && (
-          <Form {...form1}>
-            <form onSubmit={form1.handleSubmit(handleStep1Submit)} className="space-y-4">
-              <FormField
-                control={form1.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nombre completo</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form1.control}
-                name="lastNamePaterno"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Apellido paterno</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form1.control}
-                name="lastNameMaterno"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Apellido materno</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form1.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Correo electrónico</FormLabel>
-                    <FormControl>
-                      <Input type="email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form1.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Contraseña</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <Button type="submit" className="w-full h-12 text-base">
-                Siguiente
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </form>
-          </Form>
-        )}
-
-        {/* Signup Step 2 - Contact and Legal Data */}
-        {isSignUp && step === 2 && (
-          <div>
-            <button
-              onClick={() => setStep(1)}
-              className="mb-4 text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Volver al paso anterior</span>
-            </button>
-
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold text-foreground mb-2">
-                Datos de contacto
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Completa tu información para finalizar el registro
-              </p>
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border/30"></div>
             </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="px-3 bg-white text-muted-foreground">o continúa con email</span>
+            </div>
+          </div>
 
-            <Form {...form2}>
-              <form onSubmit={form2.handleSubmit(handleStep2Submit)} className="space-y-4">
+          {/* Login Form */}
+          {!isSignUp && (
+            <Form {...loginForm}>
+              <form onSubmit={loginForm.handleSubmit(handleLoginSubmit)} className="space-y-4">
                 <FormField
-                  control={form2.control}
-                  name="phone"
+                  control={loginForm.control}
+                  name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Teléfono</FormLabel>
+                      <FormLabel className="text-sm font-medium">Email</FormLabel>
                       <FormControl>
-                        <Input type="tel" placeholder="10 dígitos mínimo" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form2.control}
-                  name="dateOfBirth"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Fecha de nacimiento</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form2.control}
-                  name="gender"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Género (opcional)</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecciona una opción" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="hombre">Hombre</SelectItem>
-                          <SelectItem value="mujer">Mujer</SelectItem>
-                          <SelectItem value="prefiero_no_decir">Prefiero no decir</SelectItem>
-                          <SelectItem value="otro">Otro</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form2.control}
-                  name="acceptedTerms"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
+                        <Input
+                          type="email"
+                          placeholder="tu@email.com"
+                          className="h-12 border-2 focus:border-rappi-green"
+                          {...field}
                         />
                       </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel className="text-sm font-normal">
-                          He leído y acepto los{' '}
-                          <a href="#" className="text-primary hover:underline">
-                            Términos y Condiciones
-                          </a>
-                        </FormLabel>
-                        <FormMessage />
-                      </div>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
                 <FormField
-                  control={form2.control}
-                  name="acceptedPrivacy"
+                  control={loginForm.control}
+                  name="password"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">Contraseña</FormLabel>
                       <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          className="h-12 border-2 focus:border-rappi-green"
+                          {...field}
                         />
                       </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel className="text-sm font-normal">
-                          He leído y acepto el{' '}
-                          <a href="#" className="text-primary hover:underline">
-                            Aviso de Privacidad
-                          </a>
-                        </FormLabel>
-                        <FormMessage />
-                      </div>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <Button type="submit" className="w-full h-12 text-base">
-                  Crear cuenta
+                <Button
+                  type="submit"
+                  className="w-full h-12 bg-rappi-green hover:bg-rappi-green/90 text-white font-semibold text-base rounded-full mt-6"
+                >
+                  Iniciar sesión
                 </Button>
               </form>
             </Form>
-          </div>
-        )}
+          )}
 
-        {/* Toggle between login and signup */}
-        <div className="mt-6 text-center">
-          <button
-            onClick={toggleMode}
-            className="text-primary hover:underline text-sm"
-          >
-            {isSignUp
-              ? '¿Ya tienes cuenta? Inicia sesión'
-              : '¿No tienes cuenta? Regístrate'}
-          </button>
+          {/* Sign Up Form - Step 1 */}
+          {isSignUp && step === 1 && (
+            <Form {...form1}>
+              <form onSubmit={form1.handleSubmit(handleStep1Submit)} className="space-y-4">
+                <FormField
+                  control={form1.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">Nombre(s)</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Juan"
+                          className="h-12 border-2 focus:border-rappi-green"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-2 gap-3">
+                  <FormField
+                    control={form1.control}
+                    name="lastNamePaterno"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">Apellido paterno</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Pérez"
+                            className="h-12 border-2 focus:border-rappi-green"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form1.control}
+                    name="lastNameMaterno"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">Apellido materno</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="García"
+                            className="h-12 border-2 focus:border-rappi-green"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form1.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="tu@email.com"
+                          className="h-12 border-2 focus:border-rappi-green"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form1.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">Contraseña</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="Mínimo 6 caracteres"
+                          className="h-12 border-2 focus:border-rappi-green"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  type="submit"
+                  className="w-full h-12 bg-rappi-green hover:bg-rappi-green/90 text-white font-semibold text-base rounded-full mt-6"
+                >
+                  Continuar
+                </Button>
+              </form>
+            </Form>
+          )}
+
+          {/* Sign Up Form - Step 2 */}
+          {isSignUp && step === 2 && (
+            <>
+              <button
+                onClick={handleBackToStep1}
+                className="mb-6 text-foreground hover:text-rappi-green transition-colors flex items-center gap-2 text-sm"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Volver</span>
+              </button>
+
+              <Form {...form2}>
+                <form onSubmit={form2.handleSubmit(handleStep2Submit)} className="space-y-4">
+                  <FormField
+                    control={form2.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">Teléfono</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="tel"
+                            placeholder="5512345678"
+                            className="h-12 border-2 focus:border-rappi-green"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form2.control}
+                    name="dateOfBirth"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">Fecha de nacimiento</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="date"
+                            className="h-12 border-2 focus:border-rappi-green"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form2.control}
+                    name="gender"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">Género (opcional)</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-12 border-2 focus:border-rappi-green">
+                              <SelectValue placeholder="Selecciona una opción" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="male">Masculino</SelectItem>
+                            <SelectItem value="female">Femenino</SelectItem>
+                            <SelectItem value="other">Otro</SelectItem>
+                            <SelectItem value="prefer_not_to_say">Prefiero no decir</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="space-y-3 pt-2">
+                    <FormField
+                      control={form2.control}
+                      name="acceptedTerms"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="border-2"
+                            />
+                          </FormControl>
+                          <div className="leading-none">
+                            <FormLabel className="text-xs font-normal text-muted-foreground">
+                              Acepto los{' '}
+                              <a href="#" className="text-rappi-green hover:underline">
+                                términos y condiciones
+                              </a>
+                            </FormLabel>
+                            <FormMessage />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form2.control}
+                      name="acceptedPrivacy"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="border-2"
+                            />
+                          </FormControl>
+                          <div className="leading-none">
+                            <FormLabel className="text-xs font-normal text-muted-foreground">
+                              Acepto el{' '}
+                              <a href="#" className="text-rappi-green hover:underline">
+                                aviso de privacidad
+                              </a>
+                            </FormLabel>
+                            <FormMessage />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full h-12 bg-rappi-green hover:bg-rappi-green/90 text-white font-semibold text-base rounded-full mt-6"
+                  >
+                    Crear cuenta
+                  </Button>
+                </form>
+              </Form>
+            </>
+          )}
+
+          {/* Toggle between login and signup */}
+          <div className="text-center mt-6">
+            <button
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setStep(1);
+                form1.reset();
+                form2.reset();
+                loginForm.reset();
+              }}
+              className="text-sm text-muted-foreground hover:text-rappi-green transition-colors"
+            >
+              {isSignUp ? (
+                <>
+                  ¿Ya tienes cuenta?{' '}
+                  <span className="font-semibold text-rappi-green">Inicia sesión</span>
+                </>
+              ) : (
+                <>
+                  ¿No tienes cuenta?{' '}
+                  <span className="font-semibold text-rappi-green">Regístrate</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>
