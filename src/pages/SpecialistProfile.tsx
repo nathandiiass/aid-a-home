@@ -394,18 +394,14 @@ export default function SpecialistProfile() {
         )}
       </div>
 
-      {/* CTA Button */}
+      {/* Floating CTA Button */}
       {quoteId && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200 p-4 z-40">
-          <div className="max-w-2xl mx-auto">
-            <Button
-              onClick={() => setShowConfirmDialog(true)}
-              className="w-full rounded-full py-6 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold text-base shadow-lg active:scale-[0.98] transition-all"
-            >
-              Contratar especialista
-            </Button>
-          </div>
-        </div>
+        <Button
+          onClick={() => setShowConfirmDialog(true)}
+          className="fixed bottom-6 right-6 z-40 h-14 px-6 rounded-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold text-base shadow-2xl hover:shadow-green-500/50 active:scale-95 transition-all"
+        >
+          Contratar especialista
+        </Button>
       )}
 
       {/* Confirmation Dialog */}
