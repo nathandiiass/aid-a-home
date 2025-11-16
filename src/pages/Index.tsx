@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import ServiceSearch from "@/components/ServiceSearch";
 import { BottomNav } from "@/components/BottomNav";
 import { InProgressWorks } from "@/components/InProgressWorks";
@@ -29,32 +30,46 @@ const howItWorksSteps = [{
   imagePosition: "right" as const
 }];
 const Index = () => {
-  return <div className="min-h-screen bg-background pb-20">
-      {/* Logo */}
-      
-      
-      {/* Header with search - STICKY */}
-      <div className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
-        <div className="container max-w-2xl mx-auto px-4 py-6">
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-foreground mb-2">Aid a Home</h1>
-            <p className="text-muted-foreground text-sm">
-              Encuentra especialistas para tus servicios domésticos
-            </p>
-          </div>
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return <div className="min-h-screen bg-gray-50 pb-20">
+      {/* Header with search - STICKY with BLUR */}
+      <div className={`sticky top-0 z-50 transition-all duration-300 ${
+        scrolled 
+          ? 'bg-white/80 backdrop-blur-xl shadow-md' 
+          : 'bg-white'
+      }`}>
+        <div className="container max-w-2xl mx-auto px-4 py-4">
+          {!scrolled && (
+            <div className="mb-4 animate-fade-in">
+              <h1 className="text-2xl font-bold text-gray-900 mb-1">Aid a Home</h1>
+              <p className="text-gray-600 text-sm">
+                Encuentra especialistas para tus servicios domésticos
+              </p>
+            </div>
+          )}
           
           <ServiceSearch />
         </div>
       </div>
 
       {/* In Progress Works */}
-      <div className="container max-w-2xl mx-auto px-4">
+      <div className="container max-w-2xl mx-auto px-4 pt-4">
         <InProgressWorks />
       </div>
 
       {/* How it works */}
       <div className="container max-w-md mx-auto px-4 py-8">
-        <h2 className="text-2xl font-bold text-foreground mb-8 text-center">
+        <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
           ¿Cómo funciona?
         </h2>
         
