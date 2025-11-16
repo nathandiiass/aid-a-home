@@ -36,6 +36,7 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
           *,
           reviews(rating, comment, average_score),
           quotes!inner(
+            id,
             specialist_id, 
             status,
             specialist_profiles(
