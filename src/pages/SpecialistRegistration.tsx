@@ -530,20 +530,18 @@ export default function SpecialistRegistration() {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-muted-foreground">
-                Paso {step} de 5
+                Paso {step} de 3
               </span>
               <span className="text-xs text-muted-foreground">
                 {step === 1 && 'Datos personales'}
                 {step === 2 && 'Especialidades'}
-                {step === 3 && 'Zonas de trabajo'}
-                {step === 4 && 'Documentación'}
-                {step === 5 && 'Descripción profesional'}
+                {step === 3 && 'Documentación'}
               </span>
             </div>
             <div className="w-full bg-muted rounded-full h-1.5">
               <div
                 className="bg-rappi-green h-1.5 rounded-full transition-all duration-300"
-                style={{ width: `${(step / 5) * 100}%` }}
+                style={{ width: `${(step / 3) * 100}%` }}
               />
             </div>
           </div>
