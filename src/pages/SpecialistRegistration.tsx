@@ -787,14 +787,17 @@ export default function SpecialistRegistration() {
         )}
 
         {step === 2 && (
-          <div className="space-y-6">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Especialidades y Servicios</h2>
-              <p className="text-sm text-muted-foreground">Selecciona tus áreas de especialización</p>
+          <div className="space-y-8 animate-fade-in">
+            <div className="text-center space-y-3 mb-8">
+              <h2 className="text-4xl font-bold text-foreground">Especialidades y Servicios</h2>
+              <p className="text-lg text-muted-foreground">Selecciona tus áreas de expertise y servicios</p>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-lg border-0 p-6 space-y-4">
-              <Label className="text-sm font-semibold">Especialista en: * (Selección múltiple)</Label>
+            <div className="bg-white rounded-3xl shadow-card border border-border/50 p-8 space-y-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-3 pb-4 border-b border-border/30">
+                <div className="w-2 h-8 bg-rappi-green rounded-full"></div>
+                <Label className="text-xl font-bold text-foreground">Especialista en: * (Selección múltiple)</Label>
+              </div>
               <div className="grid grid-cols-1 gap-3">
                 {availableSpecialties.map(([category, specialties]) => (
                   <Collapsible key={category} defaultOpen>
