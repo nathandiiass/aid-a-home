@@ -24,6 +24,7 @@ export default function SpecialistProfile() {
   const [profile, setProfile] = useState<any>(null);
   const [specialties, setSpecialties] = useState<any[]>([]);
   const [workZones, setWorkZones] = useState<any[]>([]);
+  const [credentials, setCredentials] = useState<any[]>([]);
   const [rating, setRating] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -43,7 +44,7 @@ export default function SpecialistProfile() {
       // Load specialist profile - RLS will handle access control
       const { data: specialistData, error: specialistError } = await supabase
         .from('specialist_profiles')
-        .select('id, user_id, materials_policy, warranty_days, status, created_at, updated_at')
+        .select('id, user_id, materials_policy, warranty_days, status, professional_description, created_at, updated_at')
         .eq('id', specialistId)
         .single();
 
@@ -94,6 +95,17 @@ export default function SpecialistProfile() {
         const avgRating = reviewsData.reduce((sum, r) => sum + r.rating, 0) / reviewsData.length;
         setRating(avgRating);
         setReviewCount(reviewsData.length);
+      }
+
+      // Load credentials (licencias y certificaciones)
+      const { data: credentialsData } = await supabase
+        .from('specialist_credentials')
+        .select('*')
+        .eq('specialist_id', specialistId)
+        .order('created_at', { ascending: false });
+
+      if (credentialsData) {
+        setCredentials(credentialsData);
       }
     } catch (error) {
       console.error('Error loading specialist:', error);
@@ -248,13 +260,41 @@ export default function SpecialistProfile() {
             ✓ Verificado
           </Badge>
         )}
-        {workZones.length > 0 && workZones[0]?.cities?.length > 0 && (
-          <p className="text-sm flex items-center justify-center gap-1" style={{ color: '#669BBC' }}>
-            <MapPin className="w-4 h-4" />
-            {workZones[0].cities[0]}
-          </p>
-        )}
       </div>
+
+      {/* Work Zones - moved before rating */}
+      {workZones.length > 0 && (
+        <div className="px-4 mb-6">
+          <Card className="p-4" style={{ borderColor: '#669BBC' }}>
+            <div className="flex items-start gap-3">
+              <MapPin className="w-5 h-5 mt-0.5" style={{ color: '#669BBC' }} />
+              <div className="flex-1">
+                <h3 className="font-bold text-base mb-2" style={{ color: '#003049' }}>
+                  Zona de cobertura
+                </h3>
+                {workZones.map((zone: any, idx: number) => (
+                  <div key={idx} className="mb-2">
+                    <p className="font-semibold text-sm mb-1" style={{ color: '#003049' }}>
+                      {zone.state}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {zone.cities?.map((city: string, cityIdx: number) => (
+                        <Badge
+                          key={cityIdx}
+                          variant="outline"
+                          style={{ borderColor: '#669BBC', color: '#669BBC' }}
+                        >
+                          {city}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* Summary Cards */}
       <div className="px-4 mb-6">
@@ -280,36 +320,60 @@ export default function SpecialistProfile() {
       </div>
 
       <div className="px-4 space-y-6">
-        {/* Contact Info removed - phone is sensitive PII not accessible to non-owners */}
-
-        {/* Services */}
-        {specialties.length > 0 && (
+        {/* Professional Description */}
+        {specialist?.professional_description && (
           <Card className="p-4" style={{ borderColor: '#669BBC' }}>
             <h3 className="font-bold text-lg mb-3" style={{ color: '#003049' }}>
-              Servicios que ofrece
+              Sobre su experiencia
             </h3>
-            <div className="space-y-4">
+            <p className="text-sm leading-relaxed" style={{ color: '#669BBC' }}>
+              {specialist.professional_description}
+            </p>
+          </Card>
+        )}
+
+        {/* Services with Experience Years */}
+        {specialties.length > 0 && (
+          <Card className="p-4" style={{ borderColor: '#669BBC' }}>
+            <h3 className="font-bold text-lg mb-4" style={{ color: '#003049' }}>
+              Especialidades y servicios
+            </h3>
+            <div className="space-y-6">
               {specialties.map((specialty: any) => (
-                <div key={specialty.id}>
-                  <h4 className="font-semibold mb-2" style={{ color: '#003049' }}>
-                    {specialty.specialty}
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {specialty.activities?.map((activity: any) => (
-                      <Badge
-                        key={activity.id}
-                        variant="outline"
-                        style={{ borderColor: '#669BBC', color: '#003049' }}
-                      >
-                        {activity.activity}
-                        {activity.price_min && activity.price_max && (
-                          <span className="ml-1 text-xs" style={{ color: '#669BBC' }}>
-                            (${activity.price_min}-${activity.price_max})
-                          </span>
-                        )}
-                      </Badge>
-                    ))}
+                <div key={specialty.id} className="border-b border-border last:border-0 pb-4 last:pb-0">
+                  <div className="mb-3">
+                    <h4 className="font-semibold text-base mb-1" style={{ color: '#003049' }}>
+                      {specialty.specialty}
+                    </h4>
+                    {specialty.experience_years && (
+                      <p className="text-sm" style={{ color: '#669BBC' }}>
+                        {specialty.experience_years} {specialty.experience_years === 1 ? 'año' : 'años'} de experiencia
+                      </p>
+                    )}
                   </div>
+                  {specialty.activities && specialty.activities.length > 0 && (
+                    <div>
+                      <p className="text-xs font-semibold mb-2" style={{ color: '#669BBC' }}>
+                        Servicios que ofrece:
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {specialty.activities.map((activity: any) => (
+                          <Badge
+                            key={activity.id}
+                            variant="outline"
+                            style={{ borderColor: '#669BBC', color: '#003049' }}
+                          >
+                            {activity.activity}
+                            {activity.price_min && activity.price_max && (
+                              <span className="ml-1 text-xs" style={{ color: '#669BBC' }}>
+                                (${activity.price_min}-${activity.price_max})
+                              </span>
+                            )}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -319,41 +383,43 @@ export default function SpecialistProfile() {
           </Card>
         )}
 
-
-        {/* Work Zones */}
-        {workZones.length > 0 && (
+        {/* Licenses and Certifications */}
+        {credentials.length > 0 && (
           <Card className="p-4" style={{ borderColor: '#669BBC' }}>
-            <div className="flex items-start gap-3">
-              <MapPin className="w-5 h-5 mt-0.5" style={{ color: '#669BBC' }} />
-              <div className="flex-1">
-                <h3 className="font-bold text-lg mb-3" style={{ color: '#003049' }}>
-                  Zonas de trabajo
-                </h3>
-                <div className="space-y-3">
-                  {workZones.map((zone: any) => (
-                    <div key={zone.id}>
-                      <h4 className="font-semibold mb-2" style={{ color: '#003049' }}>
-                        {zone.state}
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {zone.cities?.map((city: string, idx: number) => (
-                          <Badge
-                            key={idx}
-                            variant="outline"
-                            style={{ borderColor: '#669BBC', color: '#003049' }}
-                          >
-                            {city}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+            <h3 className="font-bold text-lg mb-4" style={{ color: '#003049' }}>
+              Licencias y certificaciones
+            </h3>
+            <div className="space-y-3">
+              {credentials.map((credential: any) => (
+                <div key={credential.id} className="flex items-start justify-between gap-3 pb-3 border-b border-border last:border-0 last:pb-0">
+                  <div className="flex-1">
+                    <p className="font-semibold text-sm mb-1" style={{ color: '#003049' }}>
+                      {credential.title}
+                    </p>
+                    <p className="text-xs" style={{ color: '#669BBC' }}>
+                      {credential.issuer}
+                    </p>
+                    {credential.description && (
+                      <p className="text-xs mt-1" style={{ color: '#669BBC' }}>
+                        {credential.description}
+                      </p>
+                    )}
+                  </div>
+                  {credential.attachment_url && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => window.open(credential.attachment_url, '_blank')}
+                      style={{ borderColor: '#669BBC', color: '#669BBC' }}
+                    >
+                      Ver documento
+                    </Button>
+                  )}
                 </div>
-              </div>
+              ))}
             </div>
           </Card>
         )}
-
       </div>
 
       {/* Footer Actions */}
