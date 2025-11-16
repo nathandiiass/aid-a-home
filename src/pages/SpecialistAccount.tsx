@@ -218,10 +218,7 @@ export default function SpecialistAccount() {
                 icon={Star}
                 title="Mis reseñas"
                 subtitle={`${reviewsCount} reseñas · ${averageRating.toFixed(1)} promedio`}
-                onClick={() => toast({
-                  title: "Próximamente",
-                  description: "Esta función estará disponible pronto"
-                })}
+                onClick={() => navigate('/specialist/reviews')}
               />
             </div>
 
