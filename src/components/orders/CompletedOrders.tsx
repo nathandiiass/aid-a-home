@@ -66,7 +66,7 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
 
   if (filteredCompleted.length === 0) {
     return (
-      <Card className="p-8 text-center bg-white rounded-xl border border-border/20">
+      <Card className="p-8 text-center bg-white rounded-2xl border-0 shadow-lg">
         <p className="text-muted-foreground">No tienes órdenes completadas</p>
       </Card>
     );
@@ -77,7 +77,7 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
       {filteredCompleted.map((order) => (
         <Card 
           key={order.id} 
-          className="p-4 hover:shadow-md transition-all cursor-pointer bg-white rounded-xl border border-border/20"
+          className="p-4 hover:shadow-xl transition-all cursor-pointer bg-white rounded-2xl border-0 shadow-lg"
           onClick={() => navigate(`/orders/${order.id}`)}
         >
           <h3 className="font-bold text-foreground text-base mb-2">
@@ -94,7 +94,7 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
             </p>
           )}
 
-          <div className="flex items-center justify-between pt-3 border-t border-border/20">
+          <div className="flex items-center justify-between pt-3 border-t border-gray-100">
             {order.reviews && order.reviews.length > 0 ? (
               <div className="flex items-center gap-1.5 text-sm">
                 <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />

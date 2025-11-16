@@ -87,7 +87,7 @@ export function DraftOrders({ searchQuery }: DraftOrdersProps) {
 
   if (filteredDrafts.length === 0) {
     return (
-      <Card className="p-8 text-center bg-white rounded-xl border border-border/20">
+      <Card className="p-8 text-center bg-white rounded-2xl border-0 shadow-lg">
         <p className="text-muted-foreground mb-4">No tienes borradores guardados</p>
         <button
           onClick={() => navigate('/create-request')}
@@ -102,7 +102,7 @@ export function DraftOrders({ searchQuery }: DraftOrdersProps) {
   return (
     <div className="space-y-3">
       {filteredDrafts.map((draft) => (
-        <Card key={draft.id} className="p-4 bg-white rounded-xl border border-border/20">
+        <Card key={draft.id} className="p-4 bg-white rounded-2xl border-0 shadow-lg">
           <h3 className="font-bold text-foreground text-base mb-3">
             {draft.activity || 'Selecciona una actividad'}
           </h3>
