@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Camera, FileText, Save } from 'lucide-react';
+import { ArrowLeft, Camera, FileText, Save, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -42,17 +42,19 @@ interface ProfileData {
   address_proof_url: string | null;
 }
 
+interface Activity {
+  id: string;
+  activity: string;
+  price_min: number | null;
+  price_max: number | null;
+}
+
 interface Specialty {
   id: string;
   specialty: string;
   role_label: string;
   experience_years: number | null;
-  activities: Array<{
-    id: string;
-    activity: string;
-    price_min: number | null;
-    price_max: number | null;
-  }>;
+  activities: Activity[];
 }
 
 interface WorkZone {
@@ -74,6 +76,7 @@ export default function SpecialistPersonalInfo() {
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [workZones, setWorkZones] = useState<WorkZone[]>([]);
   const [specialistId, setSpecialistId] = useState<string | null>(null);
+  const [editingSpecialty, setEditingSpecialty] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -237,6 +240,27 @@ export default function SpecialistPersonalInfo() {
     setHasChanges(true);
   };
 
+  const handleSpecialtyChange = (specialtyId: string, field: string, value: any) => {
+    setSpecialties(prev => prev.map(s => 
+      s.id === specialtyId ? { ...s, [field]: value } : s
+    ));
+    setHasChanges(true);
+  };
+
+  const handleActivityChange = (specialtyId: string, activityId: string, field: string, value: any) => {
+    setSpecialties(prev => prev.map(s => 
+      s.id === specialtyId 
+        ? {
+            ...s,
+            activities: s.activities.map(a => 
+              a.id === activityId ? { ...a, [field]: value } : a
+            )
+          }
+        : s
+    ));
+    setHasChanges(true);
+  };
+
   const handleSave = async () => {
     if (!user || !profileData || !specialistId) return;
 
@@ -273,6 +297,32 @@ export default function SpecialistPersonalInfo() {
 
       if (specialistError) throw specialistError;
 
+      // Update specialties
+      for (const specialty of specialties) {
+        const { error: specError } = await supabase
+          .from('specialist_specialties')
+          .update({
+            experience_years: specialty.experience_years
+          })
+          .eq('id', specialty.id);
+
+        if (specError) throw specError;
+
+        // Update activities
+        for (const activity of specialty.activities) {
+          const { error: actError } = await supabase
+            .from('specialist_activities')
+            .update({
+              activity: activity.activity,
+              price_min: activity.price_min,
+              price_max: activity.price_max
+            })
+            .eq('id', activity.id);
+
+          if (actError) throw actError;
+        }
+      }
+
       setHasChanges(false);
       toast({
         title: "Éxito",
@@ -301,36 +351,36 @@ export default function SpecialistPersonalInfo() {
   if (!profileData) return null;
 
   return (
-    <div className="min-h-screen bg-muted/30 pb-24">
-      {/* Header with blur */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
-        <div className="max-w-2xl mx-auto px-4 h-16 flex items-center gap-4">
+    <div className="min-h-screen bg-gray-50 pb-24">
+      {/* Header with blur - Rappi style */}
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl shadow-sm">
+        <div className="max-w-2xl mx-auto px-4 h-14 flex items-center gap-3">
           <button
             onClick={() => navigate('/profile')}
-            className="w-10 h-10 rounded-full hover:bg-muted flex items-center justify-center transition-colors"
+            className="w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 text-gray-700" />
           </button>
-          <h1 className="text-xl font-semibold">Información personal</h1>
+          <h1 className="text-lg font-semibold text-gray-900">Información personal</h1>
         </div>
       </header>
 
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+      <div className="max-w-2xl mx-auto px-4 py-4 space-y-3">
         {/* BLOQUE 1: DATOS PERSONALES */}
-        <div className="bg-background rounded-2xl border border-border p-6 space-y-6">
-          <h2 className="text-lg font-semibold text-foreground">Datos personales</h2>
+        <div className="bg-white rounded-2xl shadow-sm p-5 space-y-5">
+          <h2 className="text-base font-bold text-gray-900">Datos personales</h2>
           
           {/* Avatar */}
-          <div className="flex flex-col items-center gap-3">
+          <div className="flex flex-col items-center gap-2">
             <div className="relative">
-              <Avatar className="w-24 h-24">
+              <Avatar className="w-20 h-20 border-2 border-gray-100">
                 <AvatarImage src={profileData.avatar_url || undefined} />
-                <AvatarFallback className="text-2xl">
+                <AvatarFallback className="text-xl bg-gradient-to-br from-primary to-primary/80 text-white">
                   {profileData.first_name?.charAt(0)}
                 </AvatarFallback>
               </Avatar>
-              <label className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors">
-                <Camera className="w-4 h-4 text-primary-foreground" />
+              <label className="absolute bottom-0 right-0 w-7 h-7 bg-green-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-green-700 transition-colors shadow-md">
+                <Camera className="w-3.5 h-3.5 text-white" />
                 <input
                   type="file"
                   accept="image/*"
@@ -340,14 +390,14 @@ export default function SpecialistPersonalInfo() {
                 />
               </label>
             </div>
-            <span className="text-sm text-muted-foreground">Cambiar foto</span>
+            <span className="text-xs text-gray-500">Cambiar foto</span>
           </div>
 
           {/* Read-only fields */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div>
-              <Label className="text-xs text-muted-foreground">Tipo de persona</Label>
-              <p className="text-base font-medium">
+              <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Tipo de persona</Label>
+              <p className="text-sm font-medium text-gray-900 mt-1">
                 {profileData.person_type === 'fisica' ? 'Persona Física' : 'Persona Moral'}
               </p>
             </div>
@@ -355,183 +405,213 @@ export default function SpecialistPersonalInfo() {
             {profileData.person_type === 'fisica' ? (
               <>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Nombre completo</Label>
-                  <p className="text-base font-medium">{profileData.first_name}</p>
+                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Nombre completo</Label>
+                  <p className="text-sm font-medium text-gray-900 mt-1">{profileData.first_name}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-xs text-muted-foreground">Apellido paterno</Label>
-                    <p className="text-base font-medium">{profileData.last_name_paterno || '—'}</p>
+                    <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Apellido paterno</Label>
+                    <p className="text-sm font-medium text-gray-900 mt-1">{profileData.last_name_paterno || '—'}</p>
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Apellido materno</Label>
-                    <p className="text-base font-medium">{profileData.last_name_materno || '—'}</p>
+                    <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Apellido materno</Label>
+                    <p className="text-sm font-medium text-gray-900 mt-1">{profileData.last_name_materno || '—'}</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-xs text-muted-foreground">Fecha de nacimiento</Label>
-                    <p className="text-base font-medium">{profileData.date_of_birth || '—'}</p>
+                    <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Fecha de nacimiento</Label>
+                    <p className="text-sm font-medium text-gray-900 mt-1">{profileData.date_of_birth || '—'}</p>
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Género</Label>
-                    <p className="text-base font-medium">{profileData.gender || '—'}</p>
+                    <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Género</Label>
+                    <p className="text-sm font-medium text-gray-900 mt-1">{profileData.gender || '—'}</p>
                   </div>
                 </div>
               </>
             ) : (
               <>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Razón social</Label>
-                  <p className="text-base font-medium">{profileData.razon_social || '—'}</p>
+                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Razón social</Label>
+                  <p className="text-sm font-medium text-gray-900 mt-1">{profileData.razon_social || '—'}</p>
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Fecha de constitución</Label>
-                  <p className="text-base font-medium">{profileData.date_of_birth || '—'}</p>
+                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Fecha de constitución</Label>
+                  <p className="text-sm font-medium text-gray-900 mt-1">{profileData.date_of_birth || '—'}</p>
                 </div>
               </>
             )}
 
             <div>
-              <Label className="text-xs text-muted-foreground">RFC</Label>
-              <p className="text-base font-medium">{profileData.rfc}</p>
+              <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">RFC</Label>
+              <p className="text-sm font-medium text-gray-900 mt-1">{profileData.rfc}</p>
             </div>
           </div>
 
           {/* Editable fields */}
-          <div className="space-y-4 pt-4 border-t border-border">
+          <div className="space-y-3 pt-3 border-t border-gray-100">
             <div>
-              <Label htmlFor="phone" className="text-xs text-muted-foreground">Teléfono móvil *</Label>
+              <Label htmlFor="phone" className="text-xs font-medium text-gray-700 mb-1.5 block">Teléfono móvil *</Label>
               <Input
                 id="phone"
                 value={profileData.phone || ''}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
-                className="mt-1 rounded-xl"
+                className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
                 placeholder="Ingresa tu teléfono"
               />
             </div>
 
             <div>
-              <Label htmlFor="email" className="text-xs text-muted-foreground">Correo electrónico *</Label>
+              <Label htmlFor="email" className="text-xs font-medium text-gray-700 mb-1.5 block">Correo electrónico *</Label>
               <Input
                 id="email"
                 type="email"
                 value={profileData.email || ''}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className="mt-1 rounded-xl"
+                className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
                 placeholder="tu@email.com"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="state" className="text-xs text-muted-foreground">Estado *</Label>
+                <Label htmlFor="state" className="text-xs font-medium text-gray-700 mb-1.5 block">Estado *</Label>
                 <Input
                   id="state"
                   value={profileData.state || ''}
                   onChange={(e) => handleInputChange('state', e.target.value)}
-                  className="mt-1 rounded-xl"
+                  className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
                 />
               </div>
               <div>
-                <Label htmlFor="city" className="text-xs text-muted-foreground">Ciudad *</Label>
+                <Label htmlFor="city" className="text-xs font-medium text-gray-700 mb-1.5 block">Ciudad *</Label>
                 <Input
                   id="city"
                   value={profileData.city || ''}
                   onChange={(e) => handleInputChange('city', e.target.value)}
-                  className="mt-1 rounded-xl"
+                  className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="postal_code" className="text-xs text-muted-foreground">Código postal</Label>
+              <Label htmlFor="postal_code" className="text-xs font-medium text-gray-700 mb-1.5 block">Código postal</Label>
               <Input
                 id="postal_code"
                 value={profileData.postal_code || ''}
                 onChange={(e) => handleInputChange('postal_code', e.target.value)}
-                className="mt-1 rounded-xl"
+                className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
                 placeholder="97000"
               />
             </div>
 
             <div>
-              <Label htmlFor="street" className="text-xs text-muted-foreground">Calle</Label>
+              <Label htmlFor="street" className="text-xs font-medium text-gray-700 mb-1.5 block">Calle</Label>
               <Input
                 id="street"
                 value={profileData.street || ''}
                 onChange={(e) => handleInputChange('street', e.target.value)}
-                className="mt-1 rounded-xl"
+                className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="street_number" className="text-xs text-muted-foreground">Número</Label>
+                <Label htmlFor="street_number" className="text-xs font-medium text-gray-700 mb-1.5 block">Número</Label>
                 <Input
                   id="street_number"
                   value={profileData.street_number || ''}
                   onChange={(e) => handleInputChange('street_number', e.target.value)}
-                  className="mt-1 rounded-xl"
+                  className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
                 />
               </div>
               <div>
-                <Label htmlFor="neighborhood" className="text-xs text-muted-foreground">Colonia</Label>
+                <Label htmlFor="neighborhood" className="text-xs font-medium text-gray-700 mb-1.5 block">Colonia</Label>
                 <Input
                   id="neighborhood"
                   value={profileData.neighborhood || ''}
                   onChange={(e) => handleInputChange('neighborhood', e.target.value)}
-                  className="mt-1 rounded-xl"
+                  className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
                 />
               </div>
             </div>
 
-            <p className="text-xs text-muted-foreground italic">
+            <p className="text-xs text-gray-500 italic pt-1">
               Esta es la dirección donde vives actualmente.
             </p>
           </div>
         </div>
 
         {/* BLOQUE 2: DATOS PROFESIONALES */}
-        <div className="bg-background rounded-2xl border border-border p-6 space-y-6">
-          <h2 className="text-lg font-semibold text-foreground">Datos profesionales</h2>
+        <div className="bg-white rounded-2xl shadow-sm p-5 space-y-5">
+          <h2 className="text-base font-bold text-gray-900">Datos profesionales</h2>
 
           <div>
-            <Label htmlFor="professional_description" className="text-xs text-muted-foreground">
+            <Label htmlFor="professional_description" className="text-xs font-medium text-gray-700 mb-1.5 block">
               Descripción profesional (máx. 200 caracteres)
             </Label>
             <Textarea
               id="professional_description"
               value={profileData.professional_description || ''}
               onChange={(e) => handleInputChange('professional_description', e.target.value.slice(0, 200))}
-              className="mt-1 rounded-xl min-h-[80px]"
+              className="rounded-2xl min-h-[70px] border-gray-200 focus:border-green-500 focus:ring-green-500 text-sm"
               placeholder="Cuéntanos sobre tu experiencia..."
               maxLength={200}
             />
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               {profileData.professional_description?.length || 0}/200
             </p>
           </div>
 
-          {/* Specialties */}
-          {specialties.map((specialty, idx) => (
-            <div key={specialty.id} className="p-4 bg-muted/30 rounded-xl space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-foreground">{specialty.role_label}</h3>
-                <Badge variant="secondary">{specialty.experience_years || 0} años</Badge>
+          {/* Specialties - Editable */}
+          {specialties.map((specialty) => (
+            <div key={specialty.id} className="p-4 bg-gray-50 rounded-2xl space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="font-bold text-gray-900 text-sm">{specialty.role_label}</h3>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    value={specialty.experience_years || 0}
+                    onChange={(e) => handleSpecialtyChange(specialty.id, 'experience_years', parseInt(e.target.value))}
+                    className="w-16 h-8 rounded-full border-gray-200 text-center text-xs font-medium"
+                    min="0"
+                  />
+                  <span className="text-xs text-gray-600">años</span>
+                </div>
               </div>
               
               <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Servicios ofrecidos</Label>
+                <Label className="text-xs font-medium text-gray-700">Servicios que ofreces</Label>
                 {specialty.activities.map((activity) => (
-                  <div key={activity.id} className="flex items-center gap-2 text-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                    <span>{activity.activity}</span>
-                    {activity.price_min && (
-                      <span className="text-muted-foreground ml-auto">
-                        desde ${activity.price_min}
-                      </span>
-                    )}
+                  <div key={activity.id} className="space-y-2">
+                    <Input
+                      value={activity.activity}
+                      onChange={(e) => handleActivityChange(specialty.id, activity.id, 'activity', e.target.value)}
+                      className="rounded-full border-gray-200 text-sm focus:border-green-500 focus:ring-green-500"
+                      placeholder="Nombre del servicio"
+                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <Label className="text-xs text-gray-600 mb-1 block">Precio mínimo</Label>
+                        <Input
+                          type="number"
+                          value={activity.price_min || ''}
+                          onChange={(e) => handleActivityChange(specialty.id, activity.id, 'price_min', e.target.value ? parseFloat(e.target.value) : null)}
+                          className="rounded-full border-gray-200 text-sm focus:border-green-500 focus:ring-green-500"
+                          placeholder="$0"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs text-gray-600 mb-1 block">Precio máximo</Label>
+                        <Input
+                          type="number"
+                          value={activity.price_max || ''}
+                          onChange={(e) => handleActivityChange(specialty.id, activity.id, 'price_max', e.target.value ? parseFloat(e.target.value) : null)}
+                          className="rounded-full border-gray-200 text-sm focus:border-green-500 focus:ring-green-500"
+                          placeholder="$0"
+                        />
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -540,14 +620,16 @@ export default function SpecialistPersonalInfo() {
 
           {/* Work Zones */}
           <div>
-            <Label className="text-xs text-muted-foreground">Zona de cobertura</Label>
-            <div className="mt-2 space-y-2">
+            <Label className="text-xs font-medium text-gray-700 mb-2 block">Zona de cobertura</Label>
+            <div className="space-y-2">
               {workZones.map((zone) => (
-                <div key={zone.id}>
-                  <p className="font-medium text-sm">{zone.state}</p>
-                  <div className="flex flex-wrap gap-2 mt-1">
+                <div key={zone.id} className="p-3 bg-gray-50 rounded-xl">
+                  <p className="font-semibold text-sm text-gray-900 mb-2">{zone.state}</p>
+                  <div className="flex flex-wrap gap-1.5">
                     {zone.cities.map((city, idx) => (
-                      <Badge key={idx} variant="outline">{city}</Badge>
+                      <Badge key={idx} variant="outline" className="rounded-full text-xs border-gray-300 bg-white">
+                        {city}
+                      </Badge>
                     ))}
                   </div>
                 </div>
@@ -557,25 +639,27 @@ export default function SpecialistPersonalInfo() {
         </div>
 
         {/* BLOQUE 3: DOCUMENTACIÓN */}
-        <div className="bg-background rounded-2xl border border-border p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-foreground">Documentación para validación</h2>
-          <p className="text-sm text-muted-foreground">
+        <div className="bg-white rounded-2xl shadow-sm p-5 space-y-3">
+          <h2 className="text-base font-bold text-gray-900">Documentación para validación</h2>
+          <p className="text-xs text-gray-500">
             La documentación no puede ser modificada una vez enviada.
           </p>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {profileData.id_document_url && (
               <a
                 href={profileData.id_document_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between p-3 bg-muted/30 rounded-xl hover:bg-muted/50 transition-colors"
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors active:scale-[0.98]"
               >
                 <div className="flex items-center gap-3">
-                  <FileText className="w-5 h-5 text-primary" />
-                  <span className="text-sm font-medium">Identificación oficial</span>
+                  <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center">
+                    <FileText className="w-4 h-4 text-green-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">Identificación oficial</span>
                 </div>
-                <span className="text-xs text-muted-foreground">Ver documento</span>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
               </a>
             )}
 
@@ -584,13 +668,15 @@ export default function SpecialistPersonalInfo() {
                 href={profileData.csf_document_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between p-3 bg-muted/30 rounded-xl hover:bg-muted/50 transition-colors"
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors active:scale-[0.98]"
               >
                 <div className="flex items-center gap-3">
-                  <FileText className="w-5 h-5 text-primary" />
-                  <span className="text-sm font-medium">Constancia de Situación Fiscal</span>
+                  <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center">
+                    <FileText className="w-4 h-4 text-green-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">Constancia de Situación Fiscal</span>
                 </div>
-                <span className="text-xs text-muted-foreground">Ver documento</span>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
               </a>
             )}
 
@@ -599,26 +685,28 @@ export default function SpecialistPersonalInfo() {
                 href={profileData.address_proof_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between p-3 bg-muted/30 rounded-xl hover:bg-muted/50 transition-colors"
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors active:scale-[0.98]"
               >
                 <div className="flex items-center gap-3">
-                  <FileText className="w-5 h-5 text-primary" />
-                  <span className="text-sm font-medium">Comprobante de domicilio</span>
+                  <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center">
+                    <FileText className="w-4 h-4 text-green-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">Comprobante de domicilio</span>
                 </div>
-                <span className="text-xs text-muted-foreground">Ver documento</span>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
               </a>
             )}
           </div>
         </div>
       </div>
 
-      {/* Floating Save Button */}
+      {/* Floating Save Button - Rappi Style */}
       {hasChanges && (
-        <div className="fixed bottom-20 left-0 right-0 flex justify-center px-4 z-40">
+        <div className="fixed bottom-20 left-0 right-0 flex justify-center px-4 z-40 animate-in slide-in-from-bottom duration-300">
           <Button
             onClick={handleSave}
             disabled={saving}
-            className="rounded-full px-8 py-6 shadow-lg hover:shadow-xl transition-all bg-green-600 hover:bg-green-700 text-white"
+            className="rounded-full px-10 py-6 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.16)] transition-all bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold text-base active:scale-95"
           >
             <Save className="w-5 h-5 mr-2" />
             {saving ? 'Guardando...' : 'Guardar cambios'}
