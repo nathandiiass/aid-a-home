@@ -276,31 +276,52 @@ export type Database = {
       }
       reviews: {
         Row: {
+          average_score: number | null
+          calidad_trabajo: number | null
           comment: string | null
           created_at: string
+          cumplimiento_servicio: number | null
           id: string
+          profesionalismo: number | null
+          puntualidad: number | null
           rating: number
+          relacion_calidad_precio: number | null
           request_id: string
           specialist_id: string
           user_id: string
+          volveria_trabajar: boolean | null
         }
         Insert: {
+          average_score?: number | null
+          calidad_trabajo?: number | null
           comment?: string | null
           created_at?: string
+          cumplimiento_servicio?: number | null
           id?: string
+          profesionalismo?: number | null
+          puntualidad?: number | null
           rating: number
+          relacion_calidad_precio?: number | null
           request_id: string
           specialist_id: string
           user_id: string
+          volveria_trabajar?: boolean | null
         }
         Update: {
+          average_score?: number | null
+          calidad_trabajo?: number | null
           comment?: string | null
           created_at?: string
+          cumplimiento_servicio?: number | null
           id?: string
+          profesionalismo?: number | null
+          puntualidad?: number | null
           rating?: number
+          relacion_calidad_precio?: number | null
           request_id?: string
           specialist_id?: string
           user_id?: string
+          volveria_trabajar?: boolean | null
         }
         Relationships: [
           {
@@ -331,6 +352,7 @@ export type Database = {
           location_id: string | null
           price_max: number | null
           price_min: number | null
+          review_submitted: boolean | null
           scheduled_date: string | null
           service_description: string | null
           service_title: string | null
@@ -352,6 +374,7 @@ export type Database = {
           location_id?: string | null
           price_max?: number | null
           price_min?: number | null
+          review_submitted?: boolean | null
           scheduled_date?: string | null
           service_description?: string | null
           service_title?: string | null
@@ -373,6 +396,7 @@ export type Database = {
           location_id?: string | null
           price_max?: number | null
           price_min?: number | null
+          review_submitted?: boolean | null
           scheduled_date?: string | null
           service_description?: string | null
           service_title?: string | null
@@ -504,6 +528,11 @@ export type Database = {
         Row: {
           accepted_terms_at: string | null
           address_proof_url: string | null
+          avg_calidad_trabajo: number | null
+          avg_cumplimiento_servicio: number | null
+          avg_profesionalismo: number | null
+          avg_puntualidad: number | null
+          avg_relacion_calidad_precio: number | null
           birth_or_constitution_date: string | null
           city: string | null
           created_at: string
@@ -516,15 +545,18 @@ export type Database = {
           neighborhood: string | null
           person_type: string | null
           phone: string
+          porcentaje_volveria: number | null
           postal_code: string | null
           professional_description: string | null
           profile_photo_url: string | null
+          rating_promedio: number | null
           razon_social: string | null
           rfc: string
           state: string | null
           status: string
           street: string | null
           street_number: string | null
+          total_reviews: number | null
           updated_at: string
           user_id: string
           warranty_days: number | null
@@ -532,6 +564,11 @@ export type Database = {
         Insert: {
           accepted_terms_at?: string | null
           address_proof_url?: string | null
+          avg_calidad_trabajo?: number | null
+          avg_cumplimiento_servicio?: number | null
+          avg_profesionalismo?: number | null
+          avg_puntualidad?: number | null
+          avg_relacion_calidad_precio?: number | null
           birth_or_constitution_date?: string | null
           city?: string | null
           created_at?: string
@@ -544,15 +581,18 @@ export type Database = {
           neighborhood?: string | null
           person_type?: string | null
           phone: string
+          porcentaje_volveria?: number | null
           postal_code?: string | null
           professional_description?: string | null
           profile_photo_url?: string | null
+          rating_promedio?: number | null
           razon_social?: string | null
           rfc: string
           state?: string | null
           status?: string
           street?: string | null
           street_number?: string | null
+          total_reviews?: number | null
           updated_at?: string
           user_id: string
           warranty_days?: number | null
@@ -560,6 +600,11 @@ export type Database = {
         Update: {
           accepted_terms_at?: string | null
           address_proof_url?: string | null
+          avg_calidad_trabajo?: number | null
+          avg_cumplimiento_servicio?: number | null
+          avg_profesionalismo?: number | null
+          avg_puntualidad?: number | null
+          avg_relacion_calidad_precio?: number | null
           birth_or_constitution_date?: string | null
           city?: string | null
           created_at?: string
@@ -572,15 +617,18 @@ export type Database = {
           neighborhood?: string | null
           person_type?: string | null
           phone?: string
+          porcentaje_volveria?: number | null
           postal_code?: string | null
           professional_description?: string | null
           profile_photo_url?: string | null
+          rating_promedio?: number | null
           razon_social?: string | null
           rfc?: string
           state?: string | null
           status?: string
           street?: string | null
           street_number?: string | null
+          total_reviews?: number | null
           updated_at?: string
           user_id?: string
           warranty_days?: number | null
@@ -691,6 +739,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_submit_review: {
+        Args: { p_request_id: string; p_user_id: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

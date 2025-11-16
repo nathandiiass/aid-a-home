@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { SpecialistReviewDialog } from './SpecialistReviewDialog';
 
 interface CompletedOrdersProps {
   searchQuery: string;
@@ -17,6 +18,8 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
   const { toast } = useToast();
   const [completed, setCompleted] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
   useEffect(() => {
     fetchCompleted();
@@ -36,10 +39,12 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
         .from('service_requests')
         .select(`
           *,
-          reviews(rating, comment)
+          reviews(rating, comment, average_score),
+          quotes!inner(specialist_id, status)
         `)
         .eq('user_id', user.id)
         .eq('status', 'completed')
+        .eq('quotes.status', 'accepted')
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
@@ -54,6 +59,15 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleOpenReview = (order: any) => {
+    setSelectedOrder(order);
+    setReviewDialogOpen(true);
+  };
+
+  const handleReviewSubmitted = () => {
+    fetchCompleted(); // Recargar la lista
   };
 
   const filteredCompleted = completed.filter(order =>
@@ -98,13 +112,17 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
             {order.reviews && order.reviews.length > 0 ? (
               <div className="flex items-center gap-1.5 text-sm">
                 <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                <span className="font-bold text-foreground">{order.reviews[0].rating}</span>
+                <span className="font-bold text-foreground">
+                  {order.reviews[0].average_score 
+                    ? Number(order.reviews[0].average_score).toFixed(1)
+                    : order.reviews[0].rating}
+                </span>
               </div>
             ) : (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigate(`/orders/${order.id}/review`);
+                  handleOpenReview(order);
                 }}
                 className="bg-white hover:bg-gray-50 text-foreground text-xs font-semibold px-3 py-1.5 rounded-full border border-border/30 transition-colors"
               >
@@ -124,6 +142,16 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
           </div>
         </Card>
       ))}
+      
+      {selectedOrder && (
+        <SpecialistReviewDialog
+          open={reviewDialogOpen}
+          onOpenChange={setReviewDialogOpen}
+          requestId={selectedOrder.id}
+          specialistId={selectedOrder.quotes?.[0]?.specialist_id}
+          onReviewSubmitted={handleReviewSubmitted}
+        />
+      )}
     </div>
   );
 }
