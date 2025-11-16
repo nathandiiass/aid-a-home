@@ -223,117 +223,102 @@ export default function SpecialistProfile() {
   }
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: 'linear-gradient(to bottom, rgba(253, 240, 213, 0.2), rgba(255, 255, 255, 1))' }}>
-      {/* Modern App Bar */}
-      <div className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b px-4 py-3 flex items-center gap-3 shadow-elegant" style={{ borderColor: 'rgba(102, 155, 188, 0.2)' }}>
+    <div className="min-h-screen pb-24 bg-background">
+      {/* Clean App Bar - Rappi Style */}
+      <div className="sticky top-0 z-50 bg-background border-b px-4 py-4 flex items-center gap-3">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => navigate(-1)}
-          className="hover:bg-primary/10 transition-all duration-200"
+          className="rounded-full"
         >
-          <ArrowLeft className="w-5 h-5" style={{ color: '#003049' }} />
+          <ArrowLeft className="h-6 w-6" />
         </Button>
-        <h1 className="flex-1 font-bold text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+        <h1 className="flex-1 text-xl font-bold">
           Perfil del Especialista
         </h1>
-        <Button variant="ghost" size="icon" className="hover:bg-primary/10 transition-all duration-200">
-          <Share2 className="w-5 h-5" style={{ color: '#669BBC' }} />
+        <Button variant="ghost" size="icon" className="rounded-full">
+          <Share2 className="h-5 w-5" />
         </Button>
-        <Button variant="ghost" size="icon" className="hover:bg-primary/10 transition-all duration-200">
-          <MoreVertical className="w-5 h-5" style={{ color: '#669BBC' }} />
+        <Button variant="ghost" size="icon" className="rounded-full">
+          <MoreVertical className="h-5 w-5" />
         </Button>
       </div>
 
-      {/* Modern Hero Section */}
-      <div className="px-4 pt-12 pb-8 text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" style={{ height: '200px' }} />
-        <div className="relative animate-fade-in">
-          <Avatar className="w-36 h-36 mx-auto mb-5 border-4 shadow-elegant hover-scale transition-all duration-300" style={{ borderColor: 'rgba(102, 155, 188, 0.3)' }}>
-            <AvatarImage src={profile.avatar_url} />
-            <AvatarFallback className="text-4xl font-bold" style={{ background: 'linear-gradient(135deg, #003049, #669BBC)', color: '#FFFFFF' }}>
-              {getInitials(displayName)}
-            </AvatarFallback>
-          </Avatar>
-          <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+      {/* Clean Hero Section */}
+      <div className="px-4 py-8 text-center space-y-4">
+        <Avatar className="h-28 w-28 mx-auto border-4 border-white shadow-md">
+          <AvatarImage src={profile.avatar_url} alt={displayName} />
+          <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
+            {getInitials(displayName)}
+          </AvatarFallback>
+        </Avatar>
+        
+        {verifiedStatus && (
+          <div className="inline-flex items-center gap-1.5 bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+            <span className="text-base">✓</span>
+            Verificado
+          </div>
+        )}
+
+        <div className="space-y-1">
+          <h2 className="text-2xl font-bold">
             {displayName}
           </h2>
-          {verifiedStatus && (
-            <Badge className="mb-2 px-4 py-1.5 text-sm shadow-subtle animate-scale-in" style={{ background: 'linear-gradient(135deg, #FDF0D5, #FFFFFF)', color: '#003049', border: '1px solid rgba(102, 155, 188, 0.2)' }}>
-              ✓ Verificado
-            </Badge>
-          )}
+          <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
+            <Phone className="h-4 w-4" />
+            <span>{profile.phone}</span>
+          </div>
         </div>
       </div>
 
-      {/* Modern Work Zones */}
+      {/* Work Zones Section */}
       {workZones.length > 0 && (
-        <div className="px-4 mb-8 animate-fade-in" style={{ animationDelay: '100ms' }}>
-          <Card className="p-6 border-0 shadow-elegant overflow-hidden relative" style={{ background: 'linear-gradient(135deg, rgba(102, 155, 188, 0.08), rgba(255, 255, 255, 0.95))' }}>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/10 to-transparent rounded-full blur-3xl" />
-            <div className="flex items-start gap-4 relative">
-              <div className="p-3 rounded-full shadow-subtle" style={{ background: 'linear-gradient(135deg, #669BBC, #003049)' }}>
-                <MapPin className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-lg mb-3" style={{ color: '#003049' }}>
-                  Zona de cobertura
-                </h3>
-                {workZones.map((zone: any, idx: number) => (
-                  <div key={idx} className="mb-3 last:mb-0">
-                    <p className="font-semibold mb-2" style={{ color: '#003049' }}>
-                      {zone.state}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {zone.cities?.map((city: string, cityIdx: number) => (
-                        <Badge
-                          key={cityIdx}
-                          className="px-3 py-1.5 shadow-subtle hover-scale cursor-pointer transition-all duration-200"
-                          style={{ 
-                            background: 'linear-gradient(135deg, rgba(253, 240, 213, 0.8), rgba(255, 255, 255, 0.9))',
-                            color: '#669BBC',
-                            border: '1px solid rgba(102, 155, 188, 0.2)'
-                          }}
-                        >
-                          {city}
-                        </Badge>
-                      ))}
-                    </div>
+        <div className="px-4 space-y-3">
+          <h3 className="text-lg font-bold flex items-center gap-2">
+            <MapPin className="h-5 w-5" />
+            Zonas de cobertura
+          </h3>
+          <div className="space-y-3">
+            {workZones.map((zone, idx) => (
+              <Card key={idx} className="p-4 bg-card border">
+                <div className="space-y-3">
+                  <div className="font-semibold text-base">{zone.state}</div>
+                  <div className="flex flex-wrap gap-2">
+                    {zone.cities.map((city: string, cityIdx: number) => (
+                      <Badge 
+                        key={cityIdx} 
+                        variant="secondary"
+                        className="rounded-full px-3 py-1 text-xs font-normal"
+                      >
+                        {city}
+                      </Badge>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-          </Card>
+                </div>
+              </Card>
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Modern Summary Cards */}
-      <div className="px-4 mb-8 animate-fade-in" style={{ animationDelay: '200ms' }}>
-        <div className="grid grid-cols-2 gap-4">
-          <Card className="p-5 text-center border-0 shadow-elegant hover-scale transition-all duration-300 cursor-pointer overflow-hidden relative group">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="relative">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Star className="w-6 h-6 fill-current animate-pulse" style={{ color: '#C1121F' }} />
-                <span className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                  {rating > 0 ? rating.toFixed(1) : '—'}
-                </span>
-              </div>
-              <p className="text-xs font-medium" style={{ color: '#669BBC' }}>
-                {rating > 0 ? 'Puntuación' : 'Sin calificaciones'}
-              </p>
-            </div>
-          </Card>
-          <Card className="p-5 text-center border-0 shadow-elegant hover-scale transition-all duration-300 cursor-pointer overflow-hidden relative group">
-            <div className="absolute inset-0 bg-gradient-to-bl from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="relative">
-              <div className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                {reviewCount}
-              </div>
-              <p className="text-xs font-medium" style={{ color: '#669BBC' }}>Reseñas</p>
-            </div>
-          </Card>
-        </div>
+      {/* Summary Cards - Rating & Reviews */}
+      <div className="px-4 grid grid-cols-2 gap-3 mt-6">
+        <Card className="p-5 text-center bg-card border">
+          <Star className="h-6 w-6 fill-yellow-400 text-yellow-400 mx-auto mb-2" />
+          <div className="text-2xl font-bold mb-1">
+            {rating > 0 ? rating.toFixed(1) : 'N/A'}
+          </div>
+          <div className="text-xs text-muted-foreground">Calificación</div>
+        </Card>
+        
+        <Card className="p-5 text-center bg-card border">
+          <div className="text-2xl mb-2">💬</div>
+          <div className="text-2xl font-bold mb-1">
+            {reviewCount}
+          </div>
+          <div className="text-xs text-muted-foreground">Reseñas</div>
+        </Card>
       </div>
 
       <div className="px-4 space-y-8">
@@ -442,84 +427,73 @@ export default function SpecialistProfile() {
           </div>
         )}
 
-        {/* Modern Licenses and Certifications */}
+        {/* Licenses and Certifications */}
         {credentials.length > 0 && (
-          <Card className="p-6 border-0 shadow-elegant overflow-hidden relative animate-fade-in" style={{ 
-            animationDelay: '500ms',
-            background: 'linear-gradient(135deg, rgba(102, 155, 188, 0.05), rgba(255, 255, 255, 0.95))'
-          }}>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/5 to-transparent rounded-full blur-3xl" />
-            <div className="relative">
-              <h3 className="font-bold text-xl mb-5 flex items-center gap-2" style={{ color: '#003049' }}>
-                <span className="w-1 h-6 rounded-full bg-gradient-to-b from-primary to-secondary" />
-                Licencias y certificaciones
-              </h3>
-              <div className="space-y-4">
-                {credentials.map((credential: any) => (
-                  <div key={credential.id} className="group p-4 rounded-xl transition-all duration-300 hover:shadow-subtle" style={{ backgroundColor: 'rgba(253, 240, 213, 0.3)' }}>
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <p className="font-semibold text-base mb-1 group-hover:text-primary transition-colors duration-200" style={{ color: '#003049' }}>
-                          {credential.title}
-                        </p>
-                        <p className="text-sm mb-2" style={{ color: '#669BBC' }}>
-                          {credential.issuer}
-                        </p>
-                        {credential.description && (
-                          <p className="text-xs leading-relaxed" style={{ color: '#669BBC' }}>
-                            {credential.description}
-                          </p>
-                        )}
+          <div className="px-4 space-y-3 mt-6">
+            <h3 className="text-lg font-bold">Licencias y certificaciones</h3>
+            <div className="space-y-3">
+              {credentials.map((credential, idx) => (
+                <Card key={idx} className="p-4 bg-card border">
+                  <div className="space-y-2">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-sm mb-1">{credential.title}</div>
+                        <div className="text-xs text-muted-foreground">{credential.issuer}</div>
                       </div>
-                      {credential.attachment_url && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => window.open(credential.attachment_url, '_blank')}
-                          className="hover-scale shadow-subtle transition-all duration-200"
-                          style={{ 
-                            borderColor: 'rgba(102, 155, 188, 0.3)',
-                            color: '#669BBC',
-                            backgroundColor: 'rgba(255, 255, 255, 0.8)'
-                          }}
-                        >
-                          Ver documento
-                        </Button>
-                      )}
+                      <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs font-normal shrink-0">
+                        {credential.type}
+                      </Badge>
                     </div>
+                    
+                    {credential.description && (
+                      <p className="text-xs text-muted-foreground">{credential.description}</p>
+                    )}
+                    
+                    {(credential.start_year || credential.issued_at) && (
+                      <div className="text-xs text-muted-foreground">
+                        {credential.start_year && credential.end_year 
+                          ? `${credential.start_year} - ${credential.end_year}`
+                          : credential.start_year 
+                          ? `Desde ${credential.start_year}`
+                          : credential.issued_at
+                          ? `Emitido: ${new Date(credential.issued_at).getFullYear()}`
+                          : null}
+                      </div>
+                    )}
+                    
+                    {credential.attachment_url && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="w-full mt-2 rounded-full text-xs h-8"
+                        onClick={() => window.open(credential.attachment_url, '_blank')}
+                      >
+                        Ver documento
+                      </Button>
+                    )}
                   </div>
-                ))}
-              </div>
+                </Card>
+              ))}
             </div>
-          </Card>
+          </div>
         )}
       </div>
 
-      {/* Modern Footer Actions */}
+      {/* Fixed Footer with Green Button - Rappi Style */}
       {quoteId && (
-        <div className="fixed bottom-0 left-0 right-0 backdrop-blur-md bg-white/90 border-t p-4 flex gap-3 shadow-elegant animate-fade-in z-40" style={{ borderColor: 'rgba(102, 155, 188, 0.2)' }}>
-          <Button
-            variant="outline"
-            className="flex-1 hover-scale transition-all duration-200 font-semibold"
-            style={{ 
-              borderColor: 'rgba(102, 155, 188, 0.3)',
-              color: '#003049',
-              backgroundColor: 'rgba(255, 255, 255, 0.8)'
-            }}
-            onClick={() => navigate(`/chat/${quoteId}`)}
-          >
-            Volver al chat
-          </Button>
-          <Button
-            className="flex-1 hover-scale transition-all duration-200 font-semibold shadow-elegant"
-            style={{ 
-              background: 'linear-gradient(135deg, #C1121F, #780000)',
-              color: '#FFFFFF'
-            }}
-            onClick={() => setShowConfirmDialog(true)}
-          >
-            Contratar
-          </Button>
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t">
+          <div className="max-w-md mx-auto">
+            <Button 
+              onClick={() => setShowConfirmDialog(true)}
+              className="w-full h-14 text-base font-semibold rounded-full shadow-lg transition-all duration-200 active:scale-95"
+              style={{ 
+                backgroundColor: '#00D563',
+                color: 'white'
+              }}
+            >
+              Contratar Especialista
+            </Button>
+          </div>
         </div>
       )}
 
@@ -535,7 +509,7 @@ export default function SpecialistProfile() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              style={{ backgroundColor: '#C1121F', color: '#FFFFFF' }}
+              style={{ backgroundColor: '#00D563', color: 'white' }}
               onClick={handleContratarConfirm}
             >
               Sí, contratar
