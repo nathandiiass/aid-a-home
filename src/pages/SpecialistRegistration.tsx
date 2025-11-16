@@ -504,38 +504,52 @@ export default function SpecialistRegistration() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <div className="max-w-3xl mx-auto p-4">
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" size="icon" onClick={() => step > 1 ? setStep(step - 1) : navigate(-1)}>
-            <ChevronLeft className="h-6 w-6" />
-          </Button>
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Header */}
+      <div className="w-full px-4 py-6 border-b border-border/30">
+        <div className="max-w-2xl mx-auto flex items-center justify-between">
+          <button
+            onClick={() => step > 1 ? setStep(step - 1) : navigate(-1)}
+            className="text-foreground hover:text-rappi-green transition-colors flex items-center gap-2"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
           <Logo />
+          <div className="w-9" />
         </div>
+      </div>
 
-        <div className="mb-8">
-          <div className="flex justify-between mb-2">
-            <span className={step >= 1 ? "text-primary font-medium" : "text-muted-foreground"}>
-              Datos Personales
-            </span>
-            <span className={step >= 2 ? "text-primary font-medium" : "text-muted-foreground"}>
-              Datos Profesionales
-            </span>
-            <span className={step >= 3 ? "text-primary font-medium" : "text-muted-foreground"}>
-              Documentación
-            </span>
+      {/* Main Content */}
+      <div className="flex-1 px-4 py-8">
+        <div className="max-w-2xl mx-auto">
+          {/* Progress bar */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-muted-foreground">
+                Paso {step} de 5
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {step === 1 && 'Datos personales'}
+                {step === 2 && 'Especialidades'}
+                {step === 3 && 'Zonas de trabajo'}
+                {step === 4 && 'Documentación'}
+                {step === 5 && 'Descripción profesional'}
+              </span>
+            </div>
+            <div className="w-full bg-muted rounded-full h-1.5">
+              <div
+                className="bg-rappi-green h-1.5 rounded-full transition-all duration-300"
+                style={{ width: `${(step / 5) * 100}%` }}
+              />
+            </div>
           </div>
-          <div className="h-2 bg-secondary rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-primary transition-all duration-300"
-              style={{ width: `${(step / 3) * 100}%` }}
-            />
-          </div>
-        </div>
 
-        {step === 1 && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold">Datos Personales</h2>
+          {step === 1 && (
+            <div className="space-y-6">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-foreground mb-2">Datos Personales</h2>
+                <p className="text-sm text-muted-foreground">Completa tu información básica</p>
+              </div>
 
             <div className="space-y-2">
               <Label>Tipo de Persona *</Label>
@@ -761,7 +775,11 @@ export default function SpecialistRegistration() {
               </Label>
             </div>
 
-            <Button onClick={handleNext} className="w-full" disabled={!validateStep1()}>
+            <Button 
+              onClick={handleNext} 
+              className="w-full h-12 bg-rappi-green hover:bg-rappi-green/90 text-white font-semibold rounded-full mt-4" 
+              disabled={!validateStep1()}
+            >
               Siguiente
             </Button>
           </div>
@@ -769,7 +787,10 @@ export default function SpecialistRegistration() {
 
         {step === 2 && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold">Datos Profesionales</h2>
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-foreground mb-2">Especialidades y Servicios</h2>
+              <p className="text-sm text-muted-foreground">Selecciona tus áreas de especialización</p>
+            </div>
 
             <div className="space-y-4">
               <Label>Especialista en: * (Selección múltiple)</Label>
@@ -990,10 +1011,18 @@ export default function SpecialistRegistration() {
             </div>
 
             <div className="flex gap-4">
-              <Button onClick={() => setStep(step - 1)} variant="outline" className="w-full">
+              <Button 
+                onClick={() => setStep(step - 1)} 
+                variant="outline" 
+                className="w-full h-12 border-2 hover:border-rappi-green hover:text-rappi-green rounded-full"
+              >
                 Atrás
               </Button>
-              <Button onClick={handleNext} className="w-full" disabled={!validateStep2()}>
+              <Button 
+                onClick={handleNext} 
+                className="w-full h-12 bg-rappi-green hover:bg-rappi-green/90 text-white font-semibold rounded-full" 
+                disabled={!validateStep2()}
+              >
                 Siguiente
               </Button>
             </div>
@@ -1002,7 +1031,10 @@ export default function SpecialistRegistration() {
 
         {step === 3 && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold">Documentación para Validación</h2>
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-foreground mb-2">Documentación y Validación</h2>
+              <p className="text-sm text-muted-foreground">Adjunta los documentos necesarios</p>
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="idDocument">Identificación Oficial (INE/IFE/Pasaporte) *</Label>
@@ -1044,15 +1076,24 @@ export default function SpecialistRegistration() {
             </div>
 
             <div className="flex gap-4">
-              <Button onClick={() => setStep(step - 1)} variant="outline" className="w-full">
+              <Button 
+                onClick={() => setStep(step - 1)} 
+                variant="outline" 
+                className="w-full h-12 border-2 hover:border-rappi-green hover:text-rappi-green rounded-full"
+              >
                 Atrás
               </Button>
-              <Button onClick={handleSubmit} className="w-full" disabled={!validateStep3() || loading}>
+              <Button 
+                onClick={handleSubmit} 
+                className="w-full h-12 bg-rappi-green hover:bg-rappi-green/90 text-white font-semibold rounded-full" 
+                disabled={!validateStep3() || loading}
+              >
                 {loading ? 'Enviando...' : 'Completar Registro'}
               </Button>
             </div>
-          </div>
-        )}
+           </div>
+         )}
+        </div>
       </div>
     </div>
   );
