@@ -332,45 +332,73 @@ export default function SpecialistProfile() {
           </Card>
         )}
 
-        {/* Services with Experience Years - Table Format */}
+        {/* Services with Experience Years - Modern Table Format */}
         {specialties.length > 0 && (
           <div className="space-y-6">
-            {specialties.map((specialty: any) => (
-              <Card key={specialty.id} className="p-4 overflow-hidden" style={{ borderColor: '#669BBC' }}>
-                {/* Header with Specialty and Experience */}
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-border">
-                  <h3 className="font-bold text-lg" style={{ color: '#003049' }}>
+            {specialties.map((specialty: any, idx: number) => (
+              <Card 
+                key={specialty.id} 
+                className="p-0 overflow-hidden border-0 shadow-elegant animate-fade-in" 
+                style={{ 
+                  animationDelay: `${idx * 100}ms`,
+                  background: 'linear-gradient(to bottom, rgba(253, 240, 213, 0.3), rgba(255, 255, 255, 1))'
+                }}
+              >
+                {/* Modern Header with Specialty and Experience */}
+                <div 
+                  className="px-6 py-4 flex items-center justify-between"
+                  style={{ 
+                    background: 'linear-gradient(135deg, #003049 0%, #669BBC 100%)',
+                  }}
+                >
+                  <h3 className="font-bold text-xl text-white">
                     {specialty.specialty}
                   </h3>
                   {specialty.experience_years && (
-                    <Badge variant="secondary" style={{ backgroundColor: '#FDF0D5', color: '#003049' }}>
-                      {specialty.experience_years} {specialty.experience_years === 1 ? 'año' : 'años'}
-                    </Badge>
+                    <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                      <span className="text-white font-semibold text-sm">
+                        {specialty.experience_years} {specialty.experience_years === 1 ? 'año' : 'años'}
+                      </span>
+                    </div>
                   )}
                 </div>
 
-                {/* Table */}
+                {/* Modern Table */}
                 {specialty.activities && specialty.activities.length > 0 && (
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b border-border">
-                          <th className="text-left py-2 px-2 font-semibold text-sm" style={{ color: '#003049' }}>
-                            Servicios que ofrece
+                        <tr style={{ backgroundColor: 'rgba(253, 240, 213, 0.5)' }}>
+                          <th className="text-left py-4 px-6 font-bold text-sm tracking-wide" style={{ color: '#003049' }}>
+                            SERVICIOS QUE OFRECE
                           </th>
-                          <th className="text-right py-2 px-2 font-semibold text-sm" style={{ color: '#003049' }}>
-                            Precio mínimo
+                          <th className="text-right py-4 px-6 font-bold text-sm tracking-wide" style={{ color: '#003049' }}>
+                            PRECIO MÍNIMO
                           </th>
                         </tr>
                       </thead>
                       <tbody>
                         {specialty.activities.map((activity: any, index: number) => (
-                          <tr key={activity.id} className={index !== specialty.activities.length - 1 ? 'border-b border-border/50' : ''}>
-                            <td className="py-3 px-2 text-sm" style={{ color: '#669BBC' }}>
-                              {activity.activity}
+                          <tr 
+                            key={activity.id} 
+                            className="transition-all duration-200 hover:bg-gradient-to-r hover:from-transparent hover:to-secondary/10 cursor-pointer group"
+                            style={{
+                              borderBottom: index !== specialty.activities.length - 1 ? '1px solid rgba(102, 155, 188, 0.1)' : 'none'
+                            }}
+                          >
+                            <td className="py-4 px-6 text-sm font-medium group-hover:translate-x-1 transition-transform duration-200" style={{ color: '#669BBC' }}>
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-primary to-secondary opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                                {activity.activity}
+                              </div>
                             </td>
-                            <td className="py-3 px-2 text-sm text-right font-semibold" style={{ color: '#003049' }}>
-                              {activity.price_min ? `$${activity.price_min}` : '—'}
+                            <td className="py-4 px-6 text-right">
+                              <span className="inline-flex items-center justify-center font-bold text-base px-4 py-1.5 rounded-full" style={{ 
+                                color: '#003049',
+                                backgroundColor: 'rgba(253, 240, 213, 0.6)'
+                              }}>
+                                {activity.price_min ? `$${activity.price_min}` : '—'}
+                              </span>
                             </td>
                           </tr>
                         ))}
@@ -379,9 +407,12 @@ export default function SpecialistProfile() {
                   </div>
                 )}
 
-                <p className="text-xs mt-4 pt-3 border-t border-border" style={{ color: '#669BBC' }}>
-                  * Los precios pueden variar según alcance y materiales.
-                </p>
+                <div className="px-6 py-4" style={{ backgroundColor: 'rgba(102, 155, 188, 0.05)' }}>
+                  <p className="text-xs italic flex items-center gap-2" style={{ color: '#669BBC' }}>
+                    <span className="inline-block w-1 h-1 rounded-full" style={{ backgroundColor: '#669BBC' }} />
+                    Los precios pueden variar según alcance y materiales.
+                  </p>
+                </div>
               </Card>
             ))}
           </div>
