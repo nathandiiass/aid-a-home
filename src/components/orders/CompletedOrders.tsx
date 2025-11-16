@@ -138,7 +138,7 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
               </div>
             )}
 
-            <div className="flex justify-between items-center pt-3 mt-2">
+            <div className="flex justify-end items-center pt-3 mt-2">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
