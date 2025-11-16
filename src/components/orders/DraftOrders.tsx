@@ -82,14 +82,17 @@ export function DraftOrders({ searchQuery }: DraftOrdersProps) {
   );
 
   if (loading) {
-    return <div className="text-center py-8 text-muted-foreground">Cargando...</div>;
+    return <div className="text-center py-12 text-muted-foreground">Cargando...</div>;
   }
 
   if (filteredDrafts.length === 0) {
     return (
-      <Card className="p-8 text-center">
+      <Card className="p-8 text-center bg-card/50 backdrop-blur-sm border-border/50 rounded-2xl shadow-sm">
         <p className="text-muted-foreground mb-4">No tienes borradores guardados</p>
-        <Button onClick={() => navigate('/create-request')}>
+        <Button 
+          onClick={() => navigate('/create-request')}
+          className="rounded-full px-6"
+        >
           Crear una solicitud
         </Button>
       </Card>
@@ -97,23 +100,32 @@ export function DraftOrders({ searchQuery }: DraftOrdersProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {filteredDrafts.map((draft) => (
-        <Card key={draft.id} className="p-4">
-          <h3 className="font-semibold text-foreground text-lg mb-3">
+        <Card key={draft.id} className="p-5 bg-card/50 backdrop-blur-sm border-border/50 rounded-2xl shadow-sm">
+          <h3 className="font-semibold text-foreground text-lg mb-4">
             {draft.activity || 'Selecciona una actividad'}
           </h3>
           
-          <div className="flex flex-wrap gap-2 mb-4">
-            <Badge variant={draft.price_min && draft.price_max ? 'default' : 'outline'}>
+          <div className="flex flex-wrap gap-2 mb-5">
+            <Badge 
+              variant={draft.price_min && draft.price_max ? 'default' : 'outline'}
+              className="rounded-full px-3 py-1"
+            >
               {draft.price_min && draft.price_max ? <Check className="w-3 h-3 mr-1" /> : <X className="w-3 h-3 mr-1" />}
               Presupuesto
             </Badge>
-            <Badge variant={draft.scheduled_date ? 'default' : 'outline'}>
+            <Badge 
+              variant={draft.scheduled_date ? 'default' : 'outline'}
+              className="rounded-full px-3 py-1"
+            >
               {draft.scheduled_date ? <Check className="w-3 h-3 mr-1" /> : <X className="w-3 h-3 mr-1" />}
               Fecha/Hora
             </Badge>
-            <Badge variant={draft.location_id ? 'default' : 'outline'}>
+            <Badge 
+              variant={draft.location_id ? 'default' : 'outline'}
+              className="rounded-full px-3 py-1"
+            >
               {draft.location_id ? <Check className="w-3 h-3 mr-1" /> : <X className="w-3 h-3 mr-1" />}
               Ubicación
             </Badge>
@@ -123,13 +135,14 @@ export function DraftOrders({ searchQuery }: DraftOrdersProps) {
             <Button 
               onClick={() => publishDraft(draft.id)}
               disabled={!draft.activity || !draft.price_min || !draft.scheduled_date || !draft.location_id}
-              className="bg-accent hover:bg-accent/90"
+              className="rounded-full flex-1"
             >
               Publicar
             </Button>
             <Button 
               variant="outline"
               onClick={() => navigate(`/create-request?edit=${draft.id}`)}
+              className="rounded-full flex-1"
             >
               Seguir editando
             </Button>

@@ -61,44 +61,44 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
   );
 
   if (loading) {
-    return <div className="text-center py-8 text-muted-foreground">Cargando...</div>;
+    return <div className="text-center py-12 text-muted-foreground">Cargando...</div>;
   }
 
   if (filteredCompleted.length === 0) {
     return (
-      <Card className="p-8 text-center">
+      <Card className="p-8 text-center bg-card/50 backdrop-blur-sm border-border/50 rounded-2xl shadow-sm">
         <p className="text-muted-foreground">No tienes órdenes completadas</p>
       </Card>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {filteredCompleted.map((order) => (
         <Card 
           key={order.id} 
-          className="p-4 hover:shadow-md transition-shadow cursor-pointer"
+          className="p-5 hover:shadow-lg transition-all cursor-pointer bg-card/50 backdrop-blur-sm border-border/50 rounded-2xl"
           onClick={() => navigate(`/orders/${order.id}`)}
         >
           <h3 className="font-semibold text-foreground text-lg mb-2">
             {order.activity}
           </h3>
           
-          <p className="text-sm text-muted-foreground mb-2">
+          <p className="text-sm text-muted-foreground mb-3">
             {format(new Date(order.updated_at), "dd MMM yyyy · HH:mm", { locale: es })}
           </p>
 
           {order.price_max && (
-            <p className="text-foreground font-medium mb-2">
+            <p className="text-foreground font-medium mb-4">
               Precio final: ${order.price_max}
             </p>
           )}
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between pt-3 border-t border-border/50">
             {order.reviews && order.reviews.length > 0 ? (
-              <div className="flex items-center gap-1 text-sm">
-                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                <span className="font-medium">{order.reviews[0].rating}</span>
+              <div className="flex items-center gap-1.5 text-sm">
+                <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                <span className="font-semibold text-foreground">{order.reviews[0].rating}</span>
               </div>
             ) : (
               <Button 
@@ -108,6 +108,7 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
                   e.stopPropagation();
                   navigate(`/orders/${order.id}/review`);
                 }}
+                className="rounded-full"
               >
                 Deja tu reseña
               </Button>
@@ -119,6 +120,7 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
                 e.stopPropagation();
                 navigate(`/create-request?template=${order.id}`);
               }}
+              className="rounded-full px-5"
             >
               Recontratar
             </Button>

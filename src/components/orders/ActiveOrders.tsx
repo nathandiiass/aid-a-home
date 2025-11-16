@@ -199,14 +199,17 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
   };
 
   if (loading) {
-    return <div className="text-center py-8 text-muted-foreground">Cargando...</div>;
+    return <div className="text-center py-12 text-muted-foreground">Cargando...</div>;
   }
 
   if (filteredOrders.length === 0) {
     return (
-      <Card className="p-8 text-center">
+      <Card className="p-8 text-center bg-card/50 backdrop-blur-sm border-border/50 rounded-2xl shadow-sm">
         <p className="text-muted-foreground mb-4">No tienes órdenes activas</p>
-        <Button onClick={() => navigate('/create-request')}>
+        <Button 
+          onClick={() => navigate('/create-request')}
+          className="rounded-full px-6"
+        >
           Crear una solicitud
         </Button>
       </Card>
@@ -215,11 +218,11 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-3">
         {filteredOrders.map((order) => (
           <Card
             key={order.id}
-            className="p-5 hover:shadow-lg transition-all cursor-pointer relative active:bg-accent/5"
+            className="p-5 hover:shadow-lg transition-all cursor-pointer relative bg-card/50 backdrop-blur-sm border-border/50 rounded-2xl"
             onClick={() => navigate(`/orders/${order.id}`)}
             onTouchStart={() => handleLongPressStart(order.id)}
             onTouchEnd={handleLongPressEnd}
@@ -228,53 +231,63 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
             onMouseLeave={handleLongPressEnd}
           >
             {order.quotes && order.quotes.length > 0 && (
-              <div className="absolute top-4 right-4 bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-semibold">
+              <div className="absolute top-4 right-4 bg-primary text-primary-foreground rounded-full w-7 h-7 flex items-center justify-center text-xs font-bold shadow-md">
                 {order.quotes.length}
               </div>
             )}
             
-            <h3 className="font-semibold text-foreground text-lg mb-4 pr-8">
+            <h3 className="font-semibold text-foreground text-lg mb-4 pr-10">
               {order.service_title || order.activity}
             </h3>
             
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {order.scheduled_date && (
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <Calendar className="w-5 h-5 text-accent" />
+                <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                  <Calendar className="w-4 h-4 flex-shrink-0" />
                   <span className="font-medium">
                     {format(new Date(order.scheduled_date), "EEE dd MMM yyyy", { locale: es })}
                   </span>
                 </div>
               )}
               
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <Clock className="w-5 h-5 text-accent" />
+              <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                <Clock className="w-4 h-4 flex-shrink-0" />
                 <span className={`font-medium ${order.is_urgent ? "text-destructive font-semibold" : ""}`}>
                   {formatTimeDisplay(order)}
                 </span>
               </div>
 
               {order.locations && (
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <MapPin className="w-5 h-5 text-accent" />
-                  <span className="font-medium">
+                <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                  <MapPin className="w-4 h-4 flex-shrink-0" />
+                  <span className="font-medium line-clamp-1">
                     {order.locations.neighborhood ? `${order.locations.neighborhood}, ` : ''}
                     {order.locations.city}
                   </span>
                 </div>
               )}
               
-              {/* Price in bottom right */}
-              <div className="flex justify-end pt-2 border-t">
+              {/* Price in bottom */}
+              <div className="flex justify-between items-center pt-3 border-t border-border/50 mt-3">
                 <div className="flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-primary" />
-                  <span className="text-base font-bold text-primary">
+                  <DollarSign className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span className="text-sm font-bold text-primary">
                     {order.price_min && order.price_max 
-                      ? `$${order.price_min.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - $${order.price_max.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`
-                      : 'Sin presupuesto, que propongan'
+                      ? `$${order.price_min.toLocaleString('es-MX')} - $${order.price_max.toLocaleString('es-MX')}`
+                      : 'Sin presupuesto'
                     }
                   </span>
                 </div>
+                <Button 
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/orders/${order.id}`);
+                  }}
+                  className="rounded-full px-4"
+                >
+                  Ver detalles
+                </Button>
               </div>
             </div>
           </Card>
