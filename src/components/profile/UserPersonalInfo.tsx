@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Camera, ArrowLeft } from 'lucide-react';
+import { Loader2, Camera, ChevronLeft } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
 
@@ -249,163 +249,187 @@ export function UserPersonalInfo({ userId }: UserPersonalInfoProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background border-b border-border">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
+      <div className="sticky top-0 z-10 bg-white shadow-sm">
+        <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-3">
+          <button
             onClick={() => navigate('/profile')}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-xl font-semibold text-foreground">Información Personal</h1>
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <h1 className="text-xl font-bold">Información personal</h1>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-        {/* Avatar */}
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative">
-            <Avatar className="w-24 h-24">
-              <AvatarImage src={formData.avatar_url} />
-              <AvatarFallback className="text-2xl">
-                {formData.first_name?.[0]}{formData.last_name_paterno?.[0]}
-              </AvatarFallback>
-            </Avatar>
-            <label
-              htmlFor="avatar-upload"
-              className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors"
-            >
-              {uploading ? (
-                <Loader2 className="w-4 h-4 text-primary-foreground animate-spin" />
-              ) : (
-                <Camera className="w-4 h-4 text-primary-foreground" />
-              )}
-              <input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleAvatarUpload}
-                disabled={uploading}
-              />
-            </label>
-          </div>
-          <p className="text-sm text-muted-foreground">Haz clic en el ícono para cambiar tu foto</p>
-        </div>
-
-        {/* Form Fields */}
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="first_name">Nombre completo *</Label>
-            <Input
-              id="first_name"
-              value={formData.first_name}
-              onChange={(e) => handleInputChange('first_name', e.target.value)}
-              placeholder="Juan"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="last_name_paterno">Apellido paterno *</Label>
-            <Input
-              id="last_name_paterno"
-              value={formData.last_name_paterno}
-              onChange={(e) => handleInputChange('last_name_paterno', e.target.value)}
-              placeholder="García"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="last_name_materno">Apellido materno</Label>
-            <Input
-              id="last_name_materno"
-              value={formData.last_name_materno}
-              onChange={(e) => handleInputChange('last_name_materno', e.target.value)}
-              placeholder="López"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Correo electrónico *</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              disabled
-              className="bg-muted cursor-not-allowed"
-            />
-            <p className="text-xs text-muted-foreground">
-              El correo electrónico no se puede modificar
+      <div className="max-w-lg mx-auto px-4 py-6 space-y-4">
+        {/* Avatar Card */}
+        <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative">
+              <Avatar className="w-24 h-24">
+                <AvatarImage src={formData.avatar_url} />
+                <AvatarFallback className="text-2xl bg-gray-100">
+                  {formData.first_name?.[0]}{formData.last_name_paterno?.[0]}
+                </AvatarFallback>
+              </Avatar>
+              <label
+                htmlFor="avatar-upload"
+                className="absolute bottom-0 right-0 w-8 h-8 bg-rappi-green rounded-full flex items-center justify-center cursor-pointer hover:bg-rappi-green/90 transition-colors shadow-md"
+              >
+                {uploading ? (
+                  <Loader2 className="w-4 h-4 text-white animate-spin" />
+                ) : (
+                  <Camera className="w-4 h-4 text-white" />
+                )}
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarUpload}
+                  disabled={uploading}
+                />
+              </label>
+            </div>
+            <p className="text-sm text-muted-foreground text-center">
+              Haz clic en el ícono para cambiar tu foto
             </p>
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="phone">Teléfono *</Label>
-            <Input
-              id="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => handleInputChange('phone', e.target.value)}
-              placeholder="5512345678"
-            />
-          </div>
+        {/* Form Card */}
+        <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
+          <h2 className="text-lg font-bold mb-4">Datos personales</h2>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="first_name" className="text-sm font-semibold text-foreground">
+                Nombre completo *
+              </Label>
+              <Input
+                id="first_name"
+                value={formData.first_name}
+                onChange={(e) => handleInputChange('first_name', e.target.value)}
+                placeholder="Juan"
+                className="h-12"
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="date_of_birth">Fecha de nacimiento *</Label>
-            <Input
-              id="date_of_birth"
-              type="date"
-              value={formData.date_of_birth}
-              onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="last_name_paterno" className="text-sm font-semibold text-foreground">
+                Apellido paterno *
+              </Label>
+              <Input
+                id="last_name_paterno"
+                value={formData.last_name_paterno}
+                onChange={(e) => handleInputChange('last_name_paterno', e.target.value)}
+                placeholder="García"
+                className="h-12"
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="gender">Género</Label>
-            <Select
-              value={formData.gender}
-              onValueChange={(value) => handleInputChange('gender', value)}
-            >
-              <SelectTrigger id="gender">
-                <SelectValue placeholder="Selecciona una opción" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Hombre">Hombre</SelectItem>
-                <SelectItem value="Mujer">Mujer</SelectItem>
-                <SelectItem value="Prefiero no decir">Prefiero no decir</SelectItem>
-                <SelectItem value="Otro">Otro</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <Label htmlFor="last_name_materno" className="text-sm font-semibold text-foreground">
+                Apellido materno
+              </Label>
+              <Input
+                id="last_name_materno"
+                value={formData.last_name_materno}
+                onChange={(e) => handleInputChange('last_name_materno', e.target.value)}
+                placeholder="López"
+                className="h-12"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm font-semibold text-foreground">
+                Correo electrónico *
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                disabled
+                className="bg-gray-100 cursor-not-allowed h-12"
+              />
+              <p className="text-xs text-muted-foreground">
+                El correo electrónico no se puede modificar
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-sm font-semibold text-foreground">
+                Teléfono *
+              </Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
+                placeholder="5512345678"
+                className="h-12"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="date_of_birth" className="text-sm font-semibold text-foreground">
+                Fecha de nacimiento *
+              </Label>
+              <Input
+                id="date_of_birth"
+                type="date"
+                value={formData.date_of_birth}
+                onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
+                className="h-12"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="gender" className="text-sm font-semibold text-foreground">
+                Género
+              </Label>
+              <Select
+                value={formData.gender}
+                onValueChange={(value) => handleInputChange('gender', value)}
+              >
+                <SelectTrigger id="gender" className="h-12">
+                  <SelectValue placeholder="Selecciona una opción" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Hombre">Hombre</SelectItem>
+                  <SelectItem value="Mujer">Mujer</SelectItem>
+                  <SelectItem value="Prefiero no decir">Prefiero no decir</SelectItem>
+                  <SelectItem value="Otro">Otro</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
         {/* Save Button */}
-        <div className="sticky bottom-20 pt-4">
-          <Button
-            onClick={handleSave}
-            disabled={!hasChanges || saving}
-            className="w-full h-12"
-          >
-            {saving ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Guardando...
-              </>
-            ) : (
-              'Guardar cambios'
-            )}
-          </Button>
-        </div>
+        <Button
+          onClick={handleSave}
+          disabled={!hasChanges || saving}
+          className="w-full bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-12 font-semibold disabled:opacity-50"
+        >
+          {saving ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Guardando...
+            </>
+          ) : (
+            'Guardar cambios'
+          )}
+        </Button>
       </div>
     </div>
   );
