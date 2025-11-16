@@ -332,55 +332,59 @@ export default function SpecialistProfile() {
           </Card>
         )}
 
-        {/* Services with Experience Years */}
+        {/* Services with Experience Years - Table Format */}
         {specialties.length > 0 && (
-          <Card className="p-4" style={{ borderColor: '#669BBC' }}>
-            <h3 className="font-bold text-lg mb-4" style={{ color: '#003049' }}>
-              Especialidades y servicios
-            </h3>
-            <div className="space-y-6">
-              {specialties.map((specialty: any) => (
-                <div key={specialty.id} className="border-b border-border last:border-0 pb-4 last:pb-0">
-                  <div className="mb-3">
-                    <h4 className="font-semibold text-base mb-1" style={{ color: '#003049' }}>
-                      {specialty.specialty}
-                    </h4>
-                    {specialty.experience_years && (
-                      <p className="text-sm" style={{ color: '#669BBC' }}>
-                        {specialty.experience_years} {specialty.experience_years === 1 ? 'año' : 'años'} de experiencia
-                      </p>
-                    )}
-                  </div>
-                  {specialty.activities && specialty.activities.length > 0 && (
-                    <div>
-                      <p className="text-xs font-semibold mb-2" style={{ color: '#669BBC' }}>
-                        Servicios que ofrece:
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {specialty.activities.map((activity: any) => (
-                          <Badge
-                            key={activity.id}
-                            variant="outline"
-                            style={{ borderColor: '#669BBC', color: '#003049' }}
-                          >
-                            {activity.activity}
-                            {activity.price_min && activity.price_max && (
-                              <span className="ml-1 text-xs" style={{ color: '#669BBC' }}>
-                                (${activity.price_min}-${activity.price_max})
-                              </span>
-                            )}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
+          <div className="space-y-6">
+            {specialties.map((specialty: any) => (
+              <Card key={specialty.id} className="p-4 overflow-hidden" style={{ borderColor: '#669BBC' }}>
+                {/* Header with Specialty and Experience */}
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-border">
+                  <h3 className="font-bold text-lg" style={{ color: '#003049' }}>
+                    {specialty.specialty}
+                  </h3>
+                  {specialty.experience_years && (
+                    <Badge variant="secondary" style={{ backgroundColor: '#FDF0D5', color: '#003049' }}>
+                      {specialty.experience_years} {specialty.experience_years === 1 ? 'año' : 'años'}
+                    </Badge>
                   )}
                 </div>
-              ))}
-            </div>
-            <p className="text-xs mt-4" style={{ color: '#669BBC' }}>
-              * Los precios pueden variar según alcance y materiales.
-            </p>
-          </Card>
+
+                {/* Table */}
+                {specialty.activities && specialty.activities.length > 0 && (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="text-left py-2 px-2 font-semibold text-sm" style={{ color: '#003049' }}>
+                            Servicios que ofrece
+                          </th>
+                          <th className="text-right py-2 px-2 font-semibold text-sm" style={{ color: '#003049' }}>
+                            Precio mínimo
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {specialty.activities.map((activity: any, index: number) => (
+                          <tr key={activity.id} className={index !== specialty.activities.length - 1 ? 'border-b border-border/50' : ''}>
+                            <td className="py-3 px-2 text-sm" style={{ color: '#669BBC' }}>
+                              {activity.activity}
+                            </td>
+                            <td className="py-3 px-2 text-sm text-right font-semibold" style={{ color: '#003049' }}>
+                              {activity.price_min ? `$${activity.price_min}` : '—'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                <p className="text-xs mt-4 pt-3 border-t border-border" style={{ color: '#669BBC' }}>
+                  * Los precios pueden variar según alcance y materiales.
+                </p>
+              </Card>
+            ))}
+          </div>
         )}
 
         {/* Licenses and Certifications */}
