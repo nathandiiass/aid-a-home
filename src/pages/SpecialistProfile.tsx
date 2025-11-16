@@ -272,27 +272,25 @@ export default function SpecialistProfile() {
         </div>
       </div>
 
-      {/* Work Zones Section */}
+      {/* Work Zones Section - Rappi Style */}
       {workZones.length > 0 && (
-        <div className="px-4 space-y-3">
-          <h3 className="text-lg font-bold flex items-center gap-2">
-            <MapPin className="h-5 w-5" />
+        <div className="px-4 space-y-4 mb-6">
+          <h3 className="text-lg font-bold text-foreground">
             Zonas de cobertura
           </h3>
           <div className="space-y-3">
             {workZones.map((zone, idx) => (
-              <Card key={idx} className="p-4 bg-card border">
+              <Card key={idx} className="p-4 bg-card border border-border rounded-lg shadow-sm">
                 <div className="space-y-3">
-                  <div className="font-semibold text-base">{zone.state}</div>
+                  <div className="font-bold text-base text-foreground">{zone.state}</div>
                   <div className="flex flex-wrap gap-2">
                     {zone.cities.map((city: string, cityIdx: number) => (
-                      <Badge 
+                      <span 
                         key={cityIdx} 
-                        variant="secondary"
-                        className="rounded-full px-3 py-1 text-xs font-normal"
+                        className="bg-muted text-muted-foreground rounded-full px-3 py-1 text-xs"
                       >
                         {city}
-                      </Badge>
+                      </span>
                     ))}
                   </div>
                 </div>
@@ -302,19 +300,19 @@ export default function SpecialistProfile() {
         </div>
       )}
 
-      {/* Summary Cards - Rating & Reviews */}
-      <div className="px-4 grid grid-cols-2 gap-3 mt-6">
-        <Card className="p-5 text-center bg-card border">
+      {/* Summary Cards - Rating & Reviews - Rappi Style */}
+      <div className="px-4 grid grid-cols-2 gap-3 mb-6">
+        <Card className="p-5 text-center bg-card border border-border rounded-lg shadow-sm">
           <Star className="h-6 w-6 fill-yellow-400 text-yellow-400 mx-auto mb-2" />
-          <div className="text-2xl font-bold mb-1">
+          <div className="text-2xl font-bold text-foreground mb-1">
             {rating > 0 ? rating.toFixed(1) : 'N/A'}
           </div>
           <div className="text-xs text-muted-foreground">Calificación</div>
         </Card>
         
-        <Card className="p-5 text-center bg-card border">
+        <Card className="p-5 text-center bg-card border border-border rounded-lg shadow-sm">
           <div className="text-2xl mb-2">💬</div>
-          <div className="text-2xl font-bold mb-1">
+          <div className="text-2xl font-bold text-foreground mb-1">
             {reviewCount}
           </div>
           <div className="text-xs text-muted-foreground">Reseñas</div>
@@ -322,103 +320,65 @@ export default function SpecialistProfile() {
       </div>
 
       <div className="px-4 space-y-8">
-        {/* Modern Professional Description */}
+        {/* Professional Description - Rappi Style */}
         {specialist?.professional_description && (
-          <Card className="p-6 border-0 shadow-elegant overflow-hidden relative animate-fade-in" style={{ 
-            animationDelay: '300ms',
-            background: 'linear-gradient(135deg, rgba(253, 240, 213, 0.3), rgba(255, 255, 255, 0.95))'
-          }}>
-            <div className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-secondary/10 to-transparent rounded-full blur-2xl" />
-            <div className="relative">
-              <h3 className="font-bold text-xl mb-4 flex items-center gap-2" style={{ color: '#003049' }}>
-                <span className="w-1 h-6 rounded-full bg-gradient-to-b from-primary to-secondary" />
-                Sobre su experiencia
-              </h3>
-              <p className="text-sm leading-relaxed" style={{ color: '#669BBC' }}>
-                {specialist.professional_description}
-              </p>
-            </div>
+          <Card className="p-6 bg-card border border-border rounded-lg shadow-sm mb-6">
+            <h3 className="font-bold text-lg text-foreground mb-3">
+              Sobre su experiencia
+            </h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {specialist.professional_description}
+            </p>
           </Card>
         )}
 
-        {/* Services with Experience Years - Modern Table Format */}
+        {/* Services with Experience Years - Rappi Style */}
         {specialties.length > 0 && (
-          <div className="space-y-6">
-            {specialties.map((specialty: any, idx: number) => (
+          <div className="space-y-4 mb-6">
+            {specialties.map((specialty: any) => (
               <Card 
                 key={specialty.id} 
-                className="p-0 overflow-hidden border-0 shadow-elegant animate-fade-in" 
-                style={{ 
-                  animationDelay: `${idx * 100}ms`,
-                  background: 'linear-gradient(to bottom, rgba(253, 240, 213, 0.3), rgba(255, 255, 255, 1))'
-                }}
+                className="overflow-hidden bg-card border border-border rounded-lg shadow-sm"
               >
-                {/* Modern Header with Specialty and Experience */}
-                <div 
-                  className="px-6 py-4 flex items-center justify-between"
-                  style={{ 
-                    background: 'linear-gradient(135deg, #003049 0%, #669BBC 100%)',
-                  }}
-                >
-                  <h3 className="font-bold text-xl text-white">
-                    {specialty.specialty}
-                  </h3>
-                  {specialty.experience_years && (
-                    <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-                      <span className="text-white font-semibold text-sm">
+                {/* Header with Specialty and Experience */}
+                <div className="px-6 py-4 bg-muted border-b border-border">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-bold text-lg text-foreground">
+                      {specialty.specialty}
+                    </h3>
+                    {specialty.experience_years && (
+                      <span className="text-sm text-muted-foreground font-medium">
                         {specialty.experience_years} {specialty.experience_years === 1 ? 'año' : 'años'}
                       </span>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
 
-                {/* Modern Table */}
+                {/* Services List */}
                 {specialty.activities && specialty.activities.length > 0 && (
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr style={{ backgroundColor: 'rgba(253, 240, 213, 0.5)' }}>
-                          <th className="text-left py-4 px-6 font-bold text-sm tracking-wide" style={{ color: '#003049' }}>
-                            SERVICIOS QUE OFRECE
-                          </th>
-                          <th className="text-right py-4 px-6 font-bold text-sm tracking-wide" style={{ color: '#003049' }}>
-                            PRECIO MÍNIMO
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {specialty.activities.map((activity: any, index: number) => (
-                          <tr 
-                            key={activity.id} 
-                            className="transition-all duration-200 hover:bg-gradient-to-r hover:from-transparent hover:to-secondary/10 cursor-pointer group"
-                            style={{
-                              borderBottom: index !== specialty.activities.length - 1 ? '1px solid rgba(102, 155, 188, 0.1)' : 'none'
-                            }}
-                          >
-                            <td className="py-4 px-6 text-sm font-medium group-hover:translate-x-1 transition-transform duration-200" style={{ color: '#669BBC' }}>
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-primary to-secondary opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                                {activity.activity}
-                              </div>
-                            </td>
-                            <td className="py-4 px-6 text-right">
-                              <span className="inline-flex items-center justify-center font-bold text-base px-4 py-1.5 rounded-full" style={{ 
-                                color: '#003049',
-                                backgroundColor: 'rgba(253, 240, 213, 0.6)'
-                              }}>
-                                {activity.price_min ? `$${activity.price_min}` : '—'}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  <div className="divide-y divide-border">
+                    {specialty.activities.map((activity: any) => (
+                      <div 
+                        key={activity.id} 
+                        className="px-6 py-4 flex items-center justify-between hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-foreground">
+                            {activity.activity}
+                          </p>
+                        </div>
+                        <div className="text-right ml-4">
+                          <span className="text-base font-bold text-foreground">
+                            {activity.price_min ? `$${activity.price_min}` : '—'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
 
-                <div className="px-6 py-4" style={{ backgroundColor: 'rgba(102, 155, 188, 0.05)' }}>
-                  <p className="text-xs italic flex items-center gap-2" style={{ color: '#669BBC' }}>
-                    <span className="inline-block w-1 h-1 rounded-full" style={{ backgroundColor: '#669BBC' }} />
+                <div className="px-6 py-3 bg-muted/50 border-t border-border">
+                  <p className="text-xs text-muted-foreground">
                     Los precios pueden variar según alcance y materiales.
                   </p>
                 </div>
@@ -427,22 +387,22 @@ export default function SpecialistProfile() {
           </div>
         )}
 
-        {/* Licenses and Certifications */}
+        {/* Licenses and Certifications - Rappi Style */}
         {credentials.length > 0 && (
-          <div className="px-4 space-y-3 mt-6">
-            <h3 className="text-lg font-bold">Licencias y certificaciones</h3>
+          <div className="space-y-4">
+            <h3 className="text-lg font-bold text-foreground">Licencias y certificaciones</h3>
             <div className="space-y-3">
               {credentials.map((credential, idx) => (
-                <Card key={idx} className="p-4 bg-card border">
-                  <div className="space-y-2">
+                <Card key={idx} className="p-4 bg-card border border-border rounded-lg shadow-sm">
+                  <div className="space-y-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-sm mb-1">{credential.title}</div>
+                        <div className="font-bold text-sm text-foreground mb-1">{credential.title}</div>
                         <div className="text-xs text-muted-foreground">{credential.issuer}</div>
                       </div>
-                      <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs font-normal shrink-0">
+                      <span className="bg-muted text-muted-foreground rounded-full px-3 py-1 text-xs shrink-0">
                         {credential.type}
-                      </Badge>
+                      </span>
                     </div>
                     
                     {credential.description && (
@@ -465,7 +425,7 @@ export default function SpecialistProfile() {
                       <Button 
                         variant="outline" 
                         size="sm"
-                        className="w-full mt-2 rounded-full text-xs h-8"
+                        className="w-full mt-2 rounded-lg text-xs h-9 font-medium"
                         onClick={() => window.open(credential.attachment_url, '_blank')}
                       >
                         Ver documento
