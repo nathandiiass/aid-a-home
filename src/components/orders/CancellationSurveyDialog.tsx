@@ -150,7 +150,7 @@ export function CancellationSurveyDialog({ open, onOpenChange, onSubmit }: Cance
             type="button"
             onClick={handleSubmit}
             disabled={!isValid}
-            className="w-full sm:w-auto bg-rappi-green hover:bg-rappi-green/90 rounded-full h-11 px-6 font-semibold disabled:bg-gray-300 disabled:text-gray-500"
+            className="w-full sm:w-auto bg-black hover:bg-black/90 text-white rounded-full h-11 px-6 font-semibold disabled:bg-gray-300 disabled:text-gray-500"
           >
             Enviar y eliminar solicitud
           </Button>
