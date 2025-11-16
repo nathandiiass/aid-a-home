@@ -163,7 +163,7 @@ export default function SpecialistHome() {
         ) : (
           <div className="space-y-4">
             {requests.map((request) => (
-              <Card key={request.id} className="bg-white rounded-2xl shadow-sm border-0 p-5 hover:shadow-md transition-all">
+              <Card key={request.id} className="bg-white rounded-2xl shadow-md border-0 p-5 hover:shadow-xl transition-all">
                 <div className="space-y-4">
                   {/* Header */}
                   <div>
@@ -233,7 +233,7 @@ export default function SpecialistHome() {
 
                   <Button
                     onClick={() => navigate(`/specialist/requests/${request.id}`)}
-                    className="w-full bg-black hover:bg-black/90 text-white rounded-full h-11 font-semibold"
+                    className="w-full bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-11 font-semibold"
                   >
                     Ver solicitud
                   </Button>
