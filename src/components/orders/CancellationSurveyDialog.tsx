@@ -61,27 +61,33 @@ export function CancellationSurveyDialog({ open, onOpenChange, onSubmit }: Cance
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl">Antes de eliminar tu solicitud</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="sm:max-w-[540px] max-h-[90vh] overflow-y-auto bg-white rounded-3xl border-0">
+        <DialogHeader className="space-y-3 pb-2">
+          <DialogTitle className="text-2xl font-bold text-foreground">
+            Antes de eliminar tu solicitud
+          </DialogTitle>
+          <DialogDescription className="text-base text-foreground/60">
             Tu opinión nos ayuda a mejorar.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 py-2">
           {/* Main reason */}
-          <div className="space-y-3">
-            <Label className="text-base font-semibold">
+          <div className="space-y-4">
+            <Label className="text-base font-bold text-foreground">
               ¿Por qué deseas eliminar esta solicitud/oferta? *
             </Label>
-            <RadioGroup value={mainReason} onValueChange={setMainReason}>
+            <RadioGroup value={mainReason} onValueChange={setMainReason} className="space-y-3">
               {CANCELLATION_REASONS.map((reason) => (
-                <div key={reason} className="flex items-start space-x-2">
-                  <RadioGroupItem value={reason} id={reason} className="mt-1" />
+                <div key={reason} className="flex items-start space-x-3 group">
+                  <RadioGroupItem 
+                    value={reason} 
+                    id={reason} 
+                    className="mt-0.5 border-2 data-[state=checked]:border-rappi-green data-[state=checked]:bg-rappi-green" 
+                  />
                   <Label
                     htmlFor={reason}
-                    className="text-sm font-normal cursor-pointer leading-relaxed"
+                    className="text-sm font-normal cursor-pointer leading-relaxed text-foreground/80 group-hover:text-foreground transition-colors"
                   >
                     {reason}
                   </Label>
@@ -92,8 +98,8 @@ export function CancellationSurveyDialog({ open, onOpenChange, onSubmit }: Cance
 
           {/* Other reason text - only show if "Otro motivo" is selected */}
           {isOtherSelected && (
-            <div className="space-y-2">
-              <Label htmlFor="otherReason" className="text-sm font-medium">
+            <div className="space-y-3 bg-gray-50 rounded-2xl p-4">
+              <Label htmlFor="otherReason" className="text-sm font-semibold text-foreground">
                 Por favor especifica el motivo *
               </Label>
               <Textarea
@@ -102,18 +108,18 @@ export function CancellationSurveyDialog({ open, onOpenChange, onSubmit }: Cance
                 value={otherReasonText}
                 onChange={(e) => setOtherReasonText(e.target.value)}
                 maxLength={120}
-                className="resize-none"
+                className="resize-none bg-white border-gray-200 rounded-xl focus:border-rappi-green focus:ring-rappi-green min-h-[80px]"
                 rows={3}
               />
-              <p className="text-xs text-muted-foreground text-right">
+              <p className="text-xs text-foreground/50 text-right">
                 {otherReasonText.length}/120 caracteres
               </p>
             </div>
           )}
 
           {/* Improvement suggestion - optional */}
-          <div className="space-y-2">
-            <Label htmlFor="improvement" className="text-sm font-medium">
+          <div className="space-y-3 bg-gray-50 rounded-2xl p-4">
+            <Label htmlFor="improvement" className="text-sm font-semibold text-foreground">
               ¿Qué hubiéramos podido mejorar? (opcional)
             </Label>
             <Textarea
@@ -122,21 +128,21 @@ export function CancellationSurveyDialog({ open, onOpenChange, onSubmit }: Cance
               value={improvementText}
               onChange={(e) => setImprovementText(e.target.value)}
               maxLength={120}
-              className="resize-none"
+              className="resize-none bg-white border-gray-200 rounded-xl focus:border-rappi-green focus:ring-rappi-green min-h-[80px]"
               rows={3}
             />
-            <p className="text-xs text-muted-foreground text-right">
+            <p className="text-xs text-foreground/50 text-right">
               {improvementText.length}/120 caracteres
             </p>
           </div>
         </div>
 
-        <DialogFooter className="flex-col sm:flex-row gap-2">
+        <DialogFooter className="flex-col sm:flex-row gap-3 pt-4">
           <Button
             type="button"
             variant="outline"
             onClick={handleCancel}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto rounded-full border-2 border-gray-300 hover:bg-gray-50 h-11 px-6 font-semibold"
           >
             Cancelar
           </Button>
@@ -144,7 +150,7 @@ export function CancellationSurveyDialog({ open, onOpenChange, onSubmit }: Cance
             type="button"
             onClick={handleSubmit}
             disabled={!isValid}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto bg-rappi-green hover:bg-rappi-green/90 rounded-full h-11 px-6 font-semibold disabled:bg-gray-300 disabled:text-gray-500"
           >
             Enviar y eliminar solicitud
           </Button>
