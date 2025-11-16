@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Plus, X } from 'lucide-react';
+import { ChevronLeft, Plus, X, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +12,7 @@ import { Logo } from '@/components/Logo';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import confetti from 'canvas-confetti';
 
 interface Specialty {
@@ -100,6 +101,7 @@ export default function SpecialistRegistration() {
   const [showOtherSpecialty, setShowOtherSpecialty] = useState(false);
   const [otherSpecialtyText, setOtherSpecialtyText] = useState('');
   const [specialtiesData, setSpecialtiesData] = useState<Specialty[]>([]);
+  const [openSpecialties, setOpenSpecialties] = useState<Record<string, boolean>>({});
   const [professionalDescription, setProfessionalDescription] = useState('');
   const [licenses, setLicenses] = useState<License[]>([]);
   const [selectedMunicipalities, setSelectedMunicipalities] = useState<string[]>([]);
@@ -863,129 +865,144 @@ export default function SpecialistRegistration() {
                 <h3 className="text-xl font-bold text-foreground">Detalles de tus especialidades</h3>
                 {specialtiesData.map((specData) => {
                   const displayName = specData.customSpecialty || specData.specialty;
+                  const isOpen = openSpecialties[specData.id] ?? true;
                   
                   return (
-                    <div key={specData.id} className="bg-white rounded-xl border-2 border-border p-6 space-y-6">
-                      {/* Header de la especialidad */}
-                      <div className="flex items-center gap-3 pb-4 border-b-2 border-border">
-                        <div className="w-10 h-10 rounded-full bg-rappi-green/10 flex items-center justify-center">
-                          <span className="text-rappi-green font-bold text-lg">✓</span>
-                        </div>
-                        <h4 className="text-xl font-bold text-foreground flex-1">{displayName}</h4>
-                      </div>
-
-                      {/* Años de experiencia */}
-                      <div className="space-y-2">
-                        <Label className="text-base font-semibold">Años de experiencia *</Label>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={specData.experienceYears}
-                          onChange={(e) => updateSpecialtyData(displayName, 'experienceYears', e.target.value)}
-                          placeholder="Ejemplo: 5"
-                          className="max-w-xs"
-                        />
-                      </div>
-
-                      {/* Servicios */}
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div className="space-y-1">
-                            <Label className="text-base font-semibold">Servicios que ofreces *</Label>
-                            <p className="text-sm text-muted-foreground">Agrega los servicios específicos de esta especialidad</p>
+                    <Collapsible
+                      key={specData.id}
+                      open={isOpen}
+                      onOpenChange={(open) => setOpenSpecialties(prev => ({ ...prev, [specData.id]: open }))}
+                      className="bg-white rounded-xl border-2 border-border overflow-hidden"
+                    >
+                      {/* Header colapsable de la especialidad */}
+                      <CollapsibleTrigger className="w-full p-6 hover:bg-muted/30 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-rappi-green/10 flex items-center justify-center flex-shrink-0">
+                            <span className="text-rappi-green font-bold text-lg">✓</span>
                           </div>
-                          <Button 
-                            onClick={() => addServiceToSpecialty(specData.id)} 
-                            className="bg-rappi-green hover:bg-rappi-green/90 text-white"
-                            size="sm"
-                          >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Agregar
-                          </Button>
+                          <h4 className="text-xl font-bold text-foreground flex-1 text-left">{displayName}</h4>
+                          <ChevronDown 
+                            className={`h-5 w-5 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                          />
                         </div>
-                        
-                        {specData.services.length === 0 && (
-                          <div className="p-4 bg-muted/50 border-2 border-dashed border-border rounded-lg text-center">
+                      </CollapsibleTrigger>
+
+                      <CollapsibleContent>
+                        <div className="p-6 pt-0 space-y-6 border-t-2 border-border">
+                          {/* Años de experiencia */}
+                          <div className="space-y-2">
+                            <Label className="text-base font-semibold">Años de experiencia *</Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              value={specData.experienceYears}
+                              onChange={(e) => updateSpecialtyData(displayName, 'experienceYears', e.target.value)}
+                              placeholder="Ejemplo: 5"
+                              className="max-w-xs"
+                            />
+                          </div>
+
+                          {/* Servicios */}
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <div className="space-y-1">
+                                <Label className="text-base font-semibold">Servicios que ofreces *</Label>
+                                <p className="text-sm text-muted-foreground">Agrega los servicios específicos de esta especialidad</p>
+                              </div>
+                              <Button 
+                                onClick={() => addServiceToSpecialty(specData.id)} 
+                                className="bg-rappi-green hover:bg-rappi-green/90 text-white"
+                                size="sm"
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Agregar
+                              </Button>
+                            </div>
+                            
+                            {specData.services.length === 0 && (
+                              <div className="p-4 bg-muted/50 border-2 border-dashed border-border rounded-lg text-center">
+                                <p className="text-sm text-muted-foreground">
+                                  No hay servicios agregados. Agrega al menos un servicio para continuar.
+                                </p>
+                              </div>
+                            )}
+                            
+                            <div className="space-y-3">
+                              {specData.services.map((service, idx) => (
+                                <div key={service.id} className="bg-muted/30 rounded-lg border-2 border-border p-5 space-y-4">
+                                  {/* Nombre del servicio */}
+                                  <div className="space-y-2">
+                                    <div className="flex items-start justify-between gap-2">
+                                      <Label className="text-sm font-semibold">Nombre del servicio *</Label>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => removeServiceFromSpecialty(specData.id, service.id)}
+                                        className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
+                                      >
+                                        <X className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                    <Input
+                                      value={service.name}
+                                      onChange={(e) => updateService(specData.id, service.id, 'name', e.target.value)}
+                                      placeholder="Ejemplo: Instalación de minisplit"
+                                    />
+                                  </div>
+                                  
+                                  {/* Precios */}
+                                  <div className="space-y-2">
+                                    <Label className="text-sm font-semibold">Rango de precios (opcional)</Label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                      <div className="space-y-2">
+                                        <Label className="text-xs text-muted-foreground">Precio Mínimo</Label>
+                                        <div className="relative">
+                                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                                          <Input
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            value={service.priceMin}
+                                            onChange={(e) => updateService(specData.id, service.id, 'priceMin', e.target.value)}
+                                            placeholder="0.00"
+                                            className="pl-7"
+                                          />
+                                        </div>
+                                      </div>
+                                      <div className="space-y-2">
+                                        <Label className="text-xs text-muted-foreground">Precio Máximo</Label>
+                                        <div className="relative">
+                                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                                          <Input
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            value={service.priceMax}
+                                            onChange={(e) => updateService(specData.id, service.id, 'priceMax', e.target.value)}
+                                            placeholder="0.00"
+                                            className="pl-7"
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                    
+                                    {service.priceMin && service.priceMax && parseFloat(service.priceMin) > parseFloat(service.priceMax) && (
+                                      <p className="text-sm text-destructive">
+                                        El precio mínimo no puede ser mayor al precio máximo
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                            
                             <p className="text-sm text-muted-foreground">
-                              No hay servicios agregados. Agrega al menos un servicio para continuar.
+                              {specData.services.length} servicio(s) agregado(s)
                             </p>
                           </div>
-                        )}
-                        
-                        <div className="space-y-3">
-                          {specData.services.map((service, idx) => (
-                            <div key={service.id} className="bg-muted/30 rounded-lg border-2 border-border p-5 space-y-4">
-                              {/* Nombre del servicio */}
-                              <div className="space-y-2">
-                                <div className="flex items-start justify-between gap-2">
-                                  <Label className="text-sm font-semibold">Nombre del servicio *</Label>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => removeServiceFromSpecialty(specData.id, service.id)}
-                                    className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                                <Input
-                                  value={service.name}
-                                  onChange={(e) => updateService(specData.id, service.id, 'name', e.target.value)}
-                                  placeholder="Ejemplo: Instalación de minisplit"
-                                />
-                              </div>
-                              
-                              {/* Precios */}
-                              <div className="space-y-2">
-                                <Label className="text-sm font-semibold">Rango de precios (opcional)</Label>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                  <div className="space-y-2">
-                                    <Label className="text-xs text-muted-foreground">Precio Mínimo</Label>
-                                    <div className="relative">
-                                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                                      <Input
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        value={service.priceMin}
-                                        onChange={(e) => updateService(specData.id, service.id, 'priceMin', e.target.value)}
-                                        placeholder="0.00"
-                                        className="pl-7"
-                                      />
-                                    </div>
-                                  </div>
-                                  <div className="space-y-2">
-                                    <Label className="text-xs text-muted-foreground">Precio Máximo</Label>
-                                    <div className="relative">
-                                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                                      <Input
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        value={service.priceMax}
-                                        onChange={(e) => updateService(specData.id, service.id, 'priceMax', e.target.value)}
-                                        placeholder="0.00"
-                                        className="pl-7"
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                                
-                                {service.priceMin && service.priceMax && parseFloat(service.priceMin) > parseFloat(service.priceMax) && (
-                                  <p className="text-sm text-destructive">
-                                    El precio mínimo no puede ser mayor al precio máximo
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          ))}
                         </div>
-                        
-                        <p className="text-sm text-muted-foreground">
-                          {specData.services.length} servicio(s) agregado(s)
-                        </p>
-                      </div>
-                    </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                   );
                 })}
               </div>
