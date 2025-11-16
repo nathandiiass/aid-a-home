@@ -71,7 +71,7 @@ export function CompleteOrderDialog({ open, onOpenChange, order, onComplete }: C
         photoUrls.push(data.signedUrl);
       }
 
-      // Update quote with final data (status remains 'accepted' for now)
+      // Update quote with final data
       const { error: updateError } = await supabase
         .from('quotes')
         .update({
@@ -82,6 +82,17 @@ export function CompleteOrderDialog({ open, onOpenChange, order, onComplete }: C
         .eq('id', order.id);
 
       if (updateError) throw updateError;
+
+      // Update service_request status to 'completed' and set final price
+      const { error: requestError } = await supabase
+        .from('service_requests')
+        .update({
+          status: 'completed',
+          price_max: parseFloat(finalPrice)
+        })
+        .eq('id', order.service_requests?.id || order.request?.id);
+
+      if (requestError) throw requestError;
 
       // Trigger confetti
       confetti({
