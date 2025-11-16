@@ -223,66 +223,77 @@ export default function SpecialistProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* App Bar */}
-      <div className="sticky top-0 z-50 bg-card border-b border-border px-4 py-3 flex items-center gap-3 shadow-sm">
+    <div className="min-h-screen pb-24" style={{ background: 'linear-gradient(to bottom, rgba(253, 240, 213, 0.2), rgba(255, 255, 255, 1))' }}>
+      {/* Modern App Bar */}
+      <div className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b px-4 py-3 flex items-center gap-3 shadow-elegant" style={{ borderColor: 'rgba(102, 155, 188, 0.2)' }}>
         <Button
           variant="ghost"
           size="icon"
           onClick={() => navigate(-1)}
+          className="hover:bg-primary/10 transition-all duration-200"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-5 h-5" style={{ color: '#003049' }} />
         </Button>
-        <h1 className="flex-1 font-bold text-lg" style={{ color: '#003049' }}>
+        <h1 className="flex-1 font-bold text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
           Perfil del Especialista
         </h1>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" className="hover:bg-primary/10 transition-all duration-200">
           <Share2 className="w-5 h-5" style={{ color: '#669BBC' }} />
         </Button>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" className="hover:bg-primary/10 transition-all duration-200">
           <MoreVertical className="w-5 h-5" style={{ color: '#669BBC' }} />
         </Button>
       </div>
 
-      {/* Hero Section */}
-      <div className="px-4 pt-8 pb-6 text-center">
-        <Avatar className="w-32 h-32 mx-auto mb-4 border-4" style={{ borderColor: '#669BBC' }}>
-          <AvatarImage src={profile.avatar_url} />
-          <AvatarFallback style={{ backgroundColor: '#669BBC', color: '#FFFFFF' }} className="text-4xl font-bold">
-            {getInitials(displayName)}
-          </AvatarFallback>
-        </Avatar>
-        <h2 className="text-2xl font-bold mb-2" style={{ color: '#003049' }}>
-          {displayName}
-        </h2>
-        {verifiedStatus && (
-          <Badge style={{ backgroundColor: '#FDF0D5', color: '#003049' }} className="mb-2">
-            ✓ Verificado
-          </Badge>
-        )}
+      {/* Modern Hero Section */}
+      <div className="px-4 pt-12 pb-8 text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" style={{ height: '200px' }} />
+        <div className="relative animate-fade-in">
+          <Avatar className="w-36 h-36 mx-auto mb-5 border-4 shadow-elegant hover-scale transition-all duration-300" style={{ borderColor: 'rgba(102, 155, 188, 0.3)' }}>
+            <AvatarImage src={profile.avatar_url} />
+            <AvatarFallback className="text-4xl font-bold" style={{ background: 'linear-gradient(135deg, #003049, #669BBC)', color: '#FFFFFF' }}>
+              {getInitials(displayName)}
+            </AvatarFallback>
+          </Avatar>
+          <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            {displayName}
+          </h2>
+          {verifiedStatus && (
+            <Badge className="mb-2 px-4 py-1.5 text-sm shadow-subtle animate-scale-in" style={{ background: 'linear-gradient(135deg, #FDF0D5, #FFFFFF)', color: '#003049', border: '1px solid rgba(102, 155, 188, 0.2)' }}>
+              ✓ Verificado
+            </Badge>
+          )}
+        </div>
       </div>
 
-      {/* Work Zones - moved before rating */}
+      {/* Modern Work Zones */}
       {workZones.length > 0 && (
-        <div className="px-4 mb-6">
-          <Card className="p-4" style={{ borderColor: '#669BBC' }}>
-            <div className="flex items-start gap-3">
-              <MapPin className="w-5 h-5 mt-0.5" style={{ color: '#669BBC' }} />
+        <div className="px-4 mb-8 animate-fade-in" style={{ animationDelay: '100ms' }}>
+          <Card className="p-6 border-0 shadow-elegant overflow-hidden relative" style={{ background: 'linear-gradient(135deg, rgba(102, 155, 188, 0.08), rgba(255, 255, 255, 0.95))' }}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/10 to-transparent rounded-full blur-3xl" />
+            <div className="flex items-start gap-4 relative">
+              <div className="p-3 rounded-full shadow-subtle" style={{ background: 'linear-gradient(135deg, #669BBC, #003049)' }}>
+                <MapPin className="w-6 h-6 text-white" />
+              </div>
               <div className="flex-1">
-                <h3 className="font-bold text-base mb-2" style={{ color: '#003049' }}>
+                <h3 className="font-bold text-lg mb-3" style={{ color: '#003049' }}>
                   Zona de cobertura
                 </h3>
                 {workZones.map((zone: any, idx: number) => (
-                  <div key={idx} className="mb-2">
-                    <p className="font-semibold text-sm mb-1" style={{ color: '#003049' }}>
+                  <div key={idx} className="mb-3 last:mb-0">
+                    <p className="font-semibold mb-2" style={{ color: '#003049' }}>
                       {zone.state}
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {zone.cities?.map((city: string, cityIdx: number) => (
                         <Badge
                           key={cityIdx}
-                          variant="outline"
-                          style={{ borderColor: '#669BBC', color: '#669BBC' }}
+                          className="px-3 py-1.5 shadow-subtle hover-scale cursor-pointer transition-all duration-200"
+                          style={{ 
+                            background: 'linear-gradient(135deg, rgba(253, 240, 213, 0.8), rgba(255, 255, 255, 0.9))',
+                            color: '#669BBC',
+                            border: '1px solid rgba(102, 155, 188, 0.2)'
+                          }}
                         >
                           {city}
                         </Badge>
@@ -296,39 +307,52 @@ export default function SpecialistProfile() {
         </div>
       )}
 
-      {/* Summary Cards */}
-      <div className="px-4 mb-6">
+      {/* Modern Summary Cards */}
+      <div className="px-4 mb-8 animate-fade-in" style={{ animationDelay: '200ms' }}>
         <div className="grid grid-cols-2 gap-4">
-          <Card className="p-4 text-center" style={{ borderColor: '#669BBC' }}>
-            <div className="flex items-center justify-center gap-1 mb-1">
-              <Star className="w-5 h-5 fill-current" style={{ color: '#C1121F' }} />
-              <span className="text-2xl font-bold" style={{ color: '#003049' }}>
-                {rating > 0 ? rating.toFixed(1) : '—'}
-              </span>
+          <Card className="p-5 text-center border-0 shadow-elegant hover-scale transition-all duration-300 cursor-pointer overflow-hidden relative group">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="relative">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Star className="w-6 h-6 fill-current animate-pulse" style={{ color: '#C1121F' }} />
+                <span className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  {rating > 0 ? rating.toFixed(1) : '—'}
+                </span>
+              </div>
+              <p className="text-xs font-medium" style={{ color: '#669BBC' }}>
+                {rating > 0 ? 'Puntuación' : 'Sin calificaciones'}
+              </p>
             </div>
-            <p className="text-xs" style={{ color: '#669BBC' }}>
-              {rating > 0 ? 'Puntuación' : 'Sin calificaciones'}
-            </p>
           </Card>
-          <Card className="p-4 text-center" style={{ borderColor: '#669BBC' }}>
-            <div className="text-2xl font-bold mb-1" style={{ color: '#003049' }}>
-              {reviewCount}
+          <Card className="p-5 text-center border-0 shadow-elegant hover-scale transition-all duration-300 cursor-pointer overflow-hidden relative group">
+            <div className="absolute inset-0 bg-gradient-to-bl from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="relative">
+              <div className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                {reviewCount}
+              </div>
+              <p className="text-xs font-medium" style={{ color: '#669BBC' }}>Reseñas</p>
             </div>
-            <p className="text-xs" style={{ color: '#669BBC' }}>Reseñas</p>
           </Card>
         </div>
       </div>
 
-      <div className="px-4 space-y-6">
-        {/* Professional Description */}
+      <div className="px-4 space-y-8">
+        {/* Modern Professional Description */}
         {specialist?.professional_description && (
-          <Card className="p-4" style={{ borderColor: '#669BBC' }}>
-            <h3 className="font-bold text-lg mb-3" style={{ color: '#003049' }}>
-              Sobre su experiencia
-            </h3>
-            <p className="text-sm leading-relaxed" style={{ color: '#669BBC' }}>
-              {specialist.professional_description}
-            </p>
+          <Card className="p-6 border-0 shadow-elegant overflow-hidden relative animate-fade-in" style={{ 
+            animationDelay: '300ms',
+            background: 'linear-gradient(135deg, rgba(253, 240, 213, 0.3), rgba(255, 255, 255, 0.95))'
+          }}>
+            <div className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-secondary/10 to-transparent rounded-full blur-2xl" />
+            <div className="relative">
+              <h3 className="font-bold text-xl mb-4 flex items-center gap-2" style={{ color: '#003049' }}>
+                <span className="w-1 h-6 rounded-full bg-gradient-to-b from-primary to-secondary" />
+                Sobre su experiencia
+              </h3>
+              <p className="text-sm leading-relaxed" style={{ color: '#669BBC' }}>
+                {specialist.professional_description}
+              </p>
+            </div>
           </Card>
         )}
 
@@ -418,59 +442,80 @@ export default function SpecialistProfile() {
           </div>
         )}
 
-        {/* Licenses and Certifications */}
+        {/* Modern Licenses and Certifications */}
         {credentials.length > 0 && (
-          <Card className="p-4" style={{ borderColor: '#669BBC' }}>
-            <h3 className="font-bold text-lg mb-4" style={{ color: '#003049' }}>
-              Licencias y certificaciones
-            </h3>
-            <div className="space-y-3">
-              {credentials.map((credential: any) => (
-                <div key={credential.id} className="flex items-start justify-between gap-3 pb-3 border-b border-border last:border-0 last:pb-0">
-                  <div className="flex-1">
-                    <p className="font-semibold text-sm mb-1" style={{ color: '#003049' }}>
-                      {credential.title}
-                    </p>
-                    <p className="text-xs" style={{ color: '#669BBC' }}>
-                      {credential.issuer}
-                    </p>
-                    {credential.description && (
-                      <p className="text-xs mt-1" style={{ color: '#669BBC' }}>
-                        {credential.description}
-                      </p>
-                    )}
+          <Card className="p-6 border-0 shadow-elegant overflow-hidden relative animate-fade-in" style={{ 
+            animationDelay: '500ms',
+            background: 'linear-gradient(135deg, rgba(102, 155, 188, 0.05), rgba(255, 255, 255, 0.95))'
+          }}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/5 to-transparent rounded-full blur-3xl" />
+            <div className="relative">
+              <h3 className="font-bold text-xl mb-5 flex items-center gap-2" style={{ color: '#003049' }}>
+                <span className="w-1 h-6 rounded-full bg-gradient-to-b from-primary to-secondary" />
+                Licencias y certificaciones
+              </h3>
+              <div className="space-y-4">
+                {credentials.map((credential: any) => (
+                  <div key={credential.id} className="group p-4 rounded-xl transition-all duration-300 hover:shadow-subtle" style={{ backgroundColor: 'rgba(253, 240, 213, 0.3)' }}>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <p className="font-semibold text-base mb-1 group-hover:text-primary transition-colors duration-200" style={{ color: '#003049' }}>
+                          {credential.title}
+                        </p>
+                        <p className="text-sm mb-2" style={{ color: '#669BBC' }}>
+                          {credential.issuer}
+                        </p>
+                        {credential.description && (
+                          <p className="text-xs leading-relaxed" style={{ color: '#669BBC' }}>
+                            {credential.description}
+                          </p>
+                        )}
+                      </div>
+                      {credential.attachment_url && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => window.open(credential.attachment_url, '_blank')}
+                          className="hover-scale shadow-subtle transition-all duration-200"
+                          style={{ 
+                            borderColor: 'rgba(102, 155, 188, 0.3)',
+                            color: '#669BBC',
+                            backgroundColor: 'rgba(255, 255, 255, 0.8)'
+                          }}
+                        >
+                          Ver documento
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                  {credential.attachment_url && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => window.open(credential.attachment_url, '_blank')}
-                      style={{ borderColor: '#669BBC', color: '#669BBC' }}
-                    >
-                      Ver documento
-                    </Button>
-                  )}
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </Card>
         )}
       </div>
 
-      {/* Footer Actions */}
+      {/* Modern Footer Actions */}
       {quoteId && (
-        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4 flex gap-3">
+        <div className="fixed bottom-0 left-0 right-0 backdrop-blur-md bg-white/90 border-t p-4 flex gap-3 shadow-elegant animate-fade-in z-40" style={{ borderColor: 'rgba(102, 155, 188, 0.2)' }}>
           <Button
             variant="outline"
-            className="flex-1"
-            style={{ borderColor: '#669BBC', color: '#003049' }}
+            className="flex-1 hover-scale transition-all duration-200 font-semibold"
+            style={{ 
+              borderColor: 'rgba(102, 155, 188, 0.3)',
+              color: '#003049',
+              backgroundColor: 'rgba(255, 255, 255, 0.8)'
+            }}
             onClick={() => navigate(`/chat/${quoteId}`)}
           >
             Volver al chat
           </Button>
           <Button
-            className="flex-1"
-            style={{ backgroundColor: '#C1121F', color: '#FFFFFF' }}
+            className="flex-1 hover-scale transition-all duration-200 font-semibold shadow-elegant"
+            style={{ 
+              background: 'linear-gradient(135deg, #C1121F, #780000)',
+              color: '#FFFFFF'
+            }}
             onClick={() => setShowConfirmDialog(true)}
           >
             Contratar
