@@ -34,17 +34,16 @@ export function InProgressOrderCard({ order, onUpdate }: InProgressOrderCardProp
   return (
     <>
       <Card 
-        className="p-5 hover:shadow-lg transition-all cursor-pointer bg-card"
-        style={{ borderColor: '#669BBC', borderWidth: '1px' }}
+        className="bg-white rounded-2xl shadow-md border-0 p-5 hover:shadow-xl transition-all cursor-pointer"
         onClick={() => navigate(`/chat/${order.id}`)}
       >
         <div className="space-y-4">
           <div className="flex justify-between items-start">
             <div className="flex-1">
-              <h3 className="font-bold text-lg mb-2" style={{ color: '#003049' }}>
+              <h3 className="font-bold text-lg text-foreground mb-2">
                 {request?.activity || 'Trabajo'}
               </h3>
-              <Badge variant="secondary" className="mb-3">
+              <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 border-0 rounded-full px-3 py-1 text-xs font-medium">
                 Pendiente de iniciar
               </Badge>
             </div>
@@ -60,51 +59,55 @@ export function InProgressOrderCard({ order, onUpdate }: InProgressOrderCardProp
             </Button>
           </div>
 
-          <div className="space-y-2 text-sm">
+          <div className="space-y-3">
             {order.proposed_date && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Calendar className="w-4 h-4" />
-                <span>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                  <Calendar className="w-4 h-4 text-gray-600" />
+                </div>
+                <span className="text-sm text-foreground/70">
                   {format(new Date(order.proposed_date), 'dd MMM yyyy', { locale: es })}
                 </span>
               </div>
             )}
 
             {order.proposed_time_start && order.proposed_time_end && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Clock className="w-4 h-4" />
-                <span>{order.proposed_time_start} - {order.proposed_time_end}</span>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-4 h-4 text-gray-600" />
+                </div>
+                <span className="text-sm text-foreground/70">{order.proposed_time_start} - {order.proposed_time_end}</span>
               </div>
             )}
 
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <MapPin className="w-4 h-4" />
-              <span>{getZone()}</span>
-            </div>
-
-            {/* Price in bottom right */}
-            <div className="flex justify-end pt-2 border-t">
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4" />
-                <span className="font-semibold" style={{ color: '#003049' }}>
-                  {getPrice()}
-                </span>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <MapPin className="w-4 h-4 text-gray-600" />
               </div>
+              <span className="text-sm text-foreground/70">{getZone()}</span>
+            </div>
+          </div>
+
+          {/* Price */}
+          <div className="pt-3 mt-3 border-t border-gray-100">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-foreground/50 uppercase tracking-wide">Precio</span>
+              <span className="font-bold text-base text-foreground">
+                {getPrice()}
+              </span>
             </div>
           </div>
 
           <div className="flex gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
             <Button
               variant="outline"
-              className="flex-1"
-              style={{ borderColor: '#003049', color: '#003049' }}
+              className="flex-1 rounded-full border-2 border-gray-300 hover:bg-gray-50 h-10 font-semibold"
             >
               <Play className="w-4 h-4 mr-2" />
               Iniciar
             </Button>
             <Button
-              className="flex-1"
-              style={{ backgroundColor: '#C1121F' }}
+              className="flex-1 bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-10 font-semibold"
               onClick={(e) => {
                 e.stopPropagation();
                 setShowCompleteDialog(true);
