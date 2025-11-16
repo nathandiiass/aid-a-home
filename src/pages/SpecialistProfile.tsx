@@ -203,7 +203,7 @@ export default function SpecialistProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 pb-32">
       {/* Header Rappi Style */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl shadow-sm">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center gap-3">
@@ -394,14 +394,16 @@ export default function SpecialistProfile() {
         )}
       </div>
 
-      {/* Floating CTA Button */}
+      {/* Floating CTA Button - Centered */}
       {quoteId && (
-        <Button
-          onClick={() => setShowConfirmDialog(true)}
-          className="fixed bottom-6 right-6 z-40 h-14 px-6 rounded-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold text-base shadow-2xl hover:shadow-green-500/50 active:scale-95 transition-all"
-        >
-          Contratar especialista
-        </Button>
+        <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4">
+          <Button
+            onClick={() => setShowConfirmDialog(true)}
+            className="h-14 px-8 rounded-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold text-base shadow-2xl hover:shadow-green-500/50 active:scale-95 transition-all"
+          >
+            Contratar especialista
+          </Button>
+        </div>
       )}
 
       {/* Confirmation Dialog */}
