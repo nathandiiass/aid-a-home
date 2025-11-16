@@ -23,6 +23,7 @@ import SpecialistProfile from "./pages/SpecialistProfile";
 import UserProfile from "./pages/UserProfile";
 import UserPersonalInfoPage from "./pages/UserPersonalInfoPage";
 import SpecialistPersonalInfo from "./pages/SpecialistPersonalInfo";
+import SpecialistAccount from "./pages/SpecialistAccount";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ const App = () => (
           <Route path="/specialist/:specialistId/profile" element={<SpecialistProfile />} />
           <Route path="/user/:userId/profile" element={<UserProfile />} />
           <Route path="/specialist/personal-info" element={<SpecialistPersonalInfo />} />
+          <Route path="/specialist/account" element={<SpecialistAccount />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
