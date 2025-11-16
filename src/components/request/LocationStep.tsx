@@ -138,43 +138,47 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
     setLoading(true);
     setError("");
 
-    const fullAddress = [
-      street,
-      `#${extNumber}`,
-      intNumber && `Int. ${intNumber}`,
-      neighborhood,
-      `${city}, ${state}`
-    ].filter(Boolean).join(', ');
-
     try {
-      let locationId: string | undefined = undefined;
+      let locationId: string | null = null;
 
-      if (user && saveLocation) {
-        const { data: insertedLocation, error } = await supabase
+      if (saveLocation && user) {
+        if (!label.trim()) {
+          setError("Agrega una etiqueta para guardar esta dirección");
+          setLoading(false);
+          return;
+        }
+
+        const { data: newLocation, error } = await supabase
           .from('locations')
-          .insert([{
+          .insert({
             user_id: user.id,
-            label: label.trim() || 'Sin etiqueta',
-            street: street.trim(),
-            neighborhood: neighborhood.trim(),
-            ext_number: extNumber.trim(),
-            int_number: intNumber.trim() || null,
-            city: city.trim(),
-            state: state.trim(),
-            lat: 19.4326,
-            lng: -99.1332,
-          }])
+            label: label,
+            street: street,
+            ext_number: extNumber,
+            int_number: intNumber || null,
+            neighborhood: neighborhood,
+            city: city,
+            state: state,
+          })
           .select()
           .single();
 
         if (error) throw error;
-        locationId = insertedLocation.id;
+        locationId = newLocation.id;
 
         toast({
           title: "Ubicación guardada",
-          description: "La ubicación se guardó para futuras solicitudes",
+          description: "La dirección se guardó correctamente",
         });
       }
+
+      const fullAddress = [
+        street,
+        extNumber && `#${extNumber}`,
+        intNumber && `Int. ${intNumber}`,
+        neighborhood,
+        `${city}, ${state}`
+      ].filter(Boolean).join(', ');
 
       updateData({
         location: {
@@ -182,7 +186,7 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
           lat: 19.4326,
           lng: -99.1332,
           address: fullAddress,
-          label: label.trim() || 'Sin etiqueta',
+          label: label || "Nueva dirección",
         },
       });
 
@@ -190,66 +194,71 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
     } catch (error: any) {
       console.error('Error saving location:', error);
       toast({
-        variant: "destructive",
         title: "Error",
-        description: error.message || "No se pudo guardar la ubicación",
+        description: "No se pudo guardar la ubicación",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Ubicación</h2>
-        <p className="text-muted-foreground">
-          Selecciona dónde necesitas el servicio
-        </p>
-      </div>
+  const getLabelIcon = (label: string) => {
+    if (label.toLowerCase().includes("casa")) return <Home className="w-5 h-5" />;
+    if (label.toLowerCase().includes("trabajo")) return <Briefcase className="w-5 h-5" />;
+    return <MapPin className="w-5 h-5" />;
+  };
 
-      <Tabs defaultValue={savedLocations.length > 0 ? "saved" : "new"} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="saved" disabled={savedLocations.length === 0}>
-            Ubicaciones guardadas
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <Tabs defaultValue="saved" className="w-full">
+        <TabsList className="w-full grid grid-cols-2 mb-6 bg-white rounded-full p-1">
+          <TabsTrigger value="saved" className="rounded-full data-[state=active]:bg-rappi-green data-[state=active]:text-white">
+            Direcciones guardadas
           </TabsTrigger>
-          <TabsTrigger value="new">Nueva ubicación</TabsTrigger>
+          <TabsTrigger value="new" className="rounded-full data-[state=active]:bg-rappi-green data-[state=active]:text-white">
+            Nueva dirección
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="saved" className="space-y-4 mt-4">
-          {savedLocations.length === 0 ? (
-            <Card className="p-8 text-center">
-              <MapPin className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground">
-                No tienes ubicaciones guardadas
+        <TabsContent value="saved" className="mt-0">
+          {!user ? (
+            <Card className="bg-white rounded-2xl shadow-lg border-0 p-8 text-center">
+              <MapPin className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+              <p className="text-gray-600 mb-4">
+                Inicia sesión para ver tus direcciones guardadas
+              </p>
+            </Card>
+          ) : savedLocations.length === 0 ? (
+            <Card className="bg-white rounded-2xl shadow-lg border-0 p-8 text-center">
+              <MapPin className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+              <p className="text-gray-600 mb-4">
+                No tienes direcciones guardadas
+              </p>
+              <p className="text-sm text-gray-500">
+                Agrega una nueva dirección y guárdala para usarla después
               </p>
             </Card>
           ) : (
             <div className="space-y-3">
-              {savedLocations.map((location) => (
+              {savedLocations.map((saved) => (
                 <Card
-                  key={location.id}
-                  className="p-4 cursor-pointer hover:border-primary transition-colors"
-                  onClick={() => handleSelectSaved(location)}
+                  key={saved.id}
+                  className="bg-white rounded-2xl shadow-lg border-0 p-4 cursor-pointer hover:shadow-xl transition-all"
+                  onClick={() => handleSelectSaved(saved)}
                 >
                   <div className="flex items-start gap-3">
-                    {location.label.toLowerCase().includes('casa') ? (
-                      <Home className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                    ) : location.label.toLowerCase().includes('trabajo') ? (
-                      <Briefcase className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                    ) : (
-                      <MapPin className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold">{location.label}</p>
-                      <p className="text-sm text-muted-foreground truncate">
-                        {location.street}
-                        {location.ext_number && ` #${location.ext_number}`}
-                        {location.int_number && ` Int. ${location.int_number}`}
+                    <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                      {getLabelIcon(saved.label)}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 mb-1">{saved.label}</h3>
+                      <p className="text-sm text-gray-600">
+                        {saved.street} #{saved.ext_number}
+                        {saved.int_number && ` Int. ${saved.int_number}`}
                       </p>
-                      <p className="text-sm text-muted-foreground">
-                        {location.neighborhood && `${location.neighborhood}, `}
-                        {location.city}, {location.state}
+                      <p className="text-sm text-gray-500">
+                        {saved.neighborhood}, {saved.city}, {saved.state}
                       </p>
                     </div>
                   </div>
@@ -259,119 +268,148 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
           )}
         </TabsContent>
 
-        <TabsContent value="new" className="space-y-4 mt-4">
-          <div className="space-y-2">
-            <Label htmlFor="label">Etiqueta (opcional)</Label>
-            <Input
-              id="label"
-              placeholder="Ej: Casa, Trabajo, Casa de mamá"
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="state">Estado *</Label>
-            <Select value={state} onValueChange={setState}>
-              <SelectTrigger id="state">
-                <SelectValue placeholder="Selecciona un estado" />
-              </SelectTrigger>
-              <SelectContent>
-                {ESTADOS_MEXICO.map((estado) => (
-                  <SelectItem key={estado} value={estado}>
-                    {estado}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="city">Ciudad / Municipio *</Label>
-            <Input
-              id="city"
-              placeholder="Ej: Guadalajara"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="neighborhood">Colonia *</Label>
-            <Input
-              id="neighborhood"
-              placeholder="Ej: Centro"
-              value={neighborhood}
-              onChange={(e) => setNeighborhood(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="street">Calle *</Label>
-            <Input
-              id="street"
-              placeholder="Ej: Av. Juárez"
-              value={street}
-              onChange={(e) => setStreet(e.target.value)}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="ext-number">Número exterior *</Label>
-              <Input
-                id="ext-number"
-                placeholder="123"
-                value={extNumber}
-                onChange={(e) => setExtNumber(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="int-number">Número interior</Label>
-              <Input
-                id="int-number"
-                placeholder="A"
-                value={intNumber}
-                onChange={(e) => setIntNumber(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {user && (
-            <Card className="p-4 bg-accent/10 border-accent">
-              <div className="flex items-start space-x-3">
-                <Checkbox
-                  id="save-location"
-                  checked={saveLocation}
-                  onCheckedChange={(checked) => setSaveLocation(checked as boolean)}
-                />
-                <div className="space-y-1 flex-1">
-                  <Label
-                    htmlFor="save-location"
-                    className="text-base font-semibold cursor-pointer leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Guardar esta ubicación para futuras solicitudes
+        <TabsContent value="new" className="mt-0">
+          <Card className="bg-white rounded-2xl shadow-lg border-0 p-6">
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <Label htmlFor="state" className="text-sm font-semibold text-gray-900 mb-2 block">
+                    Estado *
                   </Label>
-                  <p className="text-sm text-muted-foreground">
-                    Podrás usarla rápidamente en tus próximas solicitudes de servicio
-                  </p>
+                  <Select value={state} onValueChange={setState}>
+                    <SelectTrigger className="h-12 bg-white border-gray-200 rounded-xl">
+                      <SelectValue placeholder="Selecciona un estado" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white z-50">
+                      {ESTADOS_MEXICO.map((estado) => (
+                        <SelectItem key={estado} value={estado}>
+                          {estado}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="col-span-2">
+                  <Label htmlFor="city" className="text-sm font-semibold text-gray-900 mb-2 block">
+                    Ciudad/Municipio *
+                  </Label>
+                  <Input
+                    id="city"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="Ej: Monterrey"
+                    className="h-12 bg-white border-gray-200 rounded-xl"
+                  />
+                </div>
+
+                <div className="col-span-2">
+                  <Label htmlFor="neighborhood" className="text-sm font-semibold text-gray-900 mb-2 block">
+                    Colonia *
+                  </Label>
+                  <Input
+                    id="neighborhood"
+                    value={neighborhood}
+                    onChange={(e) => setNeighborhood(e.target.value)}
+                    placeholder="Ej: Centro"
+                    className="h-12 bg-white border-gray-200 rounded-xl"
+                  />
+                </div>
+
+                <div className="col-span-2">
+                  <Label htmlFor="street" className="text-sm font-semibold text-gray-900 mb-2 block">
+                    Calle *
+                  </Label>
+                  <Input
+                    id="street"
+                    value={street}
+                    onChange={(e) => setStreet(e.target.value)}
+                    placeholder="Ej: Avenida Juárez"
+                    className="h-12 bg-white border-gray-200 rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="extNumber" className="text-sm font-semibold text-gray-900 mb-2 block">
+                    Número exterior *
+                  </Label>
+                  <Input
+                    id="extNumber"
+                    value={extNumber}
+                    onChange={(e) => setExtNumber(e.target.value)}
+                    placeholder="Ej: 123"
+                    className="h-12 bg-white border-gray-200 rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="intNumber" className="text-sm font-semibold text-gray-900 mb-2 block">
+                    Número interior
+                  </Label>
+                  <Input
+                    id="intNumber"
+                    value={intNumber}
+                    onChange={(e) => setIntNumber(e.target.value)}
+                    placeholder="Ej: 4B"
+                    className="h-12 bg-white border-gray-200 rounded-xl"
+                  />
                 </div>
               </div>
-            </Card>
-          )}
 
-          {error && (
-            <p className="text-sm text-destructive">{error}</p>
-          )}
+              {user && (
+                <div className="pt-4 border-t border-gray-200">
+                  <div className="flex items-start space-x-3 mb-3">
+                    <Checkbox
+                      id="save"
+                      checked={saveLocation}
+                      onCheckedChange={(checked) => setSaveLocation(checked as boolean)}
+                      className="mt-1"
+                    />
+                    <div className="flex-1">
+                      <label
+                        htmlFor="save"
+                        className="text-sm font-medium text-gray-900 cursor-pointer"
+                      >
+                        Guardar esta dirección
+                      </label>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Podrás usarla en futuros pedidos
+                      </p>
+                    </div>
+                  </div>
 
-          <Button
-            onClick={handleContinue}
-            disabled={loading}
-            className="w-full h-12 text-base"
-            size="lg"
-          >
-            {loading ? "Guardando..." : "Continuar"}
-          </Button>
+                  {saveLocation && (
+                    <div>
+                      <Label htmlFor="label" className="text-sm font-semibold text-gray-900 mb-2 block">
+                        Etiqueta para esta dirección
+                      </Label>
+                      <Input
+                        id="label"
+                        value={label}
+                        onChange={(e) => setLabel(e.target.value)}
+                        placeholder="Ej: Casa, Trabajo, Casa de mamá"
+                        className="h-12 bg-white border-gray-200 rounded-xl"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm">
+                  {error}
+                </div>
+              )}
+
+              <Button
+                onClick={handleContinue}
+                disabled={loading}
+                className="w-full h-12 bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full font-semibold"
+              >
+                {loading ? "Guardando..." : "Continuar"}
+              </Button>
+            </div>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
