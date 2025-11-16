@@ -244,7 +244,7 @@ export default function SpecialistOrders() {
           <TabsContent value="completadas" className="space-y-4">
             {sortedCompleted.length === 0 ? <Card className="p-8 text-center">
                 <p className="text-muted-foreground">No tienes órdenes completadas</p>
-              </Card> : sortedCompleted.map(order => <CompletedOrderCard key={order.id} order={order} />)}
+              </Card> : sortedCompleted.map(order => <CompletedOrderCard key={order.id} order={order} onReviewSubmitted={loadSpecialistOrders} />)}
           </TabsContent>
 
           <TabsContent value="enviadas" className="space-y-4">

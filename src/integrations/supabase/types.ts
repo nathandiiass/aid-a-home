@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      client_reviews: {
+        Row: {
+          average_score: number | null
+          claridad_cumplimiento_pago: number
+          claridad_necesidades: number
+          client_id: string
+          created_at: string
+          facilito_condiciones_trabajo: number
+          id: string
+          order_id: string
+          puntualidad_disponibilidad: number
+          respeto_profesionalismo_cliente: number
+          specialist_id: string
+          updated_at: string
+          volveria_trabajar_con_cliente: boolean
+        }
+        Insert: {
+          average_score?: number | null
+          claridad_cumplimiento_pago: number
+          claridad_necesidades: number
+          client_id: string
+          created_at?: string
+          facilito_condiciones_trabajo: number
+          id?: string
+          order_id: string
+          puntualidad_disponibilidad: number
+          respeto_profesionalismo_cliente: number
+          specialist_id: string
+          updated_at?: string
+          volveria_trabajar_con_cliente: boolean
+        }
+        Update: {
+          average_score?: number | null
+          claridad_cumplimiento_pago?: number
+          claridad_necesidades?: number
+          client_id?: string
+          created_at?: string
+          facilito_condiciones_trabajo?: number
+          id?: string
+          order_id?: string
+          puntualidad_disponibilidad?: number
+          respeto_profesionalismo_cliente?: number
+          specialist_id?: string
+          updated_at?: string
+          volveria_trabajar_con_cliente?: boolean
+        }
+        Relationships: []
+      }
       locations: {
         Row: {
           city: string
@@ -99,6 +147,11 @@ export type Database = {
           accepted_privacy_at: string | null
           accepted_terms_at: string | null
           avatar_url: string | null
+          avg_claridad_cumplimiento_pago: number | null
+          avg_claridad_necesidades: number | null
+          avg_facilito_condiciones_trabajo: number | null
+          avg_puntualidad_disponibilidad: number | null
+          avg_respeto_profesionalismo_cliente: number | null
           bio: string | null
           created_at: string
           date_of_birth: string | null
@@ -110,12 +163,20 @@ export type Database = {
           last_name_paterno: string | null
           nationality: string | null
           phone: string | null
+          porcentaje_volveria_trabajar_cliente: number | null
+          rating_promedio_cliente: number | null
+          total_reviews_cliente: number | null
           updated_at: string
         }
         Insert: {
           accepted_privacy_at?: string | null
           accepted_terms_at?: string | null
           avatar_url?: string | null
+          avg_claridad_cumplimiento_pago?: number | null
+          avg_claridad_necesidades?: number | null
+          avg_facilito_condiciones_trabajo?: number | null
+          avg_puntualidad_disponibilidad?: number | null
+          avg_respeto_profesionalismo_cliente?: number | null
           bio?: string | null
           created_at?: string
           date_of_birth?: string | null
@@ -127,12 +188,20 @@ export type Database = {
           last_name_paterno?: string | null
           nationality?: string | null
           phone?: string | null
+          porcentaje_volveria_trabajar_cliente?: number | null
+          rating_promedio_cliente?: number | null
+          total_reviews_cliente?: number | null
           updated_at?: string
         }
         Update: {
           accepted_privacy_at?: string | null
           accepted_terms_at?: string | null
           avatar_url?: string | null
+          avg_claridad_cumplimiento_pago?: number | null
+          avg_claridad_necesidades?: number | null
+          avg_facilito_condiciones_trabajo?: number | null
+          avg_puntualidad_disponibilidad?: number | null
+          avg_respeto_profesionalismo_cliente?: number | null
           bio?: string | null
           created_at?: string
           date_of_birth?: string | null
@@ -144,6 +213,9 @@ export type Database = {
           last_name_paterno?: string | null
           nationality?: string | null
           phone?: string | null
+          porcentaje_volveria_trabajar_cliente?: number | null
+          rating_promedio_cliente?: number | null
+          total_reviews_cliente?: number | null
           updated_at?: string
         }
         Relationships: []
@@ -344,6 +416,7 @@ export type Database = {
         Row: {
           activity: string
           category: string
+          client_review_submitted: boolean | null
           created_at: string
           description: string | null
           evidence_urls: string[] | null
@@ -366,6 +439,7 @@ export type Database = {
         Insert: {
           activity: string
           category: string
+          client_review_submitted?: boolean | null
           created_at?: string
           description?: string | null
           evidence_urls?: string[] | null
@@ -388,6 +462,7 @@ export type Database = {
         Update: {
           activity?: string
           category?: string
+          client_review_submitted?: boolean | null
           created_at?: string
           description?: string | null
           evidence_urls?: string[] | null
