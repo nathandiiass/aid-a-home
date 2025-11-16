@@ -256,7 +256,7 @@ export default function SpecialistRequestDetail() {
       {/* Floating Action Button */}
       <button
         onClick={() => navigate(`/specialist/requests/${id}/quote`)}
-        className="fixed bottom-24 right-6 px-6 h-14 bg-rappi-green text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 z-40 flex items-center justify-center font-semibold text-base"
+        className="fixed bottom-24 left-1/2 -translate-x-1/2 px-6 h-14 bg-rappi-green text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 z-40 flex items-center justify-center font-semibold text-base"
       >
         Enviar cotización
       </button>
