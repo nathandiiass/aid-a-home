@@ -46,7 +46,6 @@ interface Activity {
   id: string;
   activity: string;
   price_min: number | null;
-  price_max: number | null;
 }
 
 interface Specialty {
@@ -663,27 +662,15 @@ export default function SpecialistPersonalInfo() {
                             className="rounded-xl border-gray-200 text-sm h-11 font-medium focus:border-rappi-green focus:ring-rappi-green"
                             placeholder="Nombre de la actividad"
                           />
-                          <div className="grid grid-cols-2 gap-3">
-                            <div>
-                              <Label className="text-xs font-medium text-gray-600 mb-1.5 block">Precio mínimo</Label>
-                              <Input
-                                type="number"
-                                value={activity.price_min || ''}
-                                onChange={(e) => handleActivityChange(specialty.id, activity.id, 'price_min', parseFloat(e.target.value) || null)}
-                                className="rounded-xl border-gray-200 text-sm h-10 focus:border-rappi-green focus:ring-rappi-green"
-                                placeholder="$0"
-                              />
-                            </div>
-                            <div>
-                              <Label className="text-xs font-medium text-gray-600 mb-1.5 block">Precio máximo</Label>
-                              <Input
-                                type="number"
-                                value={activity.price_max || ''}
-                                onChange={(e) => handleActivityChange(specialty.id, activity.id, 'price_max', parseFloat(e.target.value) || null)}
-                                className="rounded-xl border-gray-200 text-sm h-10 focus:border-rappi-green focus:ring-rappi-green"
-                                placeholder="$0"
-                              />
-                            </div>
+                          <div>
+                            <Label className="text-xs font-medium text-gray-600 mb-1.5 block">Precio desde</Label>
+                            <Input
+                              type="number"
+                              value={activity.price_min || ''}
+                              onChange={(e) => handleActivityChange(specialty.id, activity.id, 'price_min', parseFloat(e.target.value) || null)}
+                              className="rounded-xl border-gray-200 text-sm h-10 focus:border-rappi-green focus:ring-rappi-green"
+                              placeholder="$0"
+                            />
                           </div>
                         </div>
                       ))}
