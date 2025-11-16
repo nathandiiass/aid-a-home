@@ -621,15 +621,16 @@ export default function SpecialistPersonalInfo() {
               <div className="space-y-2">
                 <Label className="text-xs font-medium text-gray-700">Servicios que ofreces</Label>
                 {specialty.activities.map((activity) => (
-                  <div key={activity.id} className="space-y-2">
-                    <Input
-                      value={activity.activity}
-                      onChange={(e) => handleActivityChange(specialty.id, activity.id, 'activity', e.target.value)}
-                      className="rounded-full border-gray-200 text-sm focus:border-green-500 focus:ring-green-500"
-                      placeholder="Nombre del servicio"
-                    />
+                  <div key={activity.id} className="grid grid-cols-[1fr_110px] gap-2 items-start">
                     <div>
-                      <Label className="text-xs text-gray-600 mb-1 block">Precio mínimo</Label>
+                      <Input
+                        value={activity.activity}
+                        onChange={(e) => handleActivityChange(specialty.id, activity.id, 'activity', e.target.value)}
+                        className="rounded-full border-gray-200 text-sm focus:border-green-500 focus:ring-green-500"
+                        placeholder="Nombre del servicio"
+                      />
+                    </div>
+                    <div>
                       <Input
                         type="number"
                         value={activity.price_min || ''}
