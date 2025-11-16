@@ -373,34 +373,37 @@ export default function SpecialistPersonalInfo() {
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header with blur - Rappi style */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl shadow-sm">
-        <div className="max-w-2xl mx-auto px-4 h-14 flex items-center gap-3">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-gray-100">
+        <div className="max-w-2xl mx-auto px-4 h-16 flex items-center gap-3">
           <button
             onClick={() => navigate('/specialist/account')}
-            className="w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
+            className="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-all active:scale-95"
           >
             <ArrowLeft className="w-5 h-5 text-gray-700" />
           </button>
-          <h1 className="text-lg font-semibold text-gray-900">Información personal</h1>
+          <h1 className="text-xl font-bold text-gray-900">Información personal</h1>
         </div>
       </header>
 
-      <div className="max-w-2xl mx-auto px-4 py-4 space-y-3">
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
         {/* BLOQUE 1: DATOS PERSONALES */}
-        <div className="bg-white rounded-2xl shadow-sm p-5 space-y-5">
-          <h2 className="text-base font-bold text-gray-900">Datos personales</h2>
+        <div className="bg-white rounded-3xl shadow-sm p-6 space-y-6">
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-6 bg-rappi-green rounded-full" />
+            <h2 className="text-lg font-bold text-gray-900">Datos personales</h2>
+          </div>
           
           {/* Avatar */}
-          <div className="flex flex-col items-center gap-2">
-            <div className="relative">
-              <Avatar className="w-20 h-20 border-2 border-gray-100">
+          <div className="flex flex-col items-center gap-3 py-4">
+            <div className="relative group">
+              <Avatar className="w-24 h-24 border-4 border-white shadow-lg ring-2 ring-gray-100">
                 <AvatarImage src={profileData.avatar_url || undefined} />
-                <AvatarFallback className="text-xl bg-gradient-to-br from-primary to-primary/80 text-white">
+                <AvatarFallback className="text-2xl bg-gradient-to-br from-rappi-green to-emerald-600 text-white">
                   {profileData.first_name?.charAt(0)}
                 </AvatarFallback>
               </Avatar>
-              <label className="absolute bottom-0 right-0 w-7 h-7 bg-green-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-green-700 transition-colors shadow-md">
-                <Camera className="w-3.5 h-3.5 text-white" />
+              <label className="absolute bottom-0 right-0 w-9 h-9 bg-rappi-green rounded-full flex items-center justify-center cursor-pointer hover:bg-rappi-green/90 transition-all shadow-lg group-hover:scale-110 active:scale-95">
+                <Camera className="w-4 h-4 text-white" />
                 <input
                   type="file"
                   accept="image/*"
@@ -410,52 +413,52 @@ export default function SpecialistPersonalInfo() {
                 />
               </label>
             </div>
-            <span className="text-xs text-gray-500">Cambiar foto</span>
+            <span className="text-sm text-gray-500 font-medium">Cambiar foto de perfil</span>
           </div>
 
           {/* Read-only fields */}
-          <div className="space-y-3">
-            <div>
-              <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Tipo de persona</Label>
-              <p className="text-sm font-medium text-gray-900 mt-1">
+          <div className="space-y-4">
+            <div className="bg-gray-50 rounded-2xl p-4">
+              <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tipo de persona</Label>
+              <p className="text-base font-semibold text-gray-900 mt-2">
                 {profileData.person_type === 'fisica' ? 'Persona Física' : 'Persona Moral'}
               </p>
             </div>
 
             {profileData.person_type === 'fisica' ? (
               <>
-                <div>
-                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Nombre completo</Label>
-                  <p className="text-sm font-medium text-gray-900 mt-1">{profileData.first_name}</p>
+                <div className="bg-gray-50 rounded-2xl p-4">
+                  <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre completo</Label>
+                  <p className="text-base font-semibold text-gray-900 mt-2">{profileData.first_name}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-gray-50 rounded-2xl p-4">
+                    <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Apellido paterno</Label>
+                    <p className="text-base font-semibold text-gray-900 mt-2">{profileData.last_name_paterno || '—'}</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-2xl p-4">
+                    <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Apellido materno</Label>
+                    <p className="text-base font-semibold text-gray-900 mt-2">{profileData.last_name_materno || '—'}</p>
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Apellido paterno</Label>
-                    <p className="text-sm font-medium text-gray-900 mt-1">{profileData.last_name_paterno || '—'}</p>
-                  </div>
-                  <div>
-                    <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Apellido materno</Label>
-                    <p className="text-sm font-medium text-gray-900 mt-1">{profileData.last_name_materno || '—'}</p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label htmlFor="date_of_birth" className="text-xs font-medium text-gray-700 mb-1.5 block">Fecha de nacimiento</Label>
+                    <Label htmlFor="date_of_birth" className="text-sm font-semibold text-gray-700 mb-2 block">Fecha de nacimiento</Label>
                     <Input
                       id="date_of_birth"
                       type="date"
                       value={profileData.date_of_birth || ''}
                       onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
-                      className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
+                      className="rounded-2xl border-gray-200 text-sm h-12 focus:border-rappi-green focus:ring-rappi-green"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="gender" className="text-xs font-medium text-gray-700 mb-1.5 block">Género</Label>
+                    <Label htmlFor="gender" className="text-sm font-semibold text-gray-700 mb-2 block">Género</Label>
                     <Input
                       id="gender"
                       value={profileData.gender || ''}
                       onChange={(e) => handleInputChange('gender', e.target.value)}
-                      className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
+                      className="rounded-2xl border-gray-200 text-sm h-12 focus:border-rappi-green focus:ring-rappi-green"
                       placeholder="Masculino/Femenino"
                     />
                   </div>
@@ -463,210 +466,259 @@ export default function SpecialistPersonalInfo() {
               </>
             ) : (
               <>
-                <div>
-                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Razón social</Label>
-                  <p className="text-sm font-medium text-gray-900 mt-1">{profileData.razon_social || '—'}</p>
+                <div className="bg-gray-50 rounded-2xl p-4">
+                  <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Razón social</Label>
+                  <p className="text-base font-semibold text-gray-900 mt-2">{profileData.razon_social || '—'}</p>
                 </div>
                 <div>
-                  <Label htmlFor="date_of_birth" className="text-xs font-medium text-gray-700 mb-1.5 block">Fecha de constitución</Label>
+                  <Label htmlFor="date_of_birth" className="text-sm font-semibold text-gray-700 mb-2 block">Fecha de constitución</Label>
                   <Input
                     id="date_of_birth"
                     type="date"
                     value={profileData.date_of_birth || ''}
                     onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
-                    className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
+                    className="rounded-2xl border-gray-200 text-sm h-12 focus:border-rappi-green focus:ring-rappi-green"
                   />
                 </div>
               </>
             )}
 
-            <div>
-              <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">RFC</Label>
-              <p className="text-sm font-medium text-gray-900 mt-1">{profileData.rfc}</p>
+            <div className="bg-gray-50 rounded-2xl p-4">
+              <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">RFC</Label>
+              <p className="text-base font-semibold text-gray-900 mt-2">{profileData.rfc}</p>
             </div>
           </div>
 
           {/* Editable fields */}
-          <div className="space-y-3 pt-3 border-t border-gray-100">
+          <div className="space-y-4 pt-4 border-t border-gray-100">
             <div>
-              <Label htmlFor="phone" className="text-xs font-medium text-gray-700 mb-1.5 block">Teléfono móvil *</Label>
+              <Label htmlFor="phone" className="text-sm font-semibold text-gray-700 mb-2 block">Teléfono móvil *</Label>
               <Input
                 id="phone"
                 value={profileData.phone || ''}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
-                className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
+                className="rounded-2xl border-gray-200 text-sm h-12 focus:border-rappi-green focus:ring-rappi-green"
                 placeholder="Ingresa tu teléfono"
               />
             </div>
 
             <div>
-              <Label htmlFor="email" className="text-xs font-medium text-gray-700 mb-1.5 block">Correo electrónico *</Label>
+              <Label htmlFor="email" className="text-sm font-semibold text-gray-700 mb-2 block">Correo electrónico *</Label>
               <Input
                 id="email"
                 type="email"
                 value={profileData.email || ''}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
+                className="rounded-2xl border-gray-200 text-sm h-12 focus:border-rappi-green focus:ring-rappi-green"
                 placeholder="tu@email.com"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="state" className="text-xs font-medium text-gray-700 mb-1.5 block">Estado *</Label>
+                <Label htmlFor="state" className="text-sm font-semibold text-gray-700 mb-2 block">Estado *</Label>
                 <Input
                   id="state"
                   value={profileData.state || ''}
                   onChange={(e) => handleInputChange('state', e.target.value)}
-                  className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
+                  className="rounded-2xl border-gray-200 text-sm h-12 focus:border-rappi-green focus:ring-rappi-green"
                 />
               </div>
               <div>
-                <Label htmlFor="city" className="text-xs font-medium text-gray-700 mb-1.5 block">Ciudad *</Label>
+                <Label htmlFor="city" className="text-sm font-semibold text-gray-700 mb-2 block">Ciudad *</Label>
                 <Input
                   id="city"
                   value={profileData.city || ''}
                   onChange={(e) => handleInputChange('city', e.target.value)}
-                  className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
+                  className="rounded-2xl border-gray-200 text-sm h-12 focus:border-rappi-green focus:ring-rappi-green"
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="postal_code" className="text-xs font-medium text-gray-700 mb-1.5 block">Código postal</Label>
+              <Label htmlFor="postal_code" className="text-sm font-semibold text-gray-700 mb-2 block">Código postal</Label>
               <Input
                 id="postal_code"
                 value={profileData.postal_code || ''}
                 onChange={(e) => handleInputChange('postal_code', e.target.value)}
-                className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
-                placeholder="97000"
+                className="rounded-2xl border-gray-200 text-sm h-12 focus:border-rappi-green focus:ring-rappi-green"
+                placeholder="00000"
               />
             </div>
 
             <div>
-              <Label htmlFor="street" className="text-xs font-medium text-gray-700 mb-1.5 block">Calle</Label>
+              <Label htmlFor="street" className="text-sm font-semibold text-gray-700 mb-2 block">Calle</Label>
               <Input
                 id="street"
                 value={profileData.street || ''}
                 onChange={(e) => handleInputChange('street', e.target.value)}
-                className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
+                className="rounded-2xl border-gray-200 text-sm h-12 focus:border-rappi-green focus:ring-rappi-green"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="street_number" className="text-xs font-medium text-gray-700 mb-1.5 block">Número</Label>
+                <Label htmlFor="street_number" className="text-sm font-semibold text-gray-700 mb-2 block">Número ext.</Label>
                 <Input
                   id="street_number"
                   value={profileData.street_number || ''}
                   onChange={(e) => handleInputChange('street_number', e.target.value)}
-                  className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
+                  className="rounded-2xl border-gray-200 text-sm h-12 focus:border-rappi-green focus:ring-rappi-green"
                 />
               </div>
               <div>
-                <Label htmlFor="neighborhood" className="text-xs font-medium text-gray-700 mb-1.5 block">Colonia</Label>
+                <Label htmlFor="neighborhood" className="text-sm font-semibold text-gray-700 mb-2 block">Colonia</Label>
                 <Input
                   id="neighborhood"
                   value={profileData.neighborhood || ''}
                   onChange={(e) => handleInputChange('neighborhood', e.target.value)}
-                  className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
+                  className="rounded-2xl border-gray-200 text-sm h-12 focus:border-rappi-green focus:ring-rappi-green"
                 />
               </div>
             </div>
 
-            <p className="text-xs text-gray-500 italic pt-1">
-              Esta es la dirección donde vives actualmente.
-            </p>
+            <div>
+              <Label htmlFor="professional_description" className="text-sm font-semibold text-gray-700 mb-2 block">Descripción profesional</Label>
+              <Textarea
+                id="professional_description"
+                value={profileData.professional_description || ''}
+                onChange={(e) => handleInputChange('professional_description', e.target.value)}
+                className="rounded-2xl border-gray-200 text-sm focus:border-rappi-green focus:ring-rappi-green min-h-[100px]"
+                placeholder="Cuéntanos sobre tu experiencia y servicios..."
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="warranty_days" className="text-sm font-semibold text-gray-700 mb-2 block">Garantía (días)</Label>
+                <Input
+                  id="warranty_days"
+                  type="number"
+                  value={profileData.warranty_days || ''}
+                  onChange={(e) => handleInputChange('warranty_days', parseInt(e.target.value) || null)}
+                  className="rounded-2xl border-gray-200 text-sm h-12 focus:border-rappi-green focus:ring-rappi-green"
+                  placeholder="30"
+                />
+              </div>
+              <div className="flex items-end">
+                <label className="flex items-center gap-3 h-12 px-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-colors w-full">
+                  <input
+                    type="checkbox"
+                    checked={profileData.materials_policy || false}
+                    onChange={(e) => handleInputChange('materials_policy', e.target.checked)}
+                    className="w-5 h-5 rounded border-gray-300 text-rappi-green focus:ring-rappi-green"
+                  />
+                  <span className="text-sm font-medium text-gray-700">Incluye materiales</span>
+                </label>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* BLOQUE 2: DATOS PROFESIONALES */}
-        <div className="bg-white rounded-2xl shadow-sm p-5 space-y-5">
-          <h2 className="text-base font-bold text-gray-900">Datos profesionales</h2>
-
-          <div>
-            <Label htmlFor="professional_description" className="text-xs font-medium text-gray-700 mb-1.5 block">
-              Descripción profesional (máx. 200 caracteres)
-            </Label>
-            <Textarea
-              id="professional_description"
-              value={profileData.professional_description || ''}
-              onChange={(e) => handleInputChange('professional_description', e.target.value.slice(0, 200))}
-              className="rounded-2xl min-h-[70px] border-gray-200 focus:border-green-500 focus:ring-green-500 text-sm"
-              placeholder="Cuéntanos sobre tu experiencia..."
-              maxLength={200}
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              {profileData.professional_description?.length || 0}/200
-            </p>
+        {/* BLOQUE 2: ESPECIALIDADES Y ZONAS */}
+        <div className="bg-white rounded-3xl shadow-sm p-6 space-y-6">
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-6 bg-rappi-green rounded-full" />
+            <h2 className="text-lg font-bold text-gray-900">Especialidades y servicios</h2>
           </div>
 
-          {/* Specialties - Editable */}
-          {specialties.map((specialty) => (
-            <div key={specialty.id} className="p-4 bg-gray-50 rounded-2xl space-y-3">
-              <div className="flex items-center justify-between gap-2">
-                <h3 className="font-bold text-gray-900 text-sm">{specialty.role_label}</h3>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    value={specialty.experience_years || 0}
-                    onChange={(e) => handleSpecialtyChange(specialty.id, 'experience_years', parseInt(e.target.value))}
-                    className="w-16 h-8 rounded-full border-gray-200 text-center text-xs font-medium"
-                    min="0"
-                  />
-                  <span className="text-xs text-gray-600">años</span>
+          <div className="space-y-4">
+            {specialties.map((specialty) => (
+              <div key={specialty.id} className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl p-5 space-y-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    <Badge variant="outline" className="mb-2 bg-white border-rappi-green/20 text-rappi-green font-semibold">
+                      {specialty.role_label}
+                    </Badge>
+                    <h3 className="font-bold text-gray-900 text-lg">{specialty.specialty}</h3>
+                  </div>
+                  <button
+                    onClick={() => setEditingSpecialty(editingSpecialty === specialty.id ? null : specialty.id)}
+                    className="w-9 h-9 rounded-full bg-white hover:bg-gray-50 flex items-center justify-center transition-all active:scale-95 shadow-sm"
+                  >
+                    <ChevronRight className={`w-4 h-4 text-gray-600 transition-transform ${editingSpecialty === specialty.id ? 'rotate-90' : ''}`} />
+                  </button>
                 </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label className="text-xs font-medium text-gray-700">Servicios que ofreces</Label>
-                {specialty.activities.map((activity) => (
-                  <div key={activity.id} className="grid grid-cols-[1fr_110px] gap-2 items-start">
+
+                {editingSpecialty === specialty.id && (
+                  <div className="space-y-4 pt-2">
                     <div>
-                      <Input
-                        value={activity.activity}
-                        onChange={(e) => handleActivityChange(specialty.id, activity.id, 'activity', e.target.value)}
-                        className="rounded-full border-gray-200 text-sm focus:border-green-500 focus:ring-green-500"
-                        placeholder="Nombre del servicio"
-                      />
-                    </div>
-                    <div>
+                      <Label className="text-sm font-semibold text-gray-700 mb-2 block">Años de experiencia</Label>
                       <Input
                         type="number"
-                        value={activity.price_min || ''}
-                        onChange={(e) => handleActivityChange(specialty.id, activity.id, 'price_min', e.target.value ? parseFloat(e.target.value) : null)}
-                        className="rounded-full border-gray-200 text-sm focus:border-green-500 focus:ring-green-500"
-                        placeholder="$0"
+                        value={specialty.experience_years || ''}
+                        onChange={(e) => handleSpecialtyChange(specialty.id, 'experience_years', parseInt(e.target.value) || null)}
+                        className="rounded-2xl border-gray-200 bg-white text-sm h-12 focus:border-rappi-green focus:ring-rappi-green"
+                        placeholder="5"
                       />
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
 
-          {/* Work Zones - Editable */}
-          <div>
-            <Label className="text-xs font-medium text-gray-700 mb-2 block">Zona de cobertura</Label>
+                    <div className="space-y-3">
+                      <Label className="text-sm font-semibold text-gray-700">Actividades</Label>
+                      {specialty.activities.map((activity) => (
+                        <div key={activity.id} className="bg-white rounded-xl p-4 space-y-3 shadow-sm">
+                          <Input
+                            value={activity.activity}
+                            onChange={(e) => handleActivityChange(specialty.id, activity.id, 'activity', e.target.value)}
+                            className="rounded-xl border-gray-200 text-sm h-11 font-medium focus:border-rappi-green focus:ring-rappi-green"
+                            placeholder="Nombre de la actividad"
+                          />
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label className="text-xs font-medium text-gray-600 mb-1.5 block">Precio mínimo</Label>
+                              <Input
+                                type="number"
+                                value={activity.price_min || ''}
+                                onChange={(e) => handleActivityChange(specialty.id, activity.id, 'price_min', parseFloat(e.target.value) || null)}
+                                className="rounded-xl border-gray-200 text-sm h-10 focus:border-rappi-green focus:ring-rappi-green"
+                                placeholder="$0"
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-xs font-medium text-gray-600 mb-1.5 block">Precio máximo</Label>
+                              <Input
+                                type="number"
+                                value={activity.price_max || ''}
+                                onChange={(e) => handleActivityChange(specialty.id, activity.id, 'price_max', parseFloat(e.target.value) || null)}
+                                className="rounded-xl border-gray-200 text-sm h-10 focus:border-rappi-green focus:ring-rappi-green"
+                                placeholder="$0"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="pt-4 border-t border-gray-100">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-1 h-6 bg-emerald-500 rounded-full" />
+              <h3 className="text-base font-bold text-gray-900">Zonas de trabajo</h3>
+            </div>
             <div className="space-y-3">
               {workZones.map((zone) => (
-                <div key={zone.id} className="p-3 bg-gray-50 rounded-xl space-y-2">
-                  <p className="font-semibold text-sm text-gray-900">{zone.state}</p>
+                <div key={zone.id} className="bg-gradient-to-br from-emerald-50 to-emerald-100/30 rounded-2xl p-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">
+                      {zone.state}
+                    </Badge>
+                  </div>
                   <div>
-                    <Label className="text-xs text-gray-600 mb-1.5 block">Municipios (separados por coma)</Label>
+                    <Label className="text-sm font-semibold text-gray-700 mb-2 block">Ciudades (separadas por coma)</Label>
                     <Textarea
                       value={zone.cities.join(', ')}
-                      onChange={(e) => {
-                        const cities = e.target.value.split(',').map(c => c.trim()).filter(c => c);
-                        handleWorkZoneChange(zone.id, cities);
-                      }}
-                      className="rounded-2xl border-gray-200 text-sm focus:border-green-500 focus:ring-green-500 min-h-[60px]"
+                      onChange={(e) => handleWorkZoneChange(zone.id, e.target.value.split(',').map(c => c.trim()).filter(Boolean))}
+                      className="rounded-2xl border-gray-200 bg-white text-sm focus:border-emerald-500 focus:ring-emerald-500 min-h-[60px]"
                       placeholder="Mérida, Progreso, Valladolid..."
                     />
                   </div>
-                  <div className="flex flex-wrap gap-1.5 pt-1">
+                  <div className="flex flex-wrap gap-2">
                     {zone.cities.map((city, idx) => (
-                      <Badge key={idx} variant="outline" className="rounded-full text-xs border-gray-300 bg-white">
+                      <Badge key={idx} variant="outline" className="bg-white border-emerald-200 text-emerald-700 font-medium">
                         {city}
                       </Badge>
                     ))}
@@ -678,27 +730,30 @@ export default function SpecialistPersonalInfo() {
         </div>
 
         {/* BLOQUE 3: DOCUMENTACIÓN */}
-        <div className="bg-white rounded-2xl shadow-sm p-5 space-y-3">
-          <h2 className="text-base font-bold text-gray-900">Documentación para validación</h2>
-          <p className="text-xs text-gray-500">
+        <div className="bg-white rounded-3xl shadow-sm p-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-6 bg-amber-500 rounded-full" />
+            <h2 className="text-lg font-bold text-gray-900">Documentación para validación</h2>
+          </div>
+          <p className="text-sm text-gray-500">
             La documentación no puede ser modificada una vez enviada.
           </p>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             {profileData.id_document_url && (
               <a
                 href={profileData.id_document_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors active:scale-[0.98]"
+                className="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl hover:shadow-md transition-all active:scale-[0.98] group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center">
-                    <FileText className="w-4 h-4 text-green-600" />
+                  <div className="w-11 h-11 rounded-2xl bg-amber-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <FileText className="w-5 h-5 text-amber-600" />
                   </div>
-                  <span className="text-sm font-medium text-gray-900">Identificación oficial</span>
+                  <span className="text-sm font-semibold text-gray-900">Identificación oficial</span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
+                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-amber-600 transition-colors" />
               </a>
             )}
 
@@ -707,15 +762,15 @@ export default function SpecialistPersonalInfo() {
                 href={profileData.csf_document_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors active:scale-[0.98]"
+                className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl hover:shadow-md transition-all active:scale-[0.98] group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center">
-                    <FileText className="w-4 h-4 text-green-600" />
+                  <div className="w-11 h-11 rounded-2xl bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <FileText className="w-5 h-5 text-blue-600" />
                   </div>
-                  <span className="text-sm font-medium text-gray-900">Constancia de Situación Fiscal</span>
+                  <span className="text-sm font-semibold text-gray-900">Constancia de Situación Fiscal</span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
+                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
               </a>
             )}
 
@@ -724,15 +779,15 @@ export default function SpecialistPersonalInfo() {
                 href={profileData.address_proof_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors active:scale-[0.98]"
+                className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl hover:shadow-md transition-all active:scale-[0.98] group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center">
-                    <FileText className="w-4 h-4 text-green-600" />
+                  <div className="w-11 h-11 rounded-2xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <FileText className="w-5 h-5 text-purple-600" />
                   </div>
-                  <span className="text-sm font-medium text-gray-900">Comprobante de domicilio</span>
+                  <span className="text-sm font-semibold text-gray-900">Comprobante de domicilio</span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
+                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" />
               </a>
             )}
           </div>
@@ -741,11 +796,11 @@ export default function SpecialistPersonalInfo() {
 
       {/* Floating Save Button - Rappi Style */}
       {hasChanges && (
-        <div className="fixed bottom-20 left-0 right-0 flex justify-center px-4 z-40 animate-in slide-in-from-bottom duration-300">
+        <div className="fixed bottom-24 left-0 right-0 flex justify-center px-4 z-40 animate-in slide-in-from-bottom duration-300">
           <Button
             onClick={handleSave}
             disabled={saving}
-            className="rounded-full px-10 py-6 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.16)] transition-all bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold text-base active:scale-95"
+            className="h-14 px-8 bg-rappi-green hover:bg-rappi-green/90 text-white font-bold rounded-full shadow-2xl hover:shadow-rappi-green/50 transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
           >
             <Save className="w-5 h-5 mr-2" />
             {saving ? 'Guardando...' : 'Guardar cambios'}
