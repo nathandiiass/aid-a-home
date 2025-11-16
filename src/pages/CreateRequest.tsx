@@ -162,30 +162,28 @@ const CreateRequest = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-foreground">Cargando...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-gray-50 pb-20">
       <Logo className="pt-4 pb-2" />
       
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-card border-b border-border">
-        <div className="container max-w-2xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
+      <div className="sticky top-0 z-10 bg-white shadow-sm">
+        <div className="max-w-lg mx-auto px-4 py-4">
+          <div className="flex items-center gap-3">
+            <button
               onClick={() => step === 0 ? navigate("/") : prevStep()}
-              className="shrink-0"
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
             >
               <ChevronLeft className="w-6 h-6" />
-            </Button>
+            </button>
             <div className="flex-1 min-w-0">
-              <h1 className="text-lg font-semibold truncate">
+              <h1 className="text-lg font-bold truncate">
                 {requestData.actividad || "Nueva solicitud"}
               </h1>
               <p className="text-sm text-muted-foreground truncate">
@@ -199,8 +197,8 @@ const CreateRequest = () => {
             {[0, 1, 2, 3, 4].map((s) => (
               <div
                 key={s}
-                className={`h-1 flex-1 rounded-full transition-colors ${
-                  s <= step ? "bg-primary" : "bg-muted"
+                className={`h-1.5 flex-1 rounded-full transition-colors ${
+                  s <= step ? "bg-rappi-green" : "bg-gray-200"
                 }`}
               />
             ))}
@@ -209,9 +207,9 @@ const CreateRequest = () => {
       </div>
 
       {/* Content */}
-      <div className="container max-w-2xl mx-auto px-4 py-6">
+      <div className="max-w-lg mx-auto px-4 py-6">
         {step === 0 && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <ServiceSelector
               especialista={requestData.especialista}
               actividad={requestData.actividad}
@@ -234,8 +232,7 @@ const CreateRequest = () => {
                 !requestData.serviceDescription?.trim() ||
                 requestData.serviceDescription.trim().length < 20
               }
-              className="w-full h-12 text-base"
-              size="lg"
+              className="w-full bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-12 font-semibold disabled:opacity-50"
             >
               Continuar
             </Button>
