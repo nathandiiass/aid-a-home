@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Card } from "@/components/ui/card";
 import { RequestData } from "@/pages/CreateRequest";
 
 interface BudgetStepProps {
@@ -49,17 +48,17 @@ const BudgetStep = ({ data, updateData, onNext }: BudgetStepProps) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Presupuesto</h2>
-        <p className="text-muted-foreground">
+    <div className="space-y-4">
+      <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
+        <h2 className="text-xl font-bold mb-2">Presupuesto</h2>
+        <p className="text-muted-foreground text-sm">
           Establece tu rango de presupuesto o deja que los especialistas propongan
         </p>
       </div>
 
       {/* Budget range */}
-      <div className="space-y-4">
-        <Label>Estoy dispuesto a pagar</Label>
+      <div className="bg-white rounded-2xl shadow-lg border-0 p-6 space-y-4">
+        <Label className="text-sm font-semibold">Estoy dispuesto a pagar</Label>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="min-budget" className="text-sm text-muted-foreground">
@@ -79,7 +78,7 @@ const BudgetStep = ({ data, updateData, onNext }: BudgetStepProps) => {
                   setError("");
                 }}
                 disabled={noBudget}
-                className="pl-7"
+                className="pl-7 h-12"
               />
             </div>
           </div>
@@ -101,7 +100,7 @@ const BudgetStep = ({ data, updateData, onNext }: BudgetStepProps) => {
                   setError("");
                 }}
                 disabled={noBudget}
-                className="pl-7"
+                className="pl-7 h-12"
               />
             </div>
           </div>
@@ -110,32 +109,33 @@ const BudgetStep = ({ data, updateData, onNext }: BudgetStepProps) => {
       </div>
 
       {/* No budget option */}
-      <div className="flex items-start space-x-3 p-4 bg-muted/50 rounded-lg">
-        <Checkbox
-          id="no-budget"
-          checked={noBudget}
-          onCheckedChange={(checked) => {
-            setNoBudget(checked as boolean);
-            setError("");
-          }}
-        />
-        <div className="space-y-1">
-          <Label
-            htmlFor="no-budget"
-            className="text-sm font-medium cursor-pointer"
-          >
-            Sin presupuesto definido
-          </Label>
-          <p className="text-xs text-muted-foreground">
-            Deja que los especialistas propongan sus cotizaciones
-          </p>
+      <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
+        <div className="flex items-start space-x-3">
+          <Checkbox
+            id="no-budget"
+            checked={noBudget}
+            onCheckedChange={(checked) => {
+              setNoBudget(checked as boolean);
+              setError("");
+            }}
+          />
+          <div className="flex-1">
+            <Label
+              htmlFor="no-budget"
+              className="text-sm font-semibold cursor-pointer"
+            >
+              Sin presupuesto definido
+            </Label>
+            <p className="text-xs text-muted-foreground mt-1">
+              Deja que los especialistas propongan sus cotizaciones
+            </p>
+          </div>
         </div>
       </div>
 
       <Button
         onClick={handleContinue}
-        className="w-full h-12 text-base bg-primary hover:bg-primary/90"
-        size="lg"
+        className="w-full bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-12 font-semibold"
       >
         Continuar
       </Button>
