@@ -138,13 +138,13 @@ export default function SpecialistRequestDetail() {
           {/* Details */}
           <div className="space-y-4">
             {/* Especialista necesario */}
-            <Card className="bg-white rounded-2xl shadow-sm border-0 p-5">
+            <Card className="bg-white rounded-2xl shadow-md border-0 p-5 hover:shadow-xl transition-all">
               <h3 className="text-sm font-semibold text-foreground/60 mb-2">Especialista necesario</h3>
               <p className="text-lg font-bold text-foreground">{request.category}</p>
             </Card>
 
             {/* Título del servicio */}
-            <Card className="bg-white rounded-2xl shadow-sm border-0 p-5">
+            <Card className="bg-white rounded-2xl shadow-md border-0 p-5 hover:shadow-xl transition-all">
               <h3 className="text-sm font-semibold text-foreground/60 mb-2">Título del servicio</h3>
               <p className="text-lg font-bold text-foreground">
                 {request.service_title || request.activity}
@@ -153,14 +153,14 @@ export default function SpecialistRequestDetail() {
 
             {/* Descripción del servicio */}
             {(request.service_description || request.description) && (
-              <Card className="bg-white rounded-2xl shadow-sm border-0 p-5">
+              <Card className="bg-white rounded-2xl shadow-md border-0 p-5 hover:shadow-xl transition-all">
                 <h3 className="text-sm font-semibold text-foreground/60 mb-3">Descripción del servicio</h3>
                 <p className="text-foreground leading-relaxed">{request.service_description || request.description}</p>
               </Card>
             )}
 
             {/* Presupuesto */}
-            <Card className="bg-white rounded-2xl shadow-sm border-0 p-5">
+            <Card className="bg-white rounded-2xl shadow-md border-0 p-5 hover:shadow-xl transition-all">
               <h3 className="text-sm font-semibold text-foreground/60 mb-3">Presupuesto</h3>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-foreground/50 uppercase tracking-wide">Rango</span>
@@ -177,7 +177,7 @@ export default function SpecialistRequestDetail() {
             </Card>
 
             {/* Fecha y Horario */}
-            <Card className="bg-white rounded-2xl shadow-sm border-0 p-5 space-y-4">
+            <Card className="bg-white rounded-2xl shadow-md border-0 p-5 space-y-4 hover:shadow-xl transition-all">
               <h3 className="text-sm font-semibold text-foreground/60 mb-1">Fecha y horario</h3>
               
               {request.scheduled_date && (
@@ -212,7 +212,7 @@ export default function SpecialistRequestDetail() {
 
             {/* Ubicación aproximada */}
             {request.locations && (
-              <Card className="bg-white rounded-2xl shadow-sm border-0 p-5">
+              <Card className="bg-white rounded-2xl shadow-md border-0 p-5 hover:shadow-xl transition-all">
                 <h3 className="text-sm font-semibold text-foreground/60 mb-3">Ubicación aproximada</h3>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
@@ -226,7 +226,7 @@ export default function SpecialistRequestDetail() {
             )}
 
             {request.evidence_urls && request.evidence_urls.length > 0 && (
-              <Card className="bg-white rounded-2xl shadow-sm border-0 p-5">
+              <Card className="bg-white rounded-2xl shadow-md border-0 p-5 hover:shadow-xl transition-all">
                 <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
                   <ImageIcon className="w-5 h-5" />
                   Evidencias
@@ -244,7 +244,7 @@ export default function SpecialistRequestDetail() {
               </Card>
             )}
 
-            <Card className="bg-blue-50 rounded-2xl shadow-sm border-0 border-l-4 border-blue-500 p-5">
+            <Card className="bg-blue-50 rounded-2xl shadow-md border-0 border-l-4 border-blue-500 p-5">
               <p className="text-sm text-foreground/80">
                 Los datos exactos del cliente se mostrarán al enviar la cotización.
               </p>
