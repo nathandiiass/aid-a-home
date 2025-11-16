@@ -72,7 +72,7 @@ export function CompletedOrderCard({ order, onReviewSubmitted }: CompletedOrderC
 
         <div className="flex gap-2 pt-2">
           <Button 
-            onClick={() => navigate(`/specialist/request/${request?.id}`)}
+            onClick={() => navigate(`/specialist/requests/${request?.id}`)}
             variant="outline" 
             className="flex-1 rounded-full border-2 border-gray-300 hover:bg-gray-50 h-10 font-semibold" 
             size="sm"
