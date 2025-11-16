@@ -786,27 +786,37 @@ export default function SpecialistRegistration() {
         )}
 
         {step === 2 && (
-          <div className="space-y-6">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Especialidades y Servicios</h2>
-              <p className="text-sm text-muted-foreground">Selecciona tus áreas de especialización</p>
+          <div className="space-y-8">
+            {/* Header */}
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold text-foreground">Especialidades y Servicios</h2>
+              <p className="text-muted-foreground">Selecciona tus áreas de especialización y los servicios que ofreces</p>
             </div>
 
-            <div className="space-y-4">
-              <Label>Especialista en: * (Selección múltiple)</Label>
-              <div className="grid grid-cols-1 gap-4">
+            {/* Selección de especialidades */}
+            <div className="bg-white rounded-xl border-2 border-border p-6 space-y-6">
+              <div className="space-y-2">
+                <Label className="text-lg font-semibold">Especialista en: *</Label>
+                <p className="text-sm text-muted-foreground">Puedes seleccionar múltiples especialidades</p>
+              </div>
+
+              <div className="space-y-6">
                 {availableSpecialties.map(([category, specialties]) => (
-                  <div key={category} className="space-y-2">
-                    <h3 className="font-semibold text-sm text-primary">{category}</h3>
-                    <div className="grid grid-cols-1 gap-2 ml-4">
+                  <div key={category} className="space-y-3">
+                    <h3 className="font-bold text-base text-rappi-green uppercase tracking-wide">{category}</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {specialties.map((specialty) => (
-                        <div key={specialty} className="flex items-center space-x-2 p-2 border rounded hover:bg-accent">
+                        <div 
+                          key={specialty} 
+                          className="flex items-center space-x-3 p-4 border-2 border-border rounded-lg hover:border-rappi-green hover:bg-rappi-green/5 transition-all cursor-pointer"
+                          onClick={() => toggleSpecialtySelection(specialty)}
+                        >
                           <Checkbox
                             id={`specialty-${specialty}`}
                             checked={selectedSpecialties.includes(specialty)}
                             onCheckedChange={() => toggleSpecialtySelection(specialty)}
                           />
-                          <Label htmlFor={`specialty-${specialty}`} className="flex-1 cursor-pointer font-normal">
+                          <Label htmlFor={`specialty-${specialty}`} className="flex-1 cursor-pointer font-medium">
                             {specialty}
                           </Label>
                         </div>
@@ -814,207 +824,285 @@ export default function SpecialistRegistration() {
                     </div>
                   </div>
                 ))}
-                <div className="flex items-center space-x-2 p-2 border rounded hover:bg-accent">
-                  <Checkbox
-                    id="specialty-otro"
-                    checked={showOtherSpecialty}
-                    onCheckedChange={() => toggleSpecialtySelection('Otro')}
-                  />
-                  <Label htmlFor="specialty-otro" className="flex-1 cursor-pointer font-normal">
-                    Otro / Otra especialidad
-                  </Label>
-                </div>
-                {showOtherSpecialty && (
-                  <div className="ml-6 flex gap-2">
-                    <Input
-                      placeholder="Escribe tu especialidad"
-                      value={otherSpecialtyText}
-                      onChange={(e) => setOtherSpecialtyText(e.target.value)}
+
+                {/* Otra especialidad */}
+                <div className="pt-4 border-t-2 border-border">
+                  <div 
+                    className="flex items-center space-x-3 p-4 border-2 border-border rounded-lg hover:border-rappi-green hover:bg-rappi-green/5 transition-all cursor-pointer"
+                    onClick={() => toggleSpecialtySelection('Otro')}
+                  >
+                    <Checkbox
+                      id="specialty-otro"
+                      checked={showOtherSpecialty}
+                      onCheckedChange={() => toggleSpecialtySelection('Otro')}
                     />
-                    <Button onClick={handleOtherSpecialtyAdd} variant="outline" size="sm">
-                      Agregar
-                    </Button>
+                    <Label htmlFor="specialty-otro" className="flex-1 cursor-pointer font-medium">
+                      Otra especialidad
+                    </Label>
                   </div>
-                )}
+                  {showOtherSpecialty && (
+                    <div className="mt-3 ml-12 flex gap-2">
+                      <Input
+                        placeholder="Escribe tu especialidad"
+                        value={otherSpecialtyText}
+                        onChange={(e) => setOtherSpecialtyText(e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button onClick={handleOtherSpecialtyAdd} className="bg-rappi-green hover:bg-rappi-green/90 text-white">
+                        Agregar
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
-            {specialtiesData.map((specData) => {
-              const displayName = specData.customSpecialty || specData.specialty;
-              
-              return (
-                <div key={specData.id} className="p-4 border rounded-lg space-y-4 bg-card">
-                  <h3 className="font-semibold text-lg">{displayName}</h3>
-
-                  <div className="space-y-2">
-                    <Label>Años de experiencia *</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={specData.experienceYears}
-                      onChange={(e) => updateSpecialtyData(displayName, 'experienceYears', e.target.value)}
-                      placeholder="Ej: 5"
-                    />
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <Label>Servicios que ofrece *</Label>
-                      <Button 
-                        onClick={() => addServiceToSpecialty(specData.id)} 
-                        variant="outline" 
-                        size="sm"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Agregar Servicio
-                      </Button>
-                    </div>
-                    
-                    {specData.services.length === 0 && (
-                      <p className="text-sm text-muted-foreground">
-                        No hay servicios agregados. Agrega al menos un servicio.
-                      </p>
-                    )}
-                    
-                    <div className="space-y-3">
-                      {specData.services.map((service, idx) => (
-                        <div key={service.id} className="p-4 border rounded-lg space-y-3 bg-muted/20">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 space-y-2">
-                              <Label className="text-sm">Nombre del servicio *</Label>
-                              <Input
-                                value={service.name}
-                                onChange={(e) => updateService(specData.id, service.id, 'name', e.target.value)}
-                                placeholder="Ej: Instalación de minisplit"
-                              />
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => removeServiceFromSpecialty(specData.id, service.id)}
-                              className="mt-6"
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="space-y-2">
-                              <Label className="text-sm">Precio Mínimo (opcional)</Label>
-                              <Input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                value={service.priceMin}
-                                onChange={(e) => updateService(specData.id, service.id, 'priceMin', e.target.value)}
-                                placeholder="$ 0.00"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label className="text-sm">Precio Máximo (opcional)</Label>
-                              <Input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                value={service.priceMax}
-                                onChange={(e) => updateService(specData.id, service.id, 'priceMax', e.target.value)}
-                                placeholder="$ 0.00"
-                              />
-                            </div>
-                          </div>
-                          
-                          {service.priceMin && service.priceMax && parseFloat(service.priceMin) > parseFloat(service.priceMax) && (
-                            <p className="text-sm text-destructive">
-                              El precio mínimo no puede ser mayor al precio máximo
-                            </p>
-                          )}
+            {/* Detalles de especialidades seleccionadas */}
+            {specialtiesData.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold text-foreground">Detalles de tus especialidades</h3>
+                {specialtiesData.map((specData) => {
+                  const displayName = specData.customSpecialty || specData.specialty;
+                  
+                  return (
+                    <div key={specData.id} className="bg-white rounded-xl border-2 border-border p-6 space-y-6">
+                      {/* Header de la especialidad */}
+                      <div className="flex items-center gap-3 pb-4 border-b-2 border-border">
+                        <div className="w-10 h-10 rounded-full bg-rappi-green/10 flex items-center justify-center">
+                          <span className="text-rappi-green font-bold text-lg">✓</span>
                         </div>
-                      ))}
-                    </div>
-                    
-                    <p className="text-sm text-muted-foreground">
-                      {specData.services.length} servicio(s) agregado(s)
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+                        <h4 className="text-xl font-bold text-foreground flex-1">{displayName}</h4>
+                      </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="professionalDescription">Descripción Profesional * (máx 200 caracteres)</Label>
+                      {/* Años de experiencia */}
+                      <div className="space-y-2">
+                        <Label className="text-base font-semibold">Años de experiencia *</Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          value={specData.experienceYears}
+                          onChange={(e) => updateSpecialtyData(displayName, 'experienceYears', e.target.value)}
+                          placeholder="Ejemplo: 5"
+                          className="max-w-xs"
+                        />
+                      </div>
+
+                      {/* Servicios */}
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            <Label className="text-base font-semibold">Servicios que ofreces *</Label>
+                            <p className="text-sm text-muted-foreground">Agrega los servicios específicos de esta especialidad</p>
+                          </div>
+                          <Button 
+                            onClick={() => addServiceToSpecialty(specData.id)} 
+                            className="bg-rappi-green hover:bg-rappi-green/90 text-white"
+                            size="sm"
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Agregar
+                          </Button>
+                        </div>
+                        
+                        {specData.services.length === 0 && (
+                          <div className="p-4 bg-muted/50 border-2 border-dashed border-border rounded-lg text-center">
+                            <p className="text-sm text-muted-foreground">
+                              No hay servicios agregados. Agrega al menos un servicio para continuar.
+                            </p>
+                          </div>
+                        )}
+                        
+                        <div className="space-y-3">
+                          {specData.services.map((service, idx) => (
+                            <div key={service.id} className="bg-muted/30 rounded-lg border-2 border-border p-5 space-y-4">
+                              {/* Nombre del servicio */}
+                              <div className="space-y-2">
+                                <div className="flex items-start justify-between gap-2">
+                                  <Label className="text-sm font-semibold">Nombre del servicio *</Label>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => removeServiceFromSpecialty(specData.id, service.id)}
+                                    className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                                <Input
+                                  value={service.name}
+                                  onChange={(e) => updateService(specData.id, service.id, 'name', e.target.value)}
+                                  placeholder="Ejemplo: Instalación de minisplit"
+                                />
+                              </div>
+                              
+                              {/* Precios */}
+                              <div className="space-y-2">
+                                <Label className="text-sm font-semibold">Rango de precios (opcional)</Label>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                  <div className="space-y-2">
+                                    <Label className="text-xs text-muted-foreground">Precio Mínimo</Label>
+                                    <div className="relative">
+                                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                                      <Input
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        value={service.priceMin}
+                                        onChange={(e) => updateService(specData.id, service.id, 'priceMin', e.target.value)}
+                                        placeholder="0.00"
+                                        className="pl-7"
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label className="text-xs text-muted-foreground">Precio Máximo</Label>
+                                    <div className="relative">
+                                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                                      <Input
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        value={service.priceMax}
+                                        onChange={(e) => updateService(specData.id, service.id, 'priceMax', e.target.value)}
+                                        placeholder="0.00"
+                                        className="pl-7"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                {service.priceMin && service.priceMax && parseFloat(service.priceMin) > parseFloat(service.priceMax) && (
+                                  <p className="text-sm text-destructive">
+                                    El precio mínimo no puede ser mayor al precio máximo
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <p className="text-sm text-muted-foreground">
+                          {specData.services.length} servicio(s) agregado(s)
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Descripción profesional */}
+            <div className="bg-white rounded-xl border-2 border-border p-6 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="professionalDescription" className="text-base font-semibold">Descripción Profesional *</Label>
+                <p className="text-sm text-muted-foreground">Describe brevemente tu experiencia (máx 200 caracteres)</p>
+              </div>
               <Textarea
                 id="professionalDescription"
                 value={professionalDescription}
                 onChange={(e) => setProfessionalDescription(e.target.value)}
                 placeholder="Describe brevemente tu experiencia profesional..."
                 maxLength={200}
-                rows={3}
+                rows={4}
                 className="resize-none"
               />
-              <p className="text-sm text-muted-foreground">{professionalDescription.length}/200</p>
+              <p className="text-sm text-muted-foreground text-right">{professionalDescription.length}/200</p>
             </div>
 
-            <div className="space-y-4">
-              <Label>Licencias / Certificaciones (Opcional)</Label>
-              {licenses.map((license) => (
-                <div key={license.id} className="p-4 border rounded-lg space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label>Licencia/Certificación</Label>
-                    <Button variant="ghost" size="sm" onClick={() => removeLicense(license.id)}>
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <Input
-                    placeholder="Nombre de la licencia o certificación"
-                    value={license.name}
-                    onChange={(e) => updateLicense(license.id, 'name', e.target.value)}
-                  />
-                  <Input
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={(e) => e.target.files?.[0] && updateLicense(license.id, 'file', e.target.files[0])}
-                  />
-                  {license.file && (
-                    <p className="text-sm text-muted-foreground">✓ {license.file.name}</p>
-                  )}
+            {/* Licencias y certificaciones */}
+            <div className="bg-white rounded-xl border-2 border-border p-6 space-y-4">
+              <div className="space-y-2">
+                <Label className="text-base font-semibold">Licencias / Certificaciones</Label>
+                <p className="text-sm text-muted-foreground">Agrega tus licencias o certificaciones (opcional)</p>
+              </div>
+
+              {licenses.length > 0 && (
+                <div className="space-y-3">
+                  {licenses.map((license) => (
+                    <div key={license.id} className="p-4 border-2 border-border rounded-lg space-y-3 bg-muted/20">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-sm font-semibold">Licencia/Certificación</Label>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => removeLicense(license.id)}
+                          className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <Input
+                        placeholder="Nombre de la licencia o certificación"
+                        value={license.name}
+                        onChange={(e) => updateLicense(license.id, 'name', e.target.value)}
+                      />
+                      <Input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => e.target.files?.[0] && updateLicense(license.id, 'file', e.target.files[0])}
+                      />
+                      {license.file && (
+                        <p className="text-sm text-rappi-green flex items-center gap-2">
+                          <span>✓</span> {license.file.name}
+                        </p>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
-              <Button onClick={addLicense} variant="outline" className="w-full">
+              )}
+
+              <Button 
+                onClick={addLicense} 
+                variant="outline" 
+                className="w-full border-2 hover:border-rappi-green hover:text-rappi-green"
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Agregar Licencia/Certificación
               </Button>
             </div>
 
-            <div className="space-y-4">
-              <Label>Zona de Cobertura *</Label>
+            {/* Zona de cobertura */}
+            <div className="bg-white rounded-xl border-2 border-border p-6 space-y-4">
               <div className="space-y-2">
-                <Label>Estado: Yucatán</Label>
-                <Label className="text-sm text-muted-foreground">Municipios:</Label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-60 overflow-y-auto p-2 border rounded">
-                  {YUCATAN_MUNICIPALITIES.map((municipality) => (
-                    <div key={municipality} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`muni-${municipality}`}
-                        checked={selectedMunicipalities.includes(municipality)}
-                        onCheckedChange={() => toggleMunicipality(municipality)}
-                      />
-                      <Label htmlFor={`muni-${municipality}`} className="text-sm cursor-pointer font-normal">
-                        {municipality}
-                      </Label>
-                    </div>
-                  ))}
+                <Label className="text-base font-semibold">Zona de Cobertura *</Label>
+                <p className="text-sm text-muted-foreground">Selecciona los municipios donde ofreces tus servicios</p>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="font-semibold">Estado:</span>
+                  <span className="text-rappi-green">Yucatán</span>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {selectedMunicipalities.length} municipio(s) seleccionado(s)
-                </p>
+                
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold">Municipios:</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-60 overflow-y-auto p-3 bg-muted/20 border-2 border-border rounded-lg">
+                    {YUCATAN_MUNICIPALITIES.map((municipality) => (
+                      <div key={municipality} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`muni-${municipality}`}
+                          checked={selectedMunicipalities.includes(municipality)}
+                          onCheckedChange={() => toggleMunicipality(municipality)}
+                        />
+                        <Label htmlFor={`muni-${municipality}`} className="text-sm cursor-pointer font-normal">
+                          {municipality}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedMunicipalities.length} municipio(s) seleccionado(s)
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="flex gap-4">
+            {/* Botones de navegación */}
+            <div className="flex gap-4 pt-4">
               <Button 
                 onClick={() => setStep(step - 1)} 
                 variant="outline" 
-                className="w-full h-12 border-2 hover:border-rappi-green hover:text-rappi-green rounded-full"
+                className="w-full h-12 border-2 hover:border-rappi-green hover:text-rappi-green rounded-full font-semibold"
               >
                 Atrás
               </Button>
@@ -1027,7 +1115,7 @@ export default function SpecialistRegistration() {
               </Button>
             </div>
           </div>
-        )}
+         )}
 
         {step === 3 && (
           <div className="space-y-6">
