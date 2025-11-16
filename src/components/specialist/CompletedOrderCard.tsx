@@ -1,16 +1,23 @@
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, DollarSign, Star, FileText } from 'lucide-react';
+import { Calendar, DollarSign, Star, FileText, UserCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { ClientReviewDialog } from './ClientReviewDialog';
 
 interface CompletedOrderCardProps {
   order: any;
+  onReviewSubmitted?: () => void;
 }
 
-export function CompletedOrderCard({ order }: CompletedOrderCardProps) {
+export function CompletedOrderCard({ order, onReviewSubmitted }: CompletedOrderCardProps) {
   const request = order.request;
+  const [showClientReview, setShowClientReview] = useState(false);
+  
+  // Check if client review already exists
+  const hasClientReview = request?.client_review_submitted || false;
 
   const getPrice = () => {
     if (order.price_fixed) {
@@ -70,8 +77,30 @@ export function CompletedOrderCard({ order }: CompletedOrderCardProps) {
             <FileText className="w-4 h-4 mr-2" />
             Ver detalle
           </Button>
+          
+          {!hasClientReview && (
+            <Button 
+              onClick={() => setShowClientReview(true)}
+              className="flex-1 rounded-full h-10 font-semibold bg-primary hover:bg-primary/90" 
+              size="sm"
+            >
+              <UserCheck className="w-4 h-4 mr-2" />
+              Evaluar cliente
+            </Button>
+          )}
         </div>
       </div>
+      
+      <ClientReviewDialog
+        open={showClientReview}
+        onOpenChange={setShowClientReview}
+        orderId={request?.id}
+        clientId={request?.user_id}
+        specialistId={order.specialist_id}
+        onReviewSubmitted={() => {
+          if (onReviewSubmitted) onReviewSubmitted();
+        }}
+      />
     </Card>
   );
 }
