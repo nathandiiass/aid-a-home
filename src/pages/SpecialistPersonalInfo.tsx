@@ -261,6 +261,13 @@ export default function SpecialistPersonalInfo() {
     setHasChanges(true);
   };
 
+  const handleWorkZoneChange = (zoneId: string, cities: string[]) => {
+    setWorkZones(prev => prev.map(z => 
+      z.id === zoneId ? { ...z, cities } : z
+    ));
+    setHasChanges(true);
+  };
+
   const handleSave = async () => {
     if (!user || !profileData || !specialistId) return;
 
@@ -271,7 +278,9 @@ export default function SpecialistPersonalInfo() {
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
-          avatar_url: profileData.avatar_url
+          avatar_url: profileData.avatar_url,
+          date_of_birth: profileData.date_of_birth,
+          gender: profileData.gender
         })
         .eq('id', user.id);
 
@@ -314,13 +323,24 @@ export default function SpecialistPersonalInfo() {
             .from('specialist_activities')
             .update({
               activity: activity.activity,
-              price_min: activity.price_min,
-              price_max: activity.price_max
+              price_min: activity.price_min
             })
             .eq('id', activity.id);
 
           if (actError) throw actError;
         }
+      }
+
+      // Update work zones
+      for (const zone of workZones) {
+        const { error: zoneError } = await supabase
+          .from('specialist_work_zones')
+          .update({
+            cities: zone.cities
+          })
+          .eq('id', zone.id);
+
+        if (zoneError) throw zoneError;
       }
 
       setHasChanges(false);
@@ -420,12 +440,24 @@ export default function SpecialistPersonalInfo() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Fecha de nacimiento</Label>
-                    <p className="text-sm font-medium text-gray-900 mt-1">{profileData.date_of_birth || '—'}</p>
+                    <Label htmlFor="date_of_birth" className="text-xs font-medium text-gray-700 mb-1.5 block">Fecha de nacimiento</Label>
+                    <Input
+                      id="date_of_birth"
+                      type="date"
+                      value={profileData.date_of_birth || ''}
+                      onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
+                      className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
+                    />
                   </div>
                   <div>
-                    <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Género</Label>
-                    <p className="text-sm font-medium text-gray-900 mt-1">{profileData.gender || '—'}</p>
+                    <Label htmlFor="gender" className="text-xs font-medium text-gray-700 mb-1.5 block">Género</Label>
+                    <Input
+                      id="gender"
+                      value={profileData.gender || ''}
+                      onChange={(e) => handleInputChange('gender', e.target.value)}
+                      className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
+                      placeholder="Masculino/Femenino"
+                    />
                   </div>
                 </div>
               </>
@@ -436,8 +468,14 @@ export default function SpecialistPersonalInfo() {
                   <p className="text-sm font-medium text-gray-900 mt-1">{profileData.razon_social || '—'}</p>
                 </div>
                 <div>
-                  <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Fecha de constitución</Label>
-                  <p className="text-sm font-medium text-gray-900 mt-1">{profileData.date_of_birth || '—'}</p>
+                  <Label htmlFor="date_of_birth" className="text-xs font-medium text-gray-700 mb-1.5 block">Fecha de constitución</Label>
+                  <Input
+                    id="date_of_birth"
+                    type="date"
+                    value={profileData.date_of_birth || ''}
+                    onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
+                    className="rounded-full border-gray-200 focus:border-green-500 focus:ring-green-500"
+                  />
                 </div>
               </>
             )}
@@ -590,27 +628,15 @@ export default function SpecialistPersonalInfo() {
                       className="rounded-full border-gray-200 text-sm focus:border-green-500 focus:ring-green-500"
                       placeholder="Nombre del servicio"
                     />
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <Label className="text-xs text-gray-600 mb-1 block">Precio mínimo</Label>
-                        <Input
-                          type="number"
-                          value={activity.price_min || ''}
-                          onChange={(e) => handleActivityChange(specialty.id, activity.id, 'price_min', e.target.value ? parseFloat(e.target.value) : null)}
-                          className="rounded-full border-gray-200 text-sm focus:border-green-500 focus:ring-green-500"
-                          placeholder="$0"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-gray-600 mb-1 block">Precio máximo</Label>
-                        <Input
-                          type="number"
-                          value={activity.price_max || ''}
-                          onChange={(e) => handleActivityChange(specialty.id, activity.id, 'price_max', e.target.value ? parseFloat(e.target.value) : null)}
-                          className="rounded-full border-gray-200 text-sm focus:border-green-500 focus:ring-green-500"
-                          placeholder="$0"
-                        />
-                      </div>
+                    <div>
+                      <Label className="text-xs text-gray-600 mb-1 block">Precio mínimo</Label>
+                      <Input
+                        type="number"
+                        value={activity.price_min || ''}
+                        onChange={(e) => handleActivityChange(specialty.id, activity.id, 'price_min', e.target.value ? parseFloat(e.target.value) : null)}
+                        className="rounded-full border-gray-200 text-sm focus:border-green-500 focus:ring-green-500"
+                        placeholder="$0"
+                      />
                     </div>
                   </div>
                 ))}
@@ -618,14 +644,26 @@ export default function SpecialistPersonalInfo() {
             </div>
           ))}
 
-          {/* Work Zones */}
+          {/* Work Zones - Editable */}
           <div>
             <Label className="text-xs font-medium text-gray-700 mb-2 block">Zona de cobertura</Label>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {workZones.map((zone) => (
-                <div key={zone.id} className="p-3 bg-gray-50 rounded-xl">
-                  <p className="font-semibold text-sm text-gray-900 mb-2">{zone.state}</p>
-                  <div className="flex flex-wrap gap-1.5">
+                <div key={zone.id} className="p-3 bg-gray-50 rounded-xl space-y-2">
+                  <p className="font-semibold text-sm text-gray-900">{zone.state}</p>
+                  <div>
+                    <Label className="text-xs text-gray-600 mb-1.5 block">Municipios (separados por coma)</Label>
+                    <Textarea
+                      value={zone.cities.join(', ')}
+                      onChange={(e) => {
+                        const cities = e.target.value.split(',').map(c => c.trim()).filter(c => c);
+                        handleWorkZoneChange(zone.id, cities);
+                      }}
+                      className="rounded-2xl border-gray-200 text-sm focus:border-green-500 focus:ring-green-500 min-h-[60px]"
+                      placeholder="Mérida, Progreso, Valladolid..."
+                    />
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 pt-1">
                     {zone.cities.map((city, idx) => (
                       <Badge key={idx} variant="outline" className="rounded-full text-xs border-gray-300 bg-white">
                         {city}
