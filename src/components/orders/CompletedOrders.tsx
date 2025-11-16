@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/card';
 import { Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { SpecialistReviewDialog } from './SpecialistReviewDialog';
 
 interface CompletedOrdersProps {
   searchQuery: string;
@@ -17,8 +16,6 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
   const { toast } = useToast();
   const [completed, setCompleted] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
 
   useEffect(() => {
     fetchCompleted();
@@ -100,8 +97,7 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
       {filteredCompleted.map((order) => (
         <Card 
           key={order.id} 
-          className="p-4 hover:shadow-xl transition-all cursor-pointer bg-white rounded-2xl border-0 shadow-lg"
-          onClick={() => navigate(`/orders/${order.id}`)}
+          className="p-4 bg-white rounded-2xl border-0 shadow-lg"
         >
           <h3 className="font-bold text-foreground text-base mb-2">
             {order.activity}
@@ -121,53 +117,25 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
             </p>
           )}
 
-          <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-            {order.reviews && order.reviews.length > 0 ? (
-              <div className="flex items-center gap-1.5 text-sm">
-                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                <span className="font-bold text-foreground">
-                  {order.reviews[0].average_score?.toFixed(1) || order.reviews[0].rating}
-                </span>
-              </div>
-            ) : order.review_submitted ? (
-              <div className="text-xs text-muted-foreground">
-                Reseña enviada
-              </div>
-            ) : (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedOrder(order);
-                  setReviewDialogOpen(true);
-                }}
-                className="bg-white hover:bg-gray-50 text-foreground text-xs font-semibold px-3 py-1.5 rounded-full border border-border/30 transition-colors"
-              >
-                Deja tu reseña
-              </button>
-            )}
-            
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/create-request?template=${order.id}`);
-              }}
-              className="bg-rappi-green hover:bg-rappi-green/90 text-white text-xs font-semibold px-4 py-1.5 rounded-full transition-colors"
-            >
-              Recontratar
-            </button>
-          </div>
+          {order.reviews && order.reviews.length > 0 && (
+            <div className="flex items-center gap-1.5 text-sm mb-3">
+              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+              <span className="font-bold text-foreground">
+                {order.reviews[0].average_score?.toFixed(1) || order.reviews[0].rating}
+              </span>
+              <span className="text-xs text-muted-foreground ml-1">Tu calificación</span>
+            </div>
+          )}
+
+          <button
+            onClick={() => navigate(`/chat/${order.quotes[0].id}`)}
+            className="w-full bg-rappi-green hover:bg-rappi-green/90 text-white text-sm font-semibold py-2.5 rounded-full transition-colors"
+          >
+            Ver detalles
+          </button>
         </Card>
       ))}
 
-      {selectedOrder && selectedOrder.quotes?.[0]?.specialist_id && (
-        <SpecialistReviewDialog
-          open={reviewDialogOpen}
-          onOpenChange={setReviewDialogOpen}
-          requestId={selectedOrder.id}
-          specialistId={selectedOrder.quotes[0].specialist_id}
-          onReviewSubmitted={fetchCompleted}
-        />
-      )}
     </div>
   );
 }
