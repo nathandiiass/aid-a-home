@@ -792,21 +792,21 @@ export default function SpecialistRegistration() {
               <p className="text-sm text-muted-foreground">Selecciona tus áreas de especialización</p>
             </div>
 
-            <div className="space-y-4">
-              <Label>Especialista en: * (Selección múltiple)</Label>
+            <div className="bg-white rounded-2xl shadow-lg border-0 p-6 space-y-4">
+              <Label className="text-sm font-semibold">Especialista en: * (Selección múltiple)</Label>
               <div className="grid grid-cols-1 gap-4">
                 {availableSpecialties.map(([category, specialties]) => (
-                  <div key={category} className="space-y-2">
-                    <h3 className="font-semibold text-sm text-primary">{category}</h3>
+                  <div key={category} className="space-y-3">
+                    <h3 className="font-bold text-sm text-rappi-green">{category}</h3>
                     <div className="grid grid-cols-1 gap-2 ml-4">
                       {specialties.map((specialty) => (
-                        <div key={specialty} className="flex items-center space-x-2 p-2 border rounded hover:bg-accent">
+                        <div key={specialty} className="flex items-center space-x-3 p-3 border-2 border-border rounded-xl hover:border-rappi-green/30 hover:bg-rappi-green/5 transition-all">
                           <Checkbox
                             id={`specialty-${specialty}`}
                             checked={selectedSpecialties.includes(specialty)}
                             onCheckedChange={() => toggleSpecialtySelection(specialty)}
                           />
-                          <Label htmlFor={`specialty-${specialty}`} className="flex-1 cursor-pointer font-normal">
+                          <Label htmlFor={`specialty-${specialty}`} className="flex-1 cursor-pointer font-normal text-sm">
                             {specialty}
                           </Label>
                         </div>
@@ -814,24 +814,24 @@ export default function SpecialistRegistration() {
                     </div>
                   </div>
                 ))}
-                <div className="flex items-center space-x-2 p-2 border rounded hover:bg-accent">
+                <div className="flex items-center space-x-3 p-3 border-2 border-border rounded-xl hover:border-rappi-green/30 hover:bg-rappi-green/5 transition-all">
                   <Checkbox
                     id="specialty-otro"
                     checked={showOtherSpecialty}
                     onCheckedChange={() => toggleSpecialtySelection('Otro')}
                   />
-                  <Label htmlFor="specialty-otro" className="flex-1 cursor-pointer font-normal">
+                  <Label htmlFor="specialty-otro" className="flex-1 cursor-pointer font-normal text-sm">
                     Otro / Otra especialidad
                   </Label>
                 </div>
                 {showOtherSpecialty && (
-                  <div className="ml-6 flex gap-2">
+                  <div className="ml-6 flex gap-2 animate-fade-in">
                     <Input
                       placeholder="Escribe tu especialidad"
                       value={otherSpecialtyText}
                       onChange={(e) => setOtherSpecialtyText(e.target.value)}
                     />
-                    <Button onClick={handleOtherSpecialtyAdd} variant="outline" size="sm">
+                    <Button onClick={handleOtherSpecialtyAdd} className="bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full px-6">
                       Agregar
                     </Button>
                   </div>
@@ -843,11 +843,11 @@ export default function SpecialistRegistration() {
               const displayName = specData.customSpecialty || specData.specialty;
               
               return (
-                <div key={specData.id} className="p-4 border rounded-lg space-y-4 bg-card">
-                  <h3 className="font-semibold text-lg">{displayName}</h3>
+                <div key={specData.id} className="bg-white rounded-2xl shadow-lg border-0 p-6 space-y-6 animate-fade-in">
+                  <h3 className="font-bold text-xl text-foreground">{displayName}</h3>
 
                   <div className="space-y-2">
-                    <Label>Años de experiencia *</Label>
+                    <Label className="text-sm font-semibold">Años de experiencia *</Label>
                     <Input
                       type="number"
                       min="0"
@@ -859,10 +859,10 @@ export default function SpecialistRegistration() {
 
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <Label>Servicios que ofrece *</Label>
+                      <Label className="text-sm font-semibold">Servicios que ofrece *</Label>
                       <Button 
                         onClick={() => addServiceToSpecialty(specData.id)} 
-                        variant="outline" 
+                        className="bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-10"
                         size="sm"
                       >
                         <Plus className="h-4 w-4 mr-2" />
@@ -878,10 +878,10 @@ export default function SpecialistRegistration() {
                     
                     <div className="space-y-3">
                       {specData.services.map((service, idx) => (
-                        <div key={service.id} className="p-4 border rounded-lg space-y-3 bg-muted/20">
+                        <div key={service.id} className="p-4 border-2 border-border rounded-xl space-y-3 bg-background animate-fade-in">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 space-y-2">
-                              <Label className="text-sm">Nombre del servicio *</Label>
+                              <Label className="text-sm font-semibold">Nombre del servicio *</Label>
                               <Input
                                 value={service.name}
                                 onChange={(e) => updateService(specData.id, service.id, 'name', e.target.value)}
@@ -892,7 +892,7 @@ export default function SpecialistRegistration() {
                               variant="ghost"
                               size="icon"
                               onClick={() => removeServiceFromSpecialty(specData.id, service.id)}
-                              className="mt-6"
+                              className="mt-6 hover:bg-destructive/10 hover:text-destructive"
                             >
                               <X className="h-4 w-4" />
                             </Button>
@@ -900,7 +900,7 @@ export default function SpecialistRegistration() {
                           
                           <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-2">
-                              <Label className="text-sm">Precio Mínimo (opcional)</Label>
+                              <Label className="text-sm font-medium">Precio Mínimo (opcional)</Label>
                               <Input
                                 type="number"
                                 min="0"
@@ -911,7 +911,7 @@ export default function SpecialistRegistration() {
                               />
                             </div>
                             <div className="space-y-2">
-                              <Label className="text-sm">Precio Máximo (opcional)</Label>
+                              <Label className="text-sm font-medium">Precio Máximo (opcional)</Label>
                               <Input
                                 type="number"
                                 min="0"
@@ -940,8 +940,8 @@ export default function SpecialistRegistration() {
               );
             })}
 
-            <div className="space-y-2">
-              <Label htmlFor="professionalDescription">Descripción Profesional * (máx 200 caracteres)</Label>
+            <div className="bg-white rounded-2xl shadow-lg border-0 p-6 space-y-2">
+              <Label htmlFor="professionalDescription" className="text-sm font-semibold">Descripción Profesional * (máx 200 caracteres)</Label>
               <Textarea
                 id="professionalDescription"
                 value={professionalDescription}
@@ -949,18 +949,18 @@ export default function SpecialistRegistration() {
                 placeholder="Describe brevemente tu experiencia profesional..."
                 maxLength={200}
                 rows={3}
-                className="resize-none"
+                className="resize-none border-2 focus:border-rappi-green min-h-24"
               />
               <p className="text-sm text-muted-foreground">{professionalDescription.length}/200</p>
             </div>
 
-            <div className="space-y-4">
-              <Label>Licencias / Certificaciones (Opcional)</Label>
+            <div className="bg-white rounded-2xl shadow-lg border-0 p-6 space-y-4">
+              <Label className="text-sm font-semibold">Licencias / Certificaciones (Opcional)</Label>
               {licenses.map((license) => (
-                <div key={license.id} className="p-4 border rounded-lg space-y-2">
+                <div key={license.id} className="p-4 border-2 border-border rounded-xl space-y-2 animate-fade-in">
                   <div className="flex items-center justify-between">
-                    <Label>Licencia/Certificación</Label>
-                    <Button variant="ghost" size="sm" onClick={() => removeLicense(license.id)}>
+                    <Label className="text-sm font-semibold">Licencia/Certificación</Label>
+                    <Button variant="ghost" size="sm" onClick={() => removeLicense(license.id)} className="hover:bg-destructive/10 hover:text-destructive">
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
@@ -975,22 +975,22 @@ export default function SpecialistRegistration() {
                     onChange={(e) => e.target.files?.[0] && updateLicense(license.id, 'file', e.target.files[0])}
                   />
                   {license.file && (
-                    <p className="text-sm text-muted-foreground">✓ {license.file.name}</p>
+                    <p className="text-sm text-rappi-green font-medium">✓ {license.file.name}</p>
                   )}
                 </div>
               ))}
-              <Button onClick={addLicense} variant="outline" className="w-full">
+              <Button onClick={addLicense} className="w-full h-12 border-2 border-rappi-green text-rappi-green hover:bg-rappi-green hover:text-white rounded-full transition-all">
                 <Plus className="h-4 w-4 mr-2" />
                 Agregar Licencia/Certificación
               </Button>
             </div>
 
-            <div className="space-y-4">
-              <Label>Zona de Cobertura *</Label>
-              <div className="space-y-2">
-                <Label>Estado: Yucatán</Label>
-                <Label className="text-sm text-muted-foreground">Municipios:</Label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-60 overflow-y-auto p-2 border rounded">
+            <div className="bg-white rounded-2xl shadow-lg border-0 p-6 space-y-4">
+              <Label className="text-sm font-semibold">Zona de Cobertura *</Label>
+              <div className="space-y-3">
+                <Label className="text-base font-semibold text-foreground">Estado: Yucatán</Label>
+                <Label className="text-sm text-muted-foreground font-medium">Municipios:</Label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-60 overflow-y-auto p-4 border-2 border-border rounded-xl bg-background">
                   {YUCATAN_MUNICIPALITIES.map((municipality) => (
                     <div key={municipality} className="flex items-center space-x-2">
                       <Checkbox
@@ -1004,7 +1004,7 @@ export default function SpecialistRegistration() {
                     </div>
                   ))}
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-rappi-green font-semibold">
                   {selectedMunicipalities.length} municipio(s) seleccionado(s)
                 </p>
               </div>
