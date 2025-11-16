@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { RequestData } from "@/pages/CreateRequest";
 import {
   DollarSign,
@@ -198,39 +197,37 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Resumen</h2>
-        <p className="text-muted-foreground">
+    <div className="space-y-4">
+      <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
+        <h2 className="text-xl font-bold mb-2">Resumen</h2>
+        <p className="text-muted-foreground text-sm">
           Revisa tu solicitud antes de publicarla
         </p>
       </div>
 
       {/* Service info */}
-      <Card className="p-4 bg-gradient-card border-border">
-        <div className="flex items-start gap-3">
-          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-            <Edit className="w-6 h-6 text-primary" />
+      <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
+        <div className="flex items-start gap-3 mb-4">
+          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+            <Edit className="w-5 h-5 text-gray-600" />
           </div>
           <div className="flex-1">
             <div className="flex items-center justify-between mb-1">
-              <h3 className="font-semibold text-lg">{data.serviceTitle}</h3>
-              <Button
-                variant="ghost"
-                size="sm"
+              <h3 className="font-bold text-lg">{data.serviceTitle}</h3>
+              <button
                 onClick={() => goToStep(0)}
-                className="h-7 text-xs"
+                className="text-rappi-green text-sm font-semibold hover:underline"
               >
                 Editar
-              </Button>
+              </button>
             </div>
-            <p className="text-muted-foreground mb-2">{data.especialista}</p>
-            <p className="text-sm text-muted-foreground mb-3">{data.serviceDescription}</p>
+            <p className="text-muted-foreground text-sm mb-2">{data.especialista}</p>
+            <p className="text-sm text-muted-foreground">{data.serviceDescription}</p>
             
             {/* Evidence section */}
             {data.evidence && data.evidence.filter((file): file is File => file instanceof File).length > 0 && (
-              <div className="mt-4 pt-4 border-t border-border">
-                <p className="font-medium text-sm mb-3">Evidencias</p>
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <p className="font-semibold text-sm mb-3">Evidencias</p>
                 <div className="grid grid-cols-3 gap-2">
                   {data.evidence.filter((file): file is File => file instanceof File).map((file, index) => {
                     const isImage = file.type.startsWith('image/');
@@ -240,7 +237,7 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
                     return (
                       <div 
                         key={index} 
-                        className="relative aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer hover:opacity-80 transition-opacity"
+                        className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 cursor-pointer hover:opacity-80 transition-opacity"
                         onClick={() => {
                           if (isImage) {
                             window.open(preview, '_blank');
@@ -255,7 +252,7 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
                           />
                         )}
                         {isVideo && (
-                          <div className="w-full h-full flex items-center justify-center bg-muted">
+                          <div className="w-full h-full flex items-center justify-center bg-gray-100">
                             <Camera className="w-6 h-6 text-muted-foreground" />
                           </div>
                         )}
@@ -267,96 +264,89 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
             )}
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* Budget */}
-      <Card className="p-4 border-border">
+      <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3 flex-1">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-              <DollarSign className="w-5 h-5 text-primary" />
+            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+              <DollarSign className="w-5 h-5 text-gray-600" />
             </div>
             <div>
-              <p className="font-medium mb-1">Presupuesto</p>
+              <p className="font-bold mb-1">Presupuesto</p>
               {data.noBudget ? (
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Sin presupuesto definido
                 </p>
               ) : (
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   ${data.budgetMin} - ${data.budgetMax}
                 </p>
               )}
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
             onClick={() => goToStep(1)}
-            className="shrink-0"
+            className="text-rappi-green text-sm font-semibold hover:underline flex-shrink-0"
           >
-            <Edit className="w-4 h-4" />
-          </Button>
+            Editar
+          </button>
         </div>
-      </Card>
+      </div>
 
       {/* Date & Time */}
-      <Card className="p-4 border-border">
+      <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3 flex-1">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-              <Calendar className="w-5 h-5 text-primary" />
+            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+              <Calendar className="w-5 h-5 text-gray-600" />
             </div>
             <div>
-              <p className="font-medium mb-1">Fecha y horario</p>
-              <p className="text-muted-foreground">{formatDate(data.date)}</p>
+              <p className="font-bold mb-1">Fecha y horario</p>
+              <p className="text-muted-foreground text-sm">{formatDate(data.date)}</p>
               <p className="text-muted-foreground text-sm mt-1">
                 {formatTimeOption(data.timeOption)}
               </p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
             onClick={() => goToStep(2)}
-            className="shrink-0"
+            className="text-rappi-green text-sm font-semibold hover:underline flex-shrink-0"
           >
-            <Edit className="w-4 h-4" />
-          </Button>
+            Editar
+          </button>
         </div>
-      </Card>
+      </div>
 
       {/* Location */}
-      <Card className="p-4 border-border">
+      <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3 flex-1">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-              <MapPin className="w-5 h-5 text-primary" />
+            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+              <MapPin className="w-5 h-5 text-gray-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-medium mb-1">{data.location?.label}</p>
+              <p className="font-bold mb-1">{data.location?.label}</p>
               <p className="text-muted-foreground text-sm">
                 {data.location?.address}
               </p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
             onClick={() => goToStep(3)}
-            className="shrink-0"
+            className="text-rappi-green text-sm font-semibold hover:underline flex-shrink-0"
           >
-            <Edit className="w-4 h-4" />
-          </Button>
+            Editar
+          </button>
         </div>
-      </Card>
+      </div>
 
 
       <Button
         onClick={handlePublish}
         disabled={isPublishing}
-        className="w-full h-12 text-base bg-primary hover:bg-primary/90"
-        size="lg"
+        className="w-full bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-12 font-semibold"
       >
         {isPublishing ? "Guardando..." : isEditMode ? "Guardar cambios" : "Publicar solicitud"}
       </Button>
