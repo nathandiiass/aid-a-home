@@ -41,11 +41,37 @@ export default function SpecialistProfile() {
       console.log('QuoteId from URL:', quoteId);
       const { data: { user } } = await supabase.auth.getUser();
 
+      // Determine which specialist to load
+      let targetSpecialistId = specialistId;
+      
+      // If no specialistId in URL, load current user's specialist profile
+      if (!specialistId && user) {
+        const { data: ownSpecialistData } = await supabase
+          .from('specialist_profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        
+        if (ownSpecialistData) {
+          targetSpecialistId = ownSpecialistData.id;
+        }
+      }
+
+      if (!targetSpecialistId) {
+        toast({
+          title: "Error",
+          description: "No se encontró el perfil de especialista",
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
+
       // Load specialist profile
       const { data: specialistData, error: specialistError } = await supabase
         .from('specialist_profiles')
         .select('id, user_id, materials_policy, warranty_days, status, professional_description, created_at, updated_at')
-        .eq('id', specialistId)
+        .eq('id', targetSpecialistId)
         .maybeSingle();
 
       if (specialistError) throw specialistError;
@@ -69,7 +95,7 @@ export default function SpecialistProfile() {
           *,
           activities:specialist_activities(*)
         `)
-        .eq('specialist_id', specialistId);
+        .eq('specialist_id', targetSpecialistId);
 
       if (specialtiesData) {
         setSpecialties(specialtiesData);
@@ -79,7 +105,7 @@ export default function SpecialistProfile() {
       const { data: workZonesData } = await supabase
         .from('specialist_work_zones')
         .select('*')
-        .eq('specialist_id', specialistId);
+        .eq('specialist_id', targetSpecialistId);
 
       if (workZonesData) {
         setWorkZones(workZonesData);
@@ -89,7 +115,7 @@ export default function SpecialistProfile() {
       const { data: reviewsData } = await supabase
         .from('reviews')
         .select('rating')
-        .eq('specialist_id', specialistId);
+        .eq('specialist_id', targetSpecialistId);
 
       if (reviewsData && reviewsData.length > 0) {
         const avgRating = reviewsData.reduce((sum, r) => sum + r.rating, 0) / reviewsData.length;
@@ -101,7 +127,7 @@ export default function SpecialistProfile() {
       const { data: credentialsData } = await supabase
         .from('specialist_credentials')
         .select('*')
-        .eq('specialist_id', specialistId)
+        .eq('specialist_id', targetSpecialistId)
         .order('created_at', { ascending: false });
 
       if (credentialsData) {
