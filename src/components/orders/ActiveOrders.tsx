@@ -8,21 +8,12 @@ import { Calendar, Clock, MapPin, DollarSign, Edit, Trash2 } from 'lucide-react'
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { CancellationSurveyDialog } from './CancellationSurveyDialog';
 
 interface ActiveOrdersProps {
   searchQuery: string;
@@ -52,7 +43,7 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
   const { toast } = useToast();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showSurveyDialog, setShowSurveyDialog] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
   const [longPressOrder, setLongPressOrder] = useState<string | null>(null);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
@@ -132,24 +123,46 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
   const handleDeleteClick = (orderId: string, e?: React.MouseEvent) => {
     e?.stopPropagation();
     setOrderToDelete(orderId);
-    setShowDeleteDialog(true);
+    setShowSurveyDialog(true);
     setLongPressOrder(null);
   };
 
-  const handleDeleteConfirm = async () => {
+  const handleSurveySubmit = async (surveyData: {
+    mainReason: string;
+    otherReasonText?: string;
+    improvementText?: string;
+  }) => {
     if (!orderToDelete) return;
 
     try {
-      const { error } = await supabase
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
+      // Save survey feedback
+      const { error: surveyError } = await supabase
+        .from('request_cancellation_feedback')
+        .insert({
+          user_id: user.id,
+          request_id: orderToDelete,
+          main_reason: surveyData.mainReason,
+          other_reason_text: surveyData.otherReasonText,
+          improvement_text: surveyData.improvementText,
+        });
+
+      if (surveyError) throw surveyError;
+
+      // Delete the request (set status to cancelled)
+      const { error: deleteError } = await supabase
         .from('service_requests')
         .update({ status: 'cancelled' })
         .eq('id', orderToDelete);
 
-      if (error) throw error;
+      if (deleteError) throw deleteError;
 
       toast({
-        title: 'Solicitud eliminada',
-        description: 'La solicitud ha sido eliminada correctamente',
+        title: 'Gracias por tu tiempo',
+        description: 'Tu solicitud ha sido eliminada.',
       });
 
       fetchActiveOrders();
@@ -161,7 +174,7 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
         description: 'No se pudo eliminar la solicitud'
       });
     } finally {
-      setShowDeleteDialog(false);
+      setShowSurveyDialog(false);
       setOrderToDelete(null);
     }
   };
@@ -299,26 +312,12 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
         </div>
       )}
 
-      {/* Delete confirmation dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar esta solicitud?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción no se puede deshacer. Los especialistas ya no podrán cotizarla.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteConfirm}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Eliminar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Cancellation survey dialog */}
+      <CancellationSurveyDialog
+        open={showSurveyDialog}
+        onOpenChange={setShowSurveyDialog}
+        onSubmit={handleSurveySubmit}
+      />
     </>
   );
 }
