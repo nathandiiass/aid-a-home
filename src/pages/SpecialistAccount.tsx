@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
-import { LogOut, User, ChevronRight, Settings, Bell, HelpCircle, FileText, Shield, Star } from 'lucide-react';
+import { LogOut, User, ChevronRight, Settings, Bell, HelpCircle, FileText, Shield, Star, Power } from 'lucide-react';
 import { BottomNavSpecialist } from '@/components/BottomNavSpecialist';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { useSpecialistMode } from '@/hooks/use-specialist-mode';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,6 +24,7 @@ export default function SpecialistAccount() {
   const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { toggleSpecialistMode } = useSpecialistMode();
   const [reviewsCount, setReviewsCount] = useState(0);
   const [averageRating, setAverageRating] = useState(0);
 
@@ -70,6 +72,15 @@ export default function SpecialistAccount() {
     } else {
       navigate('/');
     }
+  };
+
+  const handleDeactivateSpecialistMode = async () => {
+    await toggleSpecialistMode(false);
+    toast({
+      title: "Modo especialista desactivado",
+      description: "Has vuelto al modo usuario"
+    });
+    navigate('/profile');
   };
 
   if (loading) {
@@ -202,6 +213,46 @@ export default function SpecialistAccount() {
                   description: "Esta función estará disponible pronto"
                 })}
               />
+            </div>
+
+            {/* Specialist Mode Section */}
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="p-4 border-b border-gray-100">
+                <h2 className="font-bold text-gray-900">Modo especialista</h2>
+              </div>
+              <div className="p-4">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button className="w-full flex items-center gap-4 p-4 bg-white hover:bg-gray-50 transition-colors rounded-xl border border-gray-200">
+                      <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                        <Power className="w-5 h-5 text-red-600" />
+                      </div>
+                      <div className="flex-1 text-left">
+                        <p className="font-semibold text-gray-900 text-sm">Desactivar modo especialista</p>
+                        <p className="text-xs text-gray-500 mt-0.5">Volver al modo usuario</p>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>¿Desactivar modo especialista?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Volverás al modo usuario. Podrás activar el modo especialista nuevamente desde tu perfil cuando lo necesites.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={handleDeactivateSpecialistMode}
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        Desactivar
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </div>
 
             {/* Personal Info Section */}
