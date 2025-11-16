@@ -326,7 +326,8 @@ export default function Profile() {
         )}
       </div>
 
-      {isSpecialistMode && isSpecialist ? <BottomNavSpecialist /> : <BottomNav />}
+      {/* Siempre mostrar navegación de usuario en /profile */}
+      <BottomNav />
     </div>
   );
 }
