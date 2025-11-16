@@ -38,7 +38,15 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
         .select(`
           *,
           reviews(rating, comment, average_score),
-          quotes!inner(specialist_id, status)
+          quotes!inner(
+            specialist_id, 
+            status,
+            specialist_profiles(
+              id,
+              user_id,
+              profiles(first_name, last_name_paterno, display_name)
+            )
+          )
         `)
         .eq('user_id', user.id)
         .eq('status', 'completed')
@@ -75,6 +83,18 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
     );
   }
 
+  const getSpecialistName = (order: any) => {
+    const specialist = order.quotes?.[0]?.specialist_profiles;
+    if (!specialist?.profiles) return 'Especialista';
+    
+    const profile = specialist.profiles;
+    if (profile.display_name) return profile.display_name;
+    if (profile.first_name && profile.last_name_paterno) {
+      return `${profile.first_name} ${profile.last_name_paterno}`;
+    }
+    return profile.first_name || 'Especialista';
+  };
+
   return (
     <div className="space-y-3">
       {filteredCompleted.map((order) => (
@@ -86,6 +106,10 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
           <h3 className="font-bold text-foreground text-base mb-2">
             {order.activity}
           </h3>
+          
+          <p className="text-xs text-muted-foreground mb-2">
+            Completado por: <span className="font-semibold text-foreground">{getSpecialistName(order)}</span>
+          </p>
           
           <p className="text-xs text-muted-foreground mb-3">
             {format(new Date(order.updated_at), "dd MMM yyyy · HH:mm", { locale: es })}
