@@ -244,6 +244,36 @@ export type Database = {
           },
         ]
       }
+      request_cancellation_feedback: {
+        Row: {
+          created_at: string
+          id: string
+          improvement_text: string | null
+          main_reason: string
+          other_reason_text: string | null
+          request_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          improvement_text?: string | null
+          main_reason: string
+          other_reason_text?: string | null
+          request_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          improvement_text?: string | null
+          main_reason?: string
+          other_reason_text?: string | null
+          request_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           comment: string | null
