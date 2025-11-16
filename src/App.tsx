@@ -48,6 +48,7 @@ const App = () => (
           <Route path="/chat/:quoteId" element={<Chat />} />
           <Route path="/specialist" element={<SpecialistHome />} />
           <Route path="/specialist/orders" element={<SpecialistOrders />} />
+          <Route path="/specialist/profile" element={<SpecialistProfile />} />
           <Route path="/specialist/requests/:id" element={<SpecialistRequestDetail />} />
           <Route path="/specialist/requests/:id/quote" element={<QuoteForm />} />
           <Route path="/specialist/:specialistId/profile" element={<SpecialistProfile />} />
