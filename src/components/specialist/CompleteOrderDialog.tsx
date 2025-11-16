@@ -111,14 +111,14 @@ export function CompleteOrderDialog({ open, onOpenChange, order, onComplete }: C
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle style={{ color: '#003049' }}>Finalizar trabajo</DialogTitle>
+      <DialogContent className="max-w-lg bg-white rounded-3xl border-0">
+        <DialogHeader className="space-y-3 pb-2">
+          <DialogTitle className="text-2xl font-bold text-foreground">Finalizar trabajo</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          <div>
-            <Label htmlFor="finalPrice">Precio final *</Label>
+        <div className="space-y-5 py-4">
+          <div className="bg-gray-50 rounded-2xl p-4 space-y-3">
+            <Label htmlFor="finalPrice" className="text-sm font-bold text-foreground">Precio final *</Label>
             <Input
               id="finalPrice"
               type="number"
@@ -127,65 +127,71 @@ export function CompleteOrderDialog({ open, onOpenChange, order, onComplete }: C
               onChange={(e) => setFinalPrice(e.target.value)}
               min="0"
               step="0.01"
+              className="bg-white border-gray-200 rounded-xl h-12 focus:border-rappi-green focus:ring-rappi-green"
             />
           </div>
 
-          <div>
-            <Label htmlFor="materials">Materiales adicionales (opcional)</Label>
+          <div className="bg-gray-50 rounded-2xl p-4 space-y-3">
+            <Label htmlFor="materials" className="text-sm font-bold text-foreground">Materiales adicionales (opcional)</Label>
             <Textarea
               id="materials"
               placeholder="Describe materiales adicionales utilizados..."
               value={materials}
               onChange={(e) => setMaterials(e.target.value)}
               rows={2}
+              className="bg-white border-gray-200 rounded-xl focus:border-rappi-green focus:ring-rappi-green min-h-[60px]"
             />
           </div>
 
-          <div>
-            <Label htmlFor="notes">Notas para el cliente (opcional)</Label>
+          <div className="bg-gray-50 rounded-2xl p-4 space-y-3">
+            <Label htmlFor="notes" className="text-sm font-bold text-foreground">Notas para el cliente (opcional)</Label>
             <Textarea
               id="notes"
               placeholder="Agrega notas o recomendaciones..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
+              className="bg-white border-gray-200 rounded-xl focus:border-rappi-green focus:ring-rappi-green min-h-[80px]"
             />
           </div>
 
-          <div>
-            <Label>Fotos finales (opcional, máx. 5)</Label>
-            <div className="mt-2">
-              <label
-                htmlFor="photos"
-                className="flex items-center justify-center w-full h-24 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-accent transition-colors"
-              >
-                <div className="text-center">
-                  <Upload className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">
-                    {photos.length > 0 ? `${photos.length} foto(s) seleccionada(s)` : 'Seleccionar fotos'}
-                  </span>
-                </div>
-                <input
-                  id="photos"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  className="hidden"
-                  onChange={handlePhotoChange}
-                />
-              </label>
-            </div>
+          <div className="bg-gray-50 rounded-2xl p-4 space-y-3">
+            <Label className="text-sm font-bold text-foreground">Fotos finales (opcional, máx. 5)</Label>
+            <label
+              htmlFor="photos"
+              className="flex items-center justify-center w-full h-28 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer hover:border-rappi-green hover:bg-gray-50 transition-all"
+            >
+              <div className="text-center">
+                <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                <span className="text-sm text-gray-600 font-medium">
+                  {photos.length > 0 ? `${photos.length} foto(s) seleccionada(s)` : 'Seleccionar fotos'}
+                </span>
+              </div>
+              <input
+                id="photos"
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handlePhotoChange}
+              />
+            </label>
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+        <DialogFooter className="flex-col sm:flex-row gap-3 pt-4">
+          <Button 
+            variant="outline" 
+            onClick={() => onOpenChange(false)} 
+            disabled={loading}
+            className="w-full sm:w-auto rounded-full border-2 border-gray-300 hover:bg-gray-50 h-11 px-6 font-semibold"
+          >
             Cancelar
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={loading}
-            style={{ backgroundColor: '#C1121F' }}
+            className="w-full sm:w-auto bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-11 px-6 font-semibold"
           >
             {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             Enviar cierre
