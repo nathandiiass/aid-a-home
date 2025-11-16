@@ -204,7 +204,7 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
 
   if (filteredOrders.length === 0) {
     return (
-      <Card className="p-8 text-center bg-white rounded-xl border border-border/20">
+      <Card className="p-8 text-center bg-white rounded-2xl border-0 shadow-lg">
         <p className="text-muted-foreground mb-4">No tienes órdenes activas</p>
         <button
           onClick={() => navigate('/create-request')}
@@ -222,7 +222,7 @@ export function ActiveOrders({ searchQuery }: ActiveOrdersProps) {
         {filteredOrders.map((order) => (
           <Card
             key={order.id}
-            className="p-4 hover:shadow-md transition-all cursor-pointer relative bg-white rounded-xl border border-border/20"
+            className="p-4 hover:shadow-xl transition-all cursor-pointer relative bg-white rounded-2xl border-0 shadow-lg"
             onClick={() => navigate(`/orders/${order.id}`)}
             onTouchStart={() => handleLongPressStart(order.id)}
             onTouchEnd={handleLongPressEnd}
