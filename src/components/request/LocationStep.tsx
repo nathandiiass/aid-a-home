@@ -210,16 +210,17 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <Tabs defaultValue="saved" className="w-full">
-        <TabsList className="w-full grid grid-cols-2 mb-6 bg-white rounded-full p-1">
-          <TabsTrigger value="saved" className="rounded-full data-[state=active]:bg-rappi-green data-[state=active]:text-white">
-            Direcciones guardadas
-          </TabsTrigger>
-          <TabsTrigger value="new" className="rounded-full data-[state=active]:bg-rappi-green data-[state=active]:text-white">
-            Nueva dirección
-          </TabsTrigger>
-        </TabsList>
+    <div className="min-h-screen bg-gray-50 py-6 px-4">
+      <div className="max-w-2xl mx-auto">
+        <Tabs defaultValue="saved" className="w-full">
+          <TabsList className="w-full grid grid-cols-2 mb-8 bg-white rounded-full p-1.5 shadow-sm">
+            <TabsTrigger value="saved" className="rounded-full py-3 data-[state=active]:bg-rappi-green data-[state=active]:text-white">
+              Direcciones guardadas
+            </TabsTrigger>
+            <TabsTrigger value="new" className="rounded-full py-3 data-[state=active]:bg-rappi-green data-[state=active]:text-white">
+              Nueva dirección
+            </TabsTrigger>
+          </TabsList>
 
         <TabsContent value="saved" className="mt-0">
           {!user ? (
@@ -240,20 +241,20 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
               </p>
             </Card>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {savedLocations.map((saved) => (
                 <Card
                   key={saved.id}
-                  className="bg-white rounded-2xl shadow-lg border-0 p-4 cursor-pointer hover:shadow-xl transition-all"
+                  className="bg-white rounded-2xl shadow-sm border-0 p-5 cursor-pointer hover:shadow-md transition-all"
                   onClick={() => handleSelectSaved(saved)}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
                       {getLabelIcon(saved.label)}
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 mb-1">{saved.label}</h3>
-                      <p className="text-sm text-gray-600">
+                      <h3 className="font-semibold text-gray-900 mb-2">{saved.label}</h3>
+                      <p className="text-sm text-gray-600 mb-1">
                         {saved.street} #{saved.ext_number}
                         {saved.int_number && ` Int. ${saved.int_number}`}
                       </p>
@@ -269,9 +270,9 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
         </TabsContent>
 
         <TabsContent value="new" className="mt-0">
-          <Card className="bg-white rounded-2xl shadow-lg border-0 p-6">
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+          <Card className="bg-white rounded-2xl shadow-sm border-0 p-6">
+            <div className="space-y-5">
+              <div className="grid grid-cols-2 gap-5">
                 <div className="col-span-2">
                   <Label htmlFor="state" className="text-sm font-semibold text-gray-900 mb-2 block">
                     Estado *
@@ -357,8 +358,8 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
               </div>
 
               {user && (
-                <div className="pt-4 border-t border-gray-200">
-                  <div className="flex items-start space-x-3 mb-3">
+                <div className="pt-6 border-t border-gray-200 mt-6">
+                  <div className="flex items-start space-x-3 mb-4">
                     <Checkbox
                       id="save"
                       checked={saveLocation}
@@ -411,7 +412,8 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
             </div>
           </Card>
         </TabsContent>
-      </Tabs>
+        </Tabs>
+      </div>
     </div>
   );
 };
