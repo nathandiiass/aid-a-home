@@ -27,6 +27,31 @@ export default function UserProfile() {
     },
   });
 
+  // Get client reviews data
+  const { data: clientStats } = useQuery({
+    queryKey: ["client-reviews-stats", userId],
+    queryFn: async () => {
+      const { data: reviews, error } = await supabase
+        .from("client_reviews")
+        .select("*")
+        .eq("client_id", userId);
+
+      if (error) throw error;
+
+      return {
+        totalReviews: reviews?.length || 0,
+        averageRating: profile?.rating_promedio_cliente || 0,
+        avgClaridadNecesidades: profile?.avg_claridad_necesidades || 0,
+        avgPuntualidad: profile?.avg_puntualidad_disponibilidad || 0,
+        avgRespeto: profile?.avg_respeto_profesionalismo_cliente || 0,
+        avgFacilito: profile?.avg_facilito_condiciones_trabajo || 0,
+        avgPago: profile?.avg_claridad_cumplimiento_pago || 0,
+        porcentajeVolveria: profile?.porcentaje_volveria_trabajar_cliente || 0,
+      };
+    },
+    enabled: !!profile,
+  });
+
   // Mock data for fields not yet in DB
   const mockData = {
     verified: true,
@@ -115,13 +140,17 @@ export default function UserProfile() {
           <Card className="p-4 text-center space-y-2 border-[#E6EEF4]">
             <div className="flex items-center justify-center gap-1">
               <Star className="h-5 w-5 fill-[#C1121F] text-[#C1121F]" />
-              <span className="text-2xl font-bold text-foreground">{mockData.rating_avg}</span>
+              <span className="text-2xl font-bold text-foreground">
+                {clientStats?.averageRating ? clientStats.averageRating.toFixed(1) : '0.0'}
+              </span>
             </div>
             <p className="text-xs text-muted-foreground">Promedio</p>
           </Card>
 
           <Card className="p-4 text-center space-y-2 border-[#E6EEF4]">
-            <div className="text-2xl font-bold text-foreground">{mockData.rating_count}</div>
+            <div className="text-2xl font-bold text-foreground">
+              {clientStats?.totalReviews || 0}
+            </div>
             <p className="text-xs text-muted-foreground">De especialistas</p>
           </Card>
         </div>
