@@ -2,15 +2,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
-import { LogOut, User, Briefcase } from 'lucide-react';
+import { LogOut, User, Briefcase, ChevronRight, Star, Settings, Info } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
 import { BottomNavSpecialist } from '@/components/BottomNavSpecialist';
 import { supabase } from '@/integrations/supabase/client';
 import { Switch } from '@/components/ui/switch';
 import { useSpecialistMode } from '@/hooks/use-specialist-mode';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PersonalInfoTab } from '@/components/profile/PersonalInfoTab';
-import { CredentialsTab } from '@/components/profile/CredentialsTab';
+import { cn } from '@/lib/utils';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -80,6 +78,34 @@ export default function Profile() {
       </div>
     );
   }
+
+  // Menu items for specialist mode
+  const specialistMenuItems = [
+    {
+      icon: Star,
+      label: 'Reviews',
+      path: '/specialist/reviews',
+      available: false
+    },
+    {
+      icon: User,
+      label: 'Información personal',
+      path: '/specialist/personal-info',
+      available: true
+    },
+    {
+      icon: Settings,
+      label: 'Configuración',
+      path: '/specialist/settings',
+      available: false
+    },
+    {
+      icon: Info,
+      label: 'Más información',
+      path: '/specialist/more-info',
+      available: false
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -191,18 +217,32 @@ export default function Profile() {
             </div>
 
             {isSpecialistMode && isSpecialist && specialistId ? (
-              <Tabs defaultValue="personal" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="personal">Información personal</TabsTrigger>
-                  <TabsTrigger value="credentials">Estudios y certificaciones</TabsTrigger>
-                </TabsList>
-                <TabsContent value="personal" className="mt-6">
-                  <PersonalInfoTab userId={user.id} specialistId={specialistId} />
-                </TabsContent>
-                <TabsContent value="credentials" className="mt-6">
-                  <CredentialsTab specialistId={specialistId} />
-                </TabsContent>
-              </Tabs>
+              <div className="space-y-3">
+                {specialistMenuItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.path}
+                      onClick={() => item.available && navigate(item.path)}
+                      disabled={!item.available}
+                      className={cn(
+                        "w-full flex items-center justify-between p-4 bg-background rounded-xl border border-border transition-all",
+                        item.available 
+                          ? "hover:shadow-md hover:border-primary/20 cursor-pointer" 
+                          : "opacity-50 cursor-not-allowed"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Icon className="w-5 h-5 text-primary" />
+                        </div>
+                        <span className="font-medium text-foreground">{item.label}</span>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                    </button>
+                  );
+                })}
+              </div>
             ) : (
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold text-foreground">Mi cuenta</h2>
