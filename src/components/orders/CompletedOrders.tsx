@@ -66,7 +66,7 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
 
   if (filteredCompleted.length === 0) {
     return (
-      <Card className="p-8 text-center bg-card/50 backdrop-blur-sm border-border/50 rounded-2xl shadow-sm">
+      <Card className="p-8 text-center bg-white rounded-xl border border-border/20">
         <p className="text-muted-foreground">No tienes órdenes completadas</p>
       </Card>
     );
@@ -77,53 +77,50 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
       {filteredCompleted.map((order) => (
         <Card 
           key={order.id} 
-          className="p-5 hover:shadow-lg transition-all cursor-pointer bg-card/50 backdrop-blur-sm border-border/50 rounded-2xl"
+          className="p-4 hover:shadow-md transition-all cursor-pointer bg-white rounded-xl border border-border/20"
           onClick={() => navigate(`/orders/${order.id}`)}
         >
-          <h3 className="font-semibold text-foreground text-lg mb-2">
+          <h3 className="font-bold text-foreground text-base mb-2">
             {order.activity}
           </h3>
           
-          <p className="text-sm text-muted-foreground mb-3">
+          <p className="text-xs text-muted-foreground mb-3">
             {format(new Date(order.updated_at), "dd MMM yyyy · HH:mm", { locale: es })}
           </p>
 
           {order.price_max && (
-            <p className="text-foreground font-medium mb-4">
+            <p className="text-foreground font-semibold text-sm mb-3">
               Precio final: ${order.price_max}
             </p>
           )}
 
-          <div className="flex items-center justify-between pt-3 border-t border-border/50">
+          <div className="flex items-center justify-between pt-3 border-t border-border/20">
             {order.reviews && order.reviews.length > 0 ? (
               <div className="flex items-center gap-1.5 text-sm">
-                <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                <span className="font-semibold text-foreground">{order.reviews[0].rating}</span>
+                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                <span className="font-bold text-foreground">{order.reviews[0].rating}</span>
               </div>
             ) : (
-              <Button 
-                size="sm" 
-                variant="outline"
+              <button
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate(`/orders/${order.id}/review`);
                 }}
-                className="rounded-full"
+                className="bg-white hover:bg-gray-50 text-foreground text-xs font-semibold px-3 py-1.5 rounded-full border border-border/30 transition-colors"
               >
                 Deja tu reseña
-              </Button>
+              </button>
             )}
             
-            <Button 
-              size="sm"
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 navigate(`/create-request?template=${order.id}`);
               }}
-              className="rounded-full px-5"
+              className="bg-rappi-green hover:bg-rappi-green/90 text-white text-xs font-semibold px-4 py-1.5 rounded-full transition-colors"
             >
               Recontratar
-            </Button>
+            </button>
           </div>
         </Card>
       ))}

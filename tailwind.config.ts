@@ -47,6 +47,10 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        rappi: {
+          green: "hsl(var(--rappi-green))",
+          "green-foreground": "hsl(var(--rappi-green-foreground))",
+        },
         category: {
           jardines: "hsl(var(--category-jardines))",
           plomeria: "hsl(var(--category-plomeria))",
