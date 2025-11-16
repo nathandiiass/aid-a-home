@@ -119,15 +119,6 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
               </span>
             </div>
 
-            {order.price_max && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <DollarSign className="w-3.5 h-3.5 flex-shrink-0" />
-                <span className="font-bold text-foreground">
-                  ${order.price_max.toLocaleString('es-MX')}
-                </span>
-              </div>
-            )}
-
             {order.reviews && order.reviews.length > 0 && (
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Star className="w-3.5 h-3.5 flex-shrink-0 fill-yellow-400 text-yellow-400" />
@@ -138,7 +129,14 @@ export function CompletedOrders({ searchQuery }: CompletedOrdersProps) {
               </div>
             )}
 
-            <div className="flex justify-end items-center pt-3 mt-2">
+            <div className="flex justify-between items-center pt-3 mt-2">
+              {order.price_max && (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-base font-bold text-foreground">
+                    ${order.price_max.toLocaleString('es-MX')}
+                  </span>
+                </div>
+              )}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
