@@ -40,8 +40,8 @@ export default function Orders() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header con blur */}
-      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm">
+      {/* Header con blur estilo Rappi */}
+      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-border/10 shadow-sm">
         <Logo className="pt-4 pb-2" />
         <div className="container max-w-4xl mx-auto px-4 pb-4">
           <h1 className="text-2xl font-bold text-foreground mb-4">Órdenes</h1>
@@ -53,10 +53,10 @@ export default function Orders() {
                 placeholder="Buscar por actividad..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-secondary/30 border-secondary/50 rounded-full h-11 focus-visible:ring-1"
+                className="pl-10 bg-gray-50 border-gray-200 rounded-full h-11 focus-visible:ring-1"
               />
             </div>
-            <button className="p-2.5 bg-secondary/30 border border-secondary/50 rounded-full hover:bg-secondary/50 transition-colors">
+            <button className="p-2.5 bg-gray-50 border border-gray-200 rounded-full hover:bg-gray-100 transition-colors">
               <Filter className="w-5 h-5 text-foreground" />
             </button>
           </div>
@@ -65,14 +65,14 @@ export default function Orders() {
 
       <div className="container max-w-4xl mx-auto px-4 pt-4">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full grid grid-cols-3 mb-6 bg-secondary/20 p-1 rounded-full">
-            <TabsTrigger value="active" className="rounded-full data-[state=active]:bg-background data-[state=active]:shadow-sm">
+          <TabsList className="w-full grid grid-cols-3 mb-6 bg-gray-100 p-1 rounded-full">
+            <TabsTrigger value="active" className="rounded-full data-[state=active]:bg-white data-[state=active]:shadow-sm text-sm font-medium">
               Activas
             </TabsTrigger>
-            <TabsTrigger value="draft" className="rounded-full data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="draft" className="rounded-full data-[state=active]:bg-white data-[state=active]:shadow-sm text-sm font-medium">
               Por activar
             </TabsTrigger>
-            <TabsTrigger value="completed" className="rounded-full data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="completed" className="rounded-full data-[state=active]:bg-white data-[state=active]:shadow-sm text-sm font-medium">
               Completadas
             </TabsTrigger>
           </TabsList>
