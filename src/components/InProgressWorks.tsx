@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -14,6 +14,8 @@ export function InProgressWorks() {
   const { toast } = useToast();
   const [works, setWorks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchInProgressWorks();
@@ -115,13 +117,26 @@ export function InProgressWorks() {
     return null;
   }
 
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const scrollLeft = scrollContainerRef.current.scrollLeft;
+      const cardWidth = 300 + 16; // card width + gap
+      const index = Math.round(scrollLeft / cardWidth);
+      setActiveIndex(index);
+    }
+  };
+
   return (
     <div className="mb-10 bg-gray-50 -mx-4 px-4 py-6">
       <h2 className="text-lg font-bold text-foreground mb-5">
         Trabajos en curso
       </h2>
       
-      <div className="flex gap-4 overflow-x-auto pb-2">
+      <div 
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide"
+      >
         {works.map((work) => {
           const getPrice = () => {
             if (work.quote.price_fixed) {
@@ -136,7 +151,7 @@ export function InProgressWorks() {
           return (
             <Card
               key={work.id}
-              className="flex-shrink-0 w-[300px] bg-white rounded-2xl shadow-sm border-0 p-4 cursor-pointer hover:shadow-md transition-all"
+              className="flex-shrink-0 w-[300px] bg-white rounded-2xl shadow-sm border-0 p-4 cursor-pointer hover:shadow-md transition-all snap-start"
               onClick={() => navigate(`/chat/${work.quote.id}`)}
             >
               <div className="space-y-3">
@@ -213,6 +228,32 @@ export function InProgressWorks() {
           );
         })}
       </div>
+      
+      {/* Dots Indicator */}
+      {works.length > 1 && (
+        <div className="flex justify-center gap-1.5 mt-4">
+          {works.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                if (scrollContainerRef.current) {
+                  const cardWidth = 300 + 16;
+                  scrollContainerRef.current.scrollTo({
+                    left: cardWidth * index,
+                    behavior: 'smooth'
+                  });
+                }
+              }}
+              className={`h-1.5 rounded-full transition-all ${
+                index === activeIndex 
+                  ? 'w-6 bg-rappi-green' 
+                  : 'w-1.5 bg-gray-300'
+              }`}
+              aria-label={`Ir a trabajo ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
