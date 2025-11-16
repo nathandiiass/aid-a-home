@@ -20,16 +20,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { CancellationSurveyDialog } from '@/components/orders/CancellationSurveyDialog';
 
 export default function OrderDetail() {
   const { id } = useParams();
@@ -40,7 +31,7 @@ export default function OrderDetail() {
   const [quotes, setQuotes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('best_match');
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showSurveyDialog, setShowSurveyDialog] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -136,18 +127,38 @@ export default function OrderDetail() {
     navigate(`/create-request?edit=${id}`);
   };
 
-  const handleDelete = async () => {
+  const handleSurveySubmit = async (surveyData: {
+    mainReason: string;
+    otherReasonText?: string;
+    improvementText?: string;
+  }) => {
+    if (!id || !user) return;
+
     try {
-      const { error } = await supabase
+      // Save survey feedback
+      const { error: surveyError } = await supabase
+        .from('request_cancellation_feedback')
+        .insert({
+          user_id: user.id,
+          request_id: id,
+          main_reason: surveyData.mainReason,
+          other_reason_text: surveyData.otherReasonText,
+          improvement_text: surveyData.improvementText,
+        });
+
+      if (surveyError) throw surveyError;
+
+      // Delete the request (set status to cancelled)
+      const { error: deleteError } = await supabase
         .from('service_requests')
         .update({ status: 'cancelled' })
         .eq('id', id);
 
-      if (error) throw error;
+      if (deleteError) throw deleteError;
 
       toast({
-        title: 'Solicitud eliminada',
-        description: 'La solicitud ha sido eliminada correctamente',
+        title: 'Gracias por tu tiempo',
+        description: 'Tu solicitud ha sido eliminada.',
       });
 
       navigate('/orders');
@@ -159,7 +170,7 @@ export default function OrderDetail() {
         description: 'No se pudo eliminar la solicitud'
       });
     } finally {
-      setShowDeleteDialog(false);
+      setShowSurveyDialog(false);
     }
   };
 
@@ -213,7 +224,7 @@ export default function OrderDetail() {
                 Editar
               </DropdownMenuItem>
               <DropdownMenuItem 
-                onClick={() => setShowDeleteDialog(true)}
+                onClick={() => setShowSurveyDialog(true)}
                 className="text-destructive focus:text-destructive"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
@@ -253,25 +264,11 @@ export default function OrderDetail() {
         )}
       </div>
 
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar esta solicitud?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción no se puede deshacer. Los especialistas ya no podrán cotizarla.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Eliminar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <CancellationSurveyDialog
+        open={showSurveyDialog}
+        onOpenChange={setShowSurveyDialog}
+        onSubmit={handleSurveySubmit}
+      />
     </div>
   );
 }
