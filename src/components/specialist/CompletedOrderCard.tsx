@@ -7,29 +7,36 @@ import { Calendar, DollarSign, Star, FileText, UserCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ClientReviewDialog } from './ClientReviewDialog';
-
 interface CompletedOrderCardProps {
   order: any;
   onReviewSubmitted?: () => void;
 }
-
-export function CompletedOrderCard({ order, onReviewSubmitted }: CompletedOrderCardProps) {
+export function CompletedOrderCard({
+  order,
+  onReviewSubmitted
+}: CompletedOrderCardProps) {
   const navigate = useNavigate();
   const request = order.request;
   const [showClientReview, setShowClientReview] = useState(false);
-  
+
   // Check if client review already exists
   const hasClientReview = request?.client_review_submitted || false;
-
   const getPrice = () => {
     if (order.price_fixed) {
-      return `$${order.price_fixed.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
+      return `$${order.price_fixed.toLocaleString('es-MX', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })} MXN`;
     }
-    return `$${order.price_min.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - $${order.price_max.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
+    return `$${order.price_min.toLocaleString('es-MX', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })} - $${order.price_max.toLocaleString('es-MX', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })} MXN`;
   };
-
-  return (
-    <Card className="bg-white rounded-2xl shadow-md border-0 p-5 hover:shadow-xl transition-all">
+  return <Card className="bg-white rounded-2xl shadow-md border-0 p-5 hover:shadow-xl transition-all">
       <div className="space-y-4">
         <div className="flex justify-between items-start">
           <div className="flex-1">
@@ -48,7 +55,9 @@ export function CompletedOrderCard({ order, onReviewSubmitted }: CompletedOrderC
               <Calendar className="w-4 h-4 text-gray-600" />
             </div>
             <span className="text-sm text-foreground/70">
-              Finalizada el {format(new Date(order.created_at), 'dd MMM yyyy', { locale: es })}
+              Finalizada el {format(new Date(order.created_at), 'dd MMM yyyy', {
+              locale: es
+            })}
             </span>
           </div>
 
@@ -71,39 +80,17 @@ export function CompletedOrderCard({ order, onReviewSubmitted }: CompletedOrderC
         </div>
 
         <div className="flex gap-2 pt-2">
-          <Button 
-            onClick={() => navigate(`/specialist/requests/${request?.id}`)}
-            variant="outline" 
-            className="flex-1 rounded-full border-2 border-gray-300 hover:bg-gray-50 h-10 font-semibold" 
-            size="sm"
-          >
-            <FileText className="w-4 h-4 mr-2" />
-            Ver detalle
-          </Button>
           
-          {!hasClientReview && (
-            <Button 
-              onClick={() => setShowClientReview(true)}
-              className="flex-1 rounded-full h-10 font-semibold bg-primary hover:bg-primary/90" 
-              size="sm"
-            >
+          
+          {!hasClientReview && <Button onClick={() => setShowClientReview(true)} className="flex-1 rounded-full h-10 font-semibold bg-primary hover:bg-primary/90" size="sm">
               <UserCheck className="w-4 h-4 mr-2" />
               Evaluar cliente
-            </Button>
-          )}
+            </Button>}
         </div>
       </div>
       
-      <ClientReviewDialog
-        open={showClientReview}
-        onOpenChange={setShowClientReview}
-        orderId={request?.id}
-        clientId={request?.user_id}
-        specialistId={order.specialist_id}
-        onReviewSubmitted={() => {
-          if (onReviewSubmitted) onReviewSubmitted();
-        }}
-      />
-    </Card>
-  );
+      <ClientReviewDialog open={showClientReview} onOpenChange={setShowClientReview} orderId={request?.id} clientId={request?.user_id} specialistId={order.specialist_id} onReviewSubmitted={() => {
+      if (onReviewSubmitted) onReviewSubmitted();
+    }} />
+    </Card>;
 }
