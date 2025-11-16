@@ -4,8 +4,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { ArrowLeft, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { ChevronLeft, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { QuoteCard } from '@/components/orders/QuoteCard';
 import {
   Select,
@@ -73,7 +72,7 @@ export default function OrderDetail() {
       
       const { data: profilesData } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name_paterno, last_name_materno, display_name')
+        .select('id, first_name, last_name_paterno, last_name_materno, display_name, avatar_url')
         .in('id', specialistIds);
 
       // Merge profiles into quotes
@@ -116,7 +115,7 @@ export default function OrderDetail() {
         });
       case 'duration':
         return [...quotesToSort].sort((a, b) => 
-          (a.estimated_duration_hours || 999) - (b.estimated_duration_hours || 999)
+          (a.estimated_duration_hours || 0) - (b.estimated_duration_hours || 0)
         );
       default:
         return quotesToSort;
@@ -176,7 +175,7 @@ export default function OrderDetail() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-foreground">Cargando...</div>
       </div>
     );
@@ -184,7 +183,7 @@ export default function OrderDetail() {
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-foreground">Orden no encontrada</div>
       </div>
     );
@@ -193,70 +192,73 @@ export default function OrderDetail() {
   const sortedQuotes = sortQuotes(quotes);
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <div className="container max-w-4xl mx-auto px-4 py-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/orders')}
-            >
-              <ArrowLeft className="w-6 h-6" />
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">{order.activity}</h1>
-              <p className="text-sm text-muted-foreground">
-                {quotes.length} cotizacion{quotes.length !== 1 ? 'es' : ''}
-              </p>
-            </div>
-          </div>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="w-5 h-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleEdit}>
-                <Edit className="w-4 h-4 mr-2" />
-                Editar
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setShowSurveyDialog(true)}
-                className="text-destructive focus:text-destructive"
+    <div className="min-h-screen bg-gray-50 pb-20">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-white shadow-sm">
+        <div className="max-w-lg mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <button
+                onClick={() => navigate('/orders')}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
               >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Eliminar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <div className="flex-1 min-w-0">
+                <h1 className="text-lg font-bold text-foreground truncate">{order.activity}</h1>
+                <p className="text-sm text-muted-foreground">
+                  {quotes.length} cotizacion{quotes.length !== 1 ? 'es' : ''}
+                </p>
+              </div>
+            </div>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="flex-shrink-0">
+                  <MoreVertical className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleEdit}>
+                  <Edit className="w-4 h-4 mr-2" />
+                  Editar
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setShowSurveyDialog(true)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Eliminar
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
+      </div>
 
-        <div className="flex gap-2 mb-6">
-          <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Ordenar por" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="best_match">Mejor ajuste</SelectItem>
-              <SelectItem value="price_asc">Precio ↑</SelectItem>
-              <SelectItem value="price_desc">Precio ↓</SelectItem>
-              <SelectItem value="rating">Calificación</SelectItem>
-              <SelectItem value="duration">Tiempo estimado</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <div className="max-w-lg mx-auto px-4 py-6 space-y-4">
+        {/* Sort Filter */}
+        <Select value={sortBy} onValueChange={setSortBy}>
+          <SelectTrigger className="w-full h-12 bg-white rounded-full shadow-sm">
+            <SelectValue placeholder="Ordenar por" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="best_match">Mejor ajuste</SelectItem>
+            <SelectItem value="price_asc">Precio: menor a mayor</SelectItem>
+            <SelectItem value="price_desc">Precio: mayor a menor</SelectItem>
+            <SelectItem value="rating">Mejor calificación</SelectItem>
+            <SelectItem value="duration">Tiempo estimado</SelectItem>
+          </SelectContent>
+        </Select>
 
         {sortedQuotes.length === 0 ? (
-          <Card className="p-8 text-center">
+          <div className="bg-white rounded-2xl shadow-lg border-0 p-8 text-center">
             <p className="text-muted-foreground">
               Aún no hay cotizaciones para esta orden
             </p>
-          </Card>
+          </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {sortedQuotes.map((quote) => (
               <QuoteCard key={quote.id} quote={quote} orderId={order.id} />
             ))}

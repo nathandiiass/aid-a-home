@@ -1,9 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Star, Package, Shield } from 'lucide-react';
+import { Star, Clock, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -60,7 +58,6 @@ export function QuoteCard({ quote, orderId, unreadCount = 0 }: QuoteCardProps) {
     }
     
     // Fallback
-    console.warn('Specialist profile incomplete:', specialist?.id);
     return 'Especialista';
   };
 
@@ -73,51 +70,52 @@ export function QuoteCard({ quote, orderId, unreadCount = 0 }: QuoteCardProps) {
   };
 
   const specialistName = getSpecialistName();
-  const truncatedName = specialistName.length > 32 
-    ? specialistName.substring(0, 29) + '...' 
-    : specialistName;
-
-  const getQuoteSummary = () => {
-    const parts = [];
-    if (quote.includes_materials) {
-      parts.push('Incluye materiales');
-    }
-    if (quote.estimated_duration_hours) {
-      parts.push(`${quote.estimated_duration_hours}h estimadas`);
-    }
-    return parts.join(' • ');
-  };
 
   const formatPrice = () => {
     if (quote.price_fixed) {
-      return `$${quote.price_fixed.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
+      return `$${quote.price_fixed.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
-    return `$${quote.price_min.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - $${quote.price_max.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
+    return `$${quote.price_min.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - $${quote.price_max.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
+  const formatDateTime = () => {
+    if (!quote.proposed_date) return null;
+    
+    const dateStr = format(new Date(quote.proposed_date), "d 'de' MMMM", { locale: es });
+    
+    if (quote.proposed_time_start) {
+      return `${dateStr} a las ${quote.proposed_time_start.slice(0, 5)}`;
+    }
+    
+    return dateStr;
   };
 
   return (
-    <Card 
-      className="p-5 hover:shadow-lg transition-all cursor-pointer bg-card border border-border/50"
+    <div 
+      className="bg-white rounded-2xl shadow-lg border-0 p-4 cursor-pointer hover:shadow-xl transition-shadow"
       onClick={() => navigate(`/chat/${quote.id}`)}
     >
-      <div className="flex gap-4">
-        <Avatar className="w-[70px] h-[70px] flex-shrink-0">
+      <div className="flex gap-3">
+        {/* Avatar */}
+        <Avatar className="w-14 h-14 flex-shrink-0">
           <AvatarImage src={specialist?.profiles?.avatar_url} />
-          <AvatarFallback className="bg-secondary text-secondary-foreground text-xl font-semibold">
+          <AvatarFallback className="bg-gray-100 text-foreground text-sm font-semibold">
             {getInitials(specialistName)}
           </AvatarFallback>
         </Avatar>
 
+        {/* Content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between mb-2">
+          {/* Name and Rating */}
+          <div className="flex items-start justify-between gap-2 mb-2">
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-lg mb-1 truncate" style={{ color: '#003049' }}>
-                {truncatedName}
+              <h3 className="font-bold text-foreground truncate">
+                {specialistName}
               </h3>
               {averageRating > 0 && (
-                <div className="inline-flex items-center gap-1.5 bg-muted px-2.5 py-1 rounded-full">
+                <div className="flex items-center gap-1 mt-1">
                   <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  <span className="font-semibold text-sm text-muted-foreground">
+                  <span className="text-sm font-semibold text-foreground">
                     {averageRating.toFixed(1)}
                   </span>
                   <span className="text-xs text-muted-foreground">
@@ -127,50 +125,41 @@ export function QuoteCard({ quote, orderId, unreadCount = 0 }: QuoteCardProps) {
               )}
             </div>
             
-            <div className="flex flex-col items-end gap-1 ml-2">
-              <span className="text-xs text-secondary">
-                {format(new Date(quote.created_at), 'dd MMM', { locale: es })}
-              </span>
-              {unreadCount > 0 && (
-                <div className="bg-accent text-accent-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
-                  {unreadCount}
-                </div>
-              )}
-            </div>
+            {/* Unread badge */}
+            {unreadCount > 0 && (
+              <div className="bg-accent text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                {unreadCount}
+              </div>
+            )}
           </div>
 
-          <p className="text-sm text-secondary mb-3 line-clamp-2">
-            {getQuoteSummary()}
-          </p>
+          {/* Date and Time */}
+          {formatDateTime() && (
+            <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
+              <Calendar className="w-4 h-4" />
+              <span>{formatDateTime()}</span>
+            </div>
+          )}
 
-          {/* Price in bottom right */}
-          <div className="flex justify-end pt-2 border-t">
-            <span className="text-base font-bold text-primary">
+          {/* Duration */}
+          {quote.estimated_duration_hours && (
+            <div className="flex items-center gap-1 text-sm text-muted-foreground mb-3">
+              <Clock className="w-4 h-4" />
+              <span>{quote.estimated_duration_hours}h estimadas</span>
+            </div>
+          )}
+
+          {/* Price */}
+          <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+            <span className="text-lg font-bold text-foreground">
               {formatPrice()}
             </span>
-          </div>
-
-          <div className="flex flex-wrap gap-2 mt-3">
-            {quote.includes_materials && (
-              <Badge variant="secondary" className="text-xs bg-muted text-muted-foreground border-0">
-                <Package className="w-3 h-3 mr-1" />
-                Materiales
-              </Badge>
-            )}
-            {quote.has_warranty && (
-              <Badge variant="secondary" className="text-xs bg-muted text-muted-foreground border-0">
-                <Shield className="w-3 h-3 mr-1" />
-                Garantía
-              </Badge>
-            )}
-            {specialist?.status === 'approved' && (
-              <Badge className="text-xs bg-foreground text-background">
-                Verificado
-              </Badge>
-            )}
+            <div className="bg-rappi-green text-white px-4 py-1.5 rounded-full text-sm font-semibold">
+              Ver detalles
+            </div>
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }
