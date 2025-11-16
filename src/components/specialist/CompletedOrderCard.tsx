@@ -82,7 +82,7 @@ export function CompletedOrderCard({
         <div className="flex gap-2 pt-2">
           
           
-          {!hasClientReview && <Button onClick={() => setShowClientReview(true)} className="flex-1 rounded-full h-10 font-semibold bg-primary hover:bg-primary/90" size="sm">
+          {!hasClientReview && <Button onClick={() => setShowClientReview(true)} className="flex-1 rounded-full h-10 font-semibold bg-rappi-green hover:bg-rappi-green/90 text-white" size="sm">
               <UserCheck className="w-4 h-4 mr-2" />
               Evaluar cliente
             </Button>}
