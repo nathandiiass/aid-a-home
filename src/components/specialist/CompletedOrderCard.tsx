@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ interface CompletedOrderCardProps {
 }
 
 export function CompletedOrderCard({ order, onReviewSubmitted }: CompletedOrderCardProps) {
+  const navigate = useNavigate();
   const request = order.request;
   const [showClientReview, setShowClientReview] = useState(false);
   
@@ -70,6 +72,7 @@ export function CompletedOrderCard({ order, onReviewSubmitted }: CompletedOrderC
 
         <div className="flex gap-2 pt-2">
           <Button 
+            onClick={() => navigate(`/specialist/request/${request?.id}`)}
             variant="outline" 
             className="flex-1 rounded-full border-2 border-gray-300 hover:bg-gray-50 h-10 font-semibold" 
             size="sm"
