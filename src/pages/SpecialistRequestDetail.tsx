@@ -99,17 +99,17 @@ export default function SpecialistRequestDetail() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center pb-20">
-        <div className="text-foreground">Cargando...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center pb-20">
+        <div className="text-foreground font-semibold">Cargando...</div>
       </div>
     );
   }
 
   if (!request) {
     return (
-      <div className="min-h-screen bg-background pb-20">
-        <div className="max-w-lg mx-auto p-6">
-          <p className="text-center text-secondary">Solicitud no encontrada</p>
+      <div className="min-h-screen bg-gray-50 pb-20">
+        <div className="max-w-2xl mx-auto p-6">
+          <p className="text-center text-foreground/60">Solicitud no encontrada</p>
         </div>
         <BottomNavSpecialist />
       </div>
@@ -117,14 +117,15 @@ export default function SpecialistRequestDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <div className="max-w-lg mx-auto">
+    <div className="min-h-screen bg-gray-50 pb-20">
+      <div className="max-w-2xl mx-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-background border-b border-border p-4 flex items-center gap-3 z-10">
+        <div className="sticky top-0 bg-white shadow-sm border-b border-gray-200 p-4 flex items-center gap-3 z-10">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate('/specialist')}
+            className="hover:bg-gray-100"
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
@@ -133,37 +134,37 @@ export default function SpecialistRequestDetail() {
           </h1>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-4 space-y-4">
           {/* Details */}
           <div className="space-y-4">
             {/* Especialista necesario */}
-            <Card className="p-4">
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">Especialista necesario</h3>
-              <p className="text-lg font-semibold text-foreground">{request.category}</p>
+            <Card className="bg-white rounded-2xl shadow-sm border-0 p-5">
+              <h3 className="text-sm font-semibold text-foreground/60 mb-2">Especialista necesario</h3>
+              <p className="text-lg font-bold text-foreground">{request.category}</p>
             </Card>
 
             {/* Título del servicio */}
-            <Card className="p-4">
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">Título del servicio</h3>
-              <p className="text-lg font-semibold text-foreground">
+            <Card className="bg-white rounded-2xl shadow-sm border-0 p-5">
+              <h3 className="text-sm font-semibold text-foreground/60 mb-2">Título del servicio</h3>
+              <p className="text-lg font-bold text-foreground">
                 {request.service_title || request.activity}
               </p>
             </Card>
 
             {/* Descripción del servicio */}
             {(request.service_description || request.description) && (
-              <Card className="p-4">
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">Descripción del servicio</h3>
-                <p className="text-foreground">{request.service_description || request.description}</p>
+              <Card className="bg-white rounded-2xl shadow-sm border-0 p-5">
+                <h3 className="text-sm font-semibold text-foreground/60 mb-3">Descripción del servicio</h3>
+                <p className="text-foreground leading-relaxed">{request.service_description || request.description}</p>
               </Card>
             )}
 
             {/* Presupuesto */}
-            <Card className="p-4">
-              <h3 className="text-sm font-medium text-muted-foreground mb-2">Presupuesto</h3>
-              <div className="flex items-center gap-2 text-primary font-semibold text-lg">
-                <DollarSign className="w-5 h-5" />
-                <span>
+            <Card className="bg-white rounded-2xl shadow-sm border-0 p-5">
+              <h3 className="text-sm font-semibold text-foreground/60 mb-3">Presupuesto</h3>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-foreground/50 uppercase tracking-wide">Rango</span>
+                <span className="font-bold text-xl text-foreground">
                   {request.price_min && request.price_max
                     ? `$${request.price_min} - $${request.price_max} MXN`
                     : request.price_min
@@ -176,12 +177,14 @@ export default function SpecialistRequestDetail() {
             </Card>
 
             {/* Fecha y Horario */}
-            <Card className="p-4 space-y-3">
-              <h3 className="text-sm font-medium text-muted-foreground mb-2">Fecha y horario</h3>
+            <Card className="bg-white rounded-2xl shadow-sm border-0 p-5 space-y-4">
+              <h3 className="text-sm font-semibold text-foreground/60 mb-1">Fecha y horario</h3>
               
               {request.scheduled_date && (
                 <div className="flex items-center gap-3">
-                  <Calendar className="w-5 h-5 text-primary" />
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-5 h-5 text-gray-600" />
+                  </div>
                   <div>
                     <p className="font-medium text-foreground">
                       {new Date(request.scheduled_date).toLocaleDateString('es-MX', {
@@ -196,9 +199,11 @@ export default function SpecialistRequestDetail() {
               )}
 
               <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-primary" />
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-5 h-5 text-gray-600" />
+                </div>
                 <div>
-                  <p className={`font-medium ${request.is_urgent ? "text-destructive font-semibold" : "text-foreground"}`}>
+                  <p className={`font-medium ${request.is_urgent ? "text-red-600 font-semibold" : "text-foreground"}`}>
                     {formatTimeDisplay()}
                   </p>
                 </div>
@@ -207,10 +212,12 @@ export default function SpecialistRequestDetail() {
 
             {/* Ubicación aproximada */}
             {request.locations && (
-              <Card className="p-4">
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">Ubicación aproximada</h3>
+              <Card className="bg-white rounded-2xl shadow-sm border-0 p-5">
+                <h3 className="text-sm font-semibold text-foreground/60 mb-3">Ubicación aproximada</h3>
                 <div className="flex items-center gap-3">
-                  <MapPin className="w-5 h-5 text-primary" />
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-5 h-5 text-gray-600" />
+                  </div>
                   <p className="font-medium text-foreground">
                     {request.locations.neighborhood}, {request.locations.city}
                   </p>
@@ -219,26 +226,26 @@ export default function SpecialistRequestDetail() {
             )}
 
             {request.evidence_urls && request.evidence_urls.length > 0 && (
-              <Card className="p-4">
-                <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+              <Card className="bg-white rounded-2xl shadow-sm border-0 p-5">
+                <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
                   <ImageIcon className="w-5 h-5" />
                   Evidencias
                 </h3>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-3">
                   {request.evidence_urls.map((url, index) => (
                     <img
                       key={index}
                       src={url}
                       alt={`Evidencia ${index + 1}`}
-                      className="w-full h-32 object-cover rounded-lg"
+                      className="w-full h-32 object-cover rounded-xl"
                     />
                   ))}
                 </div>
               </Card>
             )}
 
-            <Card className="p-4 bg-muted/20 border-l-4 border-primary">
-              <p className="text-sm text-foreground">
+            <Card className="bg-blue-50 rounded-2xl shadow-sm border-0 border-l-4 border-blue-500 p-5">
+              <p className="text-sm text-foreground/80">
                 Los datos exactos del cliente se mostrarán al enviar la cotización.
               </p>
             </Card>
@@ -246,7 +253,7 @@ export default function SpecialistRequestDetail() {
 
           <Button
             onClick={() => navigate(`/specialist/requests/${id}/quote`)}
-            className="w-full h-12 bg-accent hover:bg-accent/90 text-white text-base"
+            className="w-full h-12 bg-rappi-green hover:bg-rappi-green/90 text-white text-base font-semibold rounded-full"
           >
             Enviar cotización
           </Button>
