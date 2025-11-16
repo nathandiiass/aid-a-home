@@ -40,12 +40,13 @@ export const BottomNavSpecialist = () => {
             >
               <div className={cn(
                 "flex items-center justify-center transition-all",
-                isActive && item.label === 'Account' ? "w-10 h-10 rounded-full bg-white" : ""
+                isActive && item.label === 'Account' ? "w-10 h-10 rounded-full bg-white animate-bounce-in" : ""
               )}>
                 <Icon 
                   className={cn(
                     "w-6 h-6 transition-colors",
-                    isActive && item.label === 'Account' ? "text-red-600" : "text-white"
+                    isActive && item.label === 'Account' ? "text-red-600" : "text-white",
+                    isActive && "animate-bounce-in"
                   )} 
                 />
               </div>
