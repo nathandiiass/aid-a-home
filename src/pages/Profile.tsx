@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
-import { LogOut, User, Briefcase, ChevronRight, Star, Settings, Info } from 'lucide-react';
+import { LogOut, User, Briefcase, ChevronRight, MapPin, Settings, Bell, HelpCircle, FileText, CreditCard } from 'lucide-react';
 import { BottomNav } from '@/components/BottomNav';
 import { BottomNavSpecialist } from '@/components/BottomNavSpecialist';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,7 +21,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
-import { Logo } from '@/components/Logo';
 
 export default function Profile() {
   const { user, signOut, loading } = useAuth();
@@ -73,124 +72,132 @@ export default function Profile() {
 
   if (loading || checkingSpecialist || roleLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-foreground">Cargando...</div>
       </div>
     );
   }
 
-  // Menu items for specialist mode
-  const specialistMenuItems = [
-    {
-      icon: Star,
-      label: 'Reviews',
-      path: '/specialist/reviews',
-      available: false
-    },
-    {
-      icon: User,
-      label: 'Información personal',
-      path: '/specialist/personal-info',
-      available: true
-    },
-    {
-      icon: Settings,
-      label: 'Configuración',
-      path: '/specialist/settings',
-      available: false
-    },
-    {
-      icon: Info,
-      label: 'Más información',
-      path: '/specialist/more-info',
-      available: false
-    }
-  ];
+  const MenuItem = ({ 
+    icon: Icon, 
+    title, 
+    subtitle, 
+    onClick, 
+    showChevron = true,
+    disabled = false 
+  }: { 
+    icon: any; 
+    title: string; 
+    subtitle?: string; 
+    onClick?: () => void; 
+    showChevron?: boolean;
+    disabled?: boolean;
+  }) => (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        "w-full flex items-center gap-4 p-4 bg-white transition-colors",
+        disabled ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
+      )}
+    >
+      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+        <Icon className="w-5 h-5 text-gray-700" />
+      </div>
+      <div className="flex-1 text-left">
+        <p className="font-semibold text-gray-900 text-sm">{title}</p>
+        {subtitle && <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>}
+      </div>
+      {showChevron && <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />}
+    </button>
+  );
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <Logo className="pt-4 pb-2" />
-      <div className="max-w-lg mx-auto p-6">
+    <div className="min-h-screen bg-gray-50 pb-20">
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-lg mx-auto px-6 pt-6 pb-4">
+          <h1 className="text-2xl font-bold text-gray-900">Account</h1>
+        </div>
+      </div>
+
+      <div className="max-w-lg mx-auto px-6 py-6 space-y-6">
         {!user ? (
           // Not logged in view
-          <div className="space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">Tu cuenta</h1>
-              <p className="text-secondary">
-                Inicia sesión para guardar tus solicitudes, ver cotizaciones y registrar servicios.
-              </p>
-            </div>
-
-            <div className="bg-muted/30 rounded-lg p-8 text-center space-y-4">
-              <div className="w-20 h-20 rounded-full bg-muted mx-auto flex items-center justify-center">
-                <User className="w-10 h-10 text-secondary" />
+          <>
+            <div className="bg-white rounded-2xl shadow-lg p-8 text-center space-y-4">
+              <div className="w-20 h-20 rounded-full bg-gray-100 mx-auto flex items-center justify-center">
+                <User className="w-10 h-10 text-gray-400" />
               </div>
               
+              <div>
+                <p className="text-gray-600 mb-4">
+                  Inicia sesión para guardar tus solicitudes y ver cotizaciones.
+                </p>
+              </div>
+
               <Button
                 onClick={() => navigate('/auth')}
-                className="w-full h-12 text-base bg-accent hover:bg-accent/90"
+                className="w-full h-12 text-base bg-rappi-green hover:bg-rappi-green/90 rounded-full"
               >
                 Iniciar sesión
               </Button>
 
-              <p className="text-sm text-secondary">
+              <p className="text-sm text-gray-600">
                 ¿Aún no tienes cuenta?{' '}
                 <button
                   onClick={() => navigate('/auth')}
-                  className="text-accent hover:underline font-medium"
+                  className="text-rappi-green hover:underline font-semibold"
                 >
                   Crea una ahora
                 </button>
               </p>
             </div>
 
-            <div className="border border-border rounded-lg p-6 space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Briefcase className="w-6 h-6 text-primary" />
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="p-6 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-rappi-green/10 flex items-center justify-center">
+                    <Briefcase className="w-6 h-6 text-rappi-green" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-gray-900 text-base">Trabaja como especialista</h3>
+                    <p className="text-sm text-gray-500">Ofrece tus servicios y genera ingresos</p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground">Trabaja como especialista</h3>
-                  <p className="text-sm text-secondary">Ofrece tus servicios y genera ingresos</p>
-                </div>
+                <Button
+                  onClick={() => navigate('/auth')}
+                  className="w-full bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 rounded-full"
+                >
+                  Regístrate como especialista
+                </Button>
               </div>
-              <Button
-                onClick={() => navigate('/auth')}
-                variant="outline"
-                className="w-full"
-              >
-                Regístrate como especialista
-              </Button>
             </div>
-          </div>
+          </>
         ) : (
           // Logged in view
-          <div className="space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">
-                {user.user_metadata?.first_name || 'Usuario'}
-              </h1>
-              <p className="text-secondary">{user.email}</p>
-            </div>
-
-            <div className="bg-muted/30 rounded-lg p-6 space-y-4">
+          <>
+            {/* User Info Card */}
+            <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center">
-                  <User className="w-8 h-8 text-accent" />
+                <div className="w-16 h-16 rounded-full bg-rappi-green/10 flex items-center justify-center">
+                  <User className="w-8 h-8 text-rappi-green" />
                 </div>
-                <div>
-                  <p className="font-semibold text-foreground">
-                    {user.user_metadata?.first_name} {user.user_metadata?.last_name}
+                <div className="flex-1">
+                  <p className="font-bold text-gray-900 text-base">
+                    {user.user_metadata?.first_name || 'Usuario'} {user.user_metadata?.last_name || ''}
                   </p>
-                  <p className="text-sm text-secondary">Miembro desde {new Date(user.created_at).toLocaleDateString('es-MX')}</p>
+                  <p className="text-sm text-gray-500">{user.email}</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Miembro desde {new Date(user.created_at).toLocaleDateString('es-MX', { month: 'short', year: 'numeric' })}
+                  </p>
                 </div>
               </div>
 
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button
-                    variant="secondary"
-                    className="w-full bg-muted hover:bg-muted/80 text-primary"
+                    variant="outline"
+                    className="w-full border-gray-200 hover:bg-gray-50 text-gray-900 rounded-full"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
                     Cerrar sesión
@@ -207,7 +214,7 @@ export default function Profile() {
                     <AlertDialogCancel>Cancelar</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleSignOut}
-                      className="bg-accent hover:bg-accent/90"
+                      className="bg-rappi-green hover:bg-rappi-green/90"
                     >
                       Sí, cerrar sesión
                     </AlertDialogAction>
@@ -216,88 +223,91 @@ export default function Profile() {
               </AlertDialog>
             </div>
 
-            {isSpecialistMode && isSpecialist && specialistId ? (
-              <div className="space-y-3">
-                {specialistMenuItems.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <button
-                      key={item.path}
-                      onClick={() => item.available && navigate(item.path)}
-                      disabled={!item.available}
-                      className={cn(
-                        "w-full flex items-center justify-between p-4 bg-background rounded-xl border border-border transition-all",
-                        item.available 
-                          ? "hover:shadow-md hover:border-primary/20 cursor-pointer" 
-                          : "opacity-50 cursor-not-allowed"
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Icon className="w-5 h-5 text-primary" />
-                        </div>
-                        <span className="font-medium text-foreground">{item.label}</span>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                    </button>
-                  );
-                })}
+            {/* My Account Section */}
+            <div className="space-y-3">
+              <h2 className="text-lg font-bold text-gray-900 px-2">My account</h2>
+              <div className="bg-white rounded-2xl shadow-lg overflow-hidden divide-y divide-gray-100">
+                <MenuItem
+                  icon={User}
+                  title="Información personal"
+                  subtitle="Editar nombre, apellidos, teléfono y más"
+                  onClick={() => navigate('/profile/personal-info')}
+                />
+                <MenuItem
+                  icon={MapPin}
+                  title="Direcciones"
+                  subtitle="Administra tus ubicaciones guardadas"
+                  onClick={() => navigate('/locations')}
+                />
+                <MenuItem
+                  icon={CreditCard}
+                  title="Métodos de pago"
+                  subtitle="Tarjetas y formas de pago"
+                  disabled
+                />
+                <MenuItem
+                  icon={FileText}
+                  title="Información de facturación"
+                  subtitle="Datos fiscales y facturación"
+                  disabled
+                />
               </div>
-            ) : (
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold text-foreground">Mi cuenta</h2>
-                <div className="border border-border rounded-lg divide-y divide-border">
-                  <button 
-                    onClick={() => navigate('/profile/personal-info')}
-                    className="w-full px-4 py-3 text-left hover:bg-muted/30 transition-colors"
-                  >
-                    <p className="font-medium text-foreground">Información personal</p>
-                    <p className="text-sm text-secondary">Editar nombre, apellidos, teléfono y más</p>
-                  </button>
-                  <button className="w-full px-4 py-3 text-left hover:bg-muted/30 transition-colors">
-                    <p className="font-medium text-foreground">Configuración</p>
-                    <p className="text-sm text-secondary">Idioma, notificaciones, privacidad</p>
-                  </button>
-                  <button 
-                    onClick={() => navigate('/locations')}
-                    className="w-full px-4 py-3 text-left hover:bg-muted/30 transition-colors"
-                  >
-                    <p className="font-medium text-foreground">Ubicaciones</p>
-                    <p className="text-sm text-secondary">Administra tus direcciones guardadas</p>
-                  </button>
-                </div>
-              </div>
-            )}
+            </div>
 
+            {/* Settings Section */}
+            <div className="space-y-3">
+              <h2 className="text-lg font-bold text-gray-900 px-2">Configuración</h2>
+              <div className="bg-white rounded-2xl shadow-lg overflow-hidden divide-y divide-gray-100">
+                <MenuItem
+                  icon={Settings}
+                  title="Preferencias"
+                  subtitle="Idioma, notificaciones, privacidad"
+                  disabled
+                />
+                <MenuItem
+                  icon={Bell}
+                  title="Notificaciones"
+                  subtitle="Configura tus alertas"
+                  disabled
+                />
+                <MenuItem
+                  icon={HelpCircle}
+                  title="Ayuda"
+                  subtitle="Centro de ayuda y soporte"
+                  disabled
+                />
+              </div>
+            </div>
+
+            {/* Specialist Mode Toggle or Registration */}
             {!isSpecialist ? (
-              <div className="border border-border rounded-lg p-6 space-y-3">
+              <div className="bg-white rounded-2xl shadow-lg p-6 space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Briefcase className="w-6 h-6 text-primary" />
+                  <div className="w-12 h-12 rounded-full bg-rappi-green/10 flex items-center justify-center">
+                    <Briefcase className="w-6 h-6 text-rappi-green" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-foreground">Trabaja como especialista</h3>
-                    <p className="text-sm text-secondary">Ofrece tus servicios y genera ingresos</p>
+                    <h3 className="font-bold text-gray-900 text-base">Trabaja como especialista</h3>
+                    <p className="text-sm text-gray-500">Ofrece tus servicios y genera ingresos</p>
                   </div>
                 </div>
                 <Button 
-                  variant="outline" 
-                  className="w-full"
+                  className="w-full bg-rappi-green hover:bg-rappi-green/90 rounded-full"
                   onClick={() => navigate('/specialist-registration')}
                 >
                   Regístrate como especialista
                 </Button>
               </div>
             ) : (
-              <div className="border border-border rounded-lg p-6 space-y-3">
+              <div className="bg-white rounded-2xl shadow-lg p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Briefcase className="w-6 h-6 text-primary" />
+                    <div className="w-12 h-12 rounded-full bg-rappi-green/10 flex items-center justify-center">
+                      <Briefcase className="w-6 h-6 text-rappi-green" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-foreground">Modo especialista</h3>
-                      <p className="text-sm text-secondary">Ver solicitudes de servicio</p>
+                      <h3 className="font-bold text-gray-900 text-base">Modo especialista</h3>
+                      <p className="text-sm text-gray-500">Ver solicitudes de servicio</p>
                     </div>
                   </div>
                   <Switch
@@ -312,7 +322,7 @@ export default function Profile() {
                 </div>
               </div>
             )}
-          </div>
+          </>
         )}
       </div>
 
