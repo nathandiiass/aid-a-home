@@ -136,63 +136,63 @@ export function InProgressWorks() {
           return (
             <Card
               key={work.id}
-              className="flex-shrink-0 w-[320px] bg-white rounded-2xl shadow-sm border-0 p-6 cursor-pointer hover:shadow-md transition-all"
+              className="flex-shrink-0 w-[300px] bg-white rounded-2xl shadow-sm border-0 p-4 cursor-pointer hover:shadow-md transition-all"
               onClick={() => navigate(`/chat/${work.quote.id}`)}
             >
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {/* Header */}
-                <div>
-                  <h3 className="font-bold text-lg text-foreground mb-2">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="font-bold text-base text-foreground line-clamp-2">
                     {work.service_title || work.activity}
                   </h3>
                   <Badge 
-                    className="bg-rappi-green/10 text-rappi-green border-0 rounded-full px-3 py-1 text-xs font-medium"
+                    className="bg-rappi-green text-white border-0 rounded-full px-2.5 py-0.5 text-xs font-medium flex-shrink-0 animate-pulse"
                   >
                     En curso
                   </Badge>
                 </div>
 
                 {/* Details */}
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {work.specialist && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                        <User className="w-4 h-4 text-gray-600" />
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                        <User className="w-3.5 h-3.5 text-gray-600" />
                       </div>
-                      <span className="text-sm text-foreground/70">
+                      <span className="text-xs text-foreground/70">
                         {work.specialist.first_name} {work.specialist.last_name_paterno}
                       </span>
                     </div>
                   )}
 
                   {work.quote.proposed_date && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                        <Calendar className="w-4 h-4 text-gray-600" />
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-3.5 h-3.5 text-gray-600" />
                       </div>
-                      <span className="text-sm text-foreground/70">
+                      <span className="text-xs text-foreground/70">
                         {format(new Date(work.quote.proposed_date), 'dd MMM yyyy', { locale: es })}
                       </span>
                     </div>
                   )}
 
                   {work.quote.proposed_time_start && work.quote.proposed_time_end && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                        <Clock className="w-4 h-4 text-gray-600" />
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                        <Clock className="w-3.5 h-3.5 text-gray-600" />
                       </div>
-                      <span className="text-sm text-foreground/70">
+                      <span className="text-xs text-foreground/70">
                         {work.quote.proposed_time_start.slice(0, 5)} - {work.quote.proposed_time_end.slice(0, 5)}
                       </span>
                     </div>
                   )}
 
                   {work.locations && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                        <MapPin className="w-4 h-4 text-gray-600" />
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                        <MapPin className="w-3.5 h-3.5 text-gray-600" />
                       </div>
-                      <span className="text-sm text-foreground/70">
+                      <span className="text-xs text-foreground/70 line-clamp-1">
                         {work.locations.neighborhood ? `${work.locations.neighborhood}, ` : ''}{work.locations.city}
                       </span>
                     </div>
@@ -200,10 +200,10 @@ export function InProgressWorks() {
                 </div>
 
                 {/* Price */}
-                <div className="pt-4 mt-4 border-t border-gray-100">
+                <div className="pt-3 mt-3 border-t border-gray-100">
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-foreground/50 uppercase tracking-wide">Precio</span>
-                    <span className="font-bold text-lg text-foreground">
+                    <span className="font-bold text-base text-foreground">
                       {getPrice()}
                     </span>
                   </div>
