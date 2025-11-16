@@ -875,19 +875,21 @@ export default function SpecialistRegistration() {
                       className="bg-white rounded-xl border-2 border-border overflow-hidden"
                     >
                       {/* Header colapsable de la especialidad */}
-                      <CollapsibleTrigger className="w-full p-6 hover:bg-muted/30 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-rappi-green/10 flex items-center justify-center flex-shrink-0">
-                            <span className="text-rappi-green font-bold text-lg">✓</span>
+                      <CollapsibleTrigger asChild>
+                        <button className="w-full p-6 hover:bg-muted/30 transition-colors text-left">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-rappi-green/10 flex items-center justify-center flex-shrink-0">
+                              <span className="text-rappi-green font-bold text-lg">✓</span>
+                            </div>
+                            <h4 className="text-xl font-bold text-foreground flex-1">{displayName}</h4>
+                            <ChevronDown 
+                              className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                            />
                           </div>
-                          <h4 className="text-xl font-bold text-foreground flex-1 text-left">{displayName}</h4>
-                          <ChevronDown 
-                            className={`h-5 w-5 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                          />
-                        </div>
+                        </button>
                       </CollapsibleTrigger>
 
-                      <CollapsibleContent>
+                      <CollapsibleContent className="data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up">
                         <div className="p-6 pt-0 space-y-6 border-t-2 border-border">
                           {/* Años de experiencia */}
                           <div className="space-y-2">
