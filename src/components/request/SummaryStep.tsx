@@ -2,13 +2,7 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { RequestData } from "@/pages/CreateRequest";
-import {
-  DollarSign,
-  Calendar,
-  MapPin,
-  Camera,
-  Edit,
-} from "lucide-react";
+import { DollarSign, Calendar, MapPin, Camera, Edit } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,14 +18,14 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
-  const editOrderId = searchParams.get('edit');
+  const editOrderId = searchParams.get("edit");
   const isEditMode = !!editOrderId;
 
   const handlePublish = async () => {
     // Check if user is logged in
     if (!user) {
       // Save request data to localStorage
-      localStorage.setItem('pendingRequest', JSON.stringify(data));
+      localStorage.setItem("pendingRequest", JSON.stringify(data));
       toast.info("Inicia sesión para publicar tu solicitud");
       navigate("/auth");
       return;
@@ -68,22 +62,20 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
       let evidenceUrls: string[] = [];
       if (data.evidence && data.evidence.length > 0) {
         // Filter out any undefined or invalid files
-        const validFiles = data.evidence.filter((file): file is File => 
-          file instanceof File && file.name && file.size > 0
+        const validFiles = data.evidence.filter(
+          (file): file is File => file instanceof File && file.name && file.size > 0,
         );
 
         const uploadPromises = validFiles.map(async (file, index) => {
-          const fileExt = file.name.split('.').pop();
+          const fileExt = file.name.split(".").pop();
           const fileName = `${user.id}/${Date.now()}_${index}.${fileExt}`;
-          
-          const { error: uploadError } = await supabase.storage
-            .from('specialist-documents')
-            .upload(fileName, file);
+
+          const { error: uploadError } = await supabase.storage.from("specialist-documents").upload(fileName, file);
 
           if (uploadError) throw uploadError;
 
           const { data, error: urlError } = await supabase.storage
-            .from('specialist-documents')
+            .from("specialist-documents")
             .createSignedUrl(fileName, 31536000); // 1 year expiry
 
           if (urlError) throw urlError;
@@ -98,16 +90,16 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
       if (isEditMode) {
         // Update existing request
         const { error: updateError } = await supabase
-          .from('service_requests')
+          .from("service_requests")
           .update({
             activity: validatedData.actividad || validatedData.serviceTitle,
             category: validatedData.especialista,
             service_title: validatedData.serviceTitle,
             service_description: validatedData.serviceDescription,
-            status: 'active',
+            status: "active",
             price_min: validatedData.budgetMin || null,
             price_max: validatedData.budgetMax || null,
-            scheduled_date: validatedData.date ? validatedData.date.toISOString().split('T')[0] : null,
+            scheduled_date: validatedData.date ? validatedData.date.toISOString().split("T")[0] : null,
             time_start: data.timeStart || null,
             time_end: data.timeEnd || null,
             time_preference: data.timeOption || null,
@@ -116,7 +108,7 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
             description: null,
             evidence_urls: evidenceUrls.length > 0 ? evidenceUrls : null,
           })
-          .eq('id', editOrderId);
+          .eq("id", editOrderId);
 
         if (updateError) throw updateError;
 
@@ -124,17 +116,17 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
       } else {
         // Create new request
         const { error: insertError } = await supabase
-          .from('service_requests')
+          .from("service_requests")
           .insert({
             user_id: user.id,
             activity: validatedData.actividad || validatedData.serviceTitle,
             category: validatedData.especialista,
             service_title: validatedData.serviceTitle,
             service_description: validatedData.serviceDescription,
-            status: 'active',
+            status: "active",
             price_min: validatedData.budgetMin || null,
             price_max: validatedData.budgetMax || null,
-            scheduled_date: validatedData.date ? validatedData.date.toISOString().split('T')[0] : null,
+            scheduled_date: validatedData.date ? validatedData.date.toISOString().split("T")[0] : null,
             time_start: data.timeStart || null,
             time_end: data.timeEnd || null,
             time_preference: data.timeOption || null,
@@ -151,12 +143,12 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
         toast.success("¡Solicitud publicada exitosamente!");
       }
       // Clear pending request
-      localStorage.removeItem('pendingRequest');
+      localStorage.removeItem("pendingRequest");
 
       navigate("/orders?tab=active");
     } catch (error: any) {
-      console.error('Error publishing request:', error);
-      
+      console.error("Error publishing request:", error);
+
       if (error instanceof z.ZodError) {
         // Show specific validation errors
         const firstError = error.errors[0];
@@ -200,9 +192,7 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
     <div className="space-y-4">
       <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
         <h2 className="text-xl font-bold mb-2">Resumen</h2>
-        <p className="text-muted-foreground text-sm">
-          Revisa tu solicitud antes de publicarla
-        </p>
+        <p className="text-muted-foreground text-sm">Revisa tu solicitud antes de publicarla</p>
       </div>
 
       {/* Service info */}
@@ -214,51 +204,46 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
           <div className="flex-1">
             <div className="flex items-center justify-between mb-1">
               <h3 className="font-bold text-lg">{data.serviceTitle}</h3>
-              <button
-                onClick={() => goToStep(0)}
-                className="text-rappi-green text-sm font-semibold hover:underline"
-              >
+              <button onClick={() => goToStep(0)} className="text-rappi-green text-sm font-semibold hover:underline">
                 Editar
               </button>
             </div>
             <p className="text-muted-foreground text-sm mb-2">{data.especialista}</p>
             <p className="text-sm text-muted-foreground">{data.serviceDescription}</p>
-            
+
             {/* Evidence section */}
             {data.evidence && data.evidence.filter((file): file is File => file instanceof File).length > 0 && (
               <div className="mt-4 pt-4 border-t border-gray-100">
                 <p className="font-semibold text-sm mb-3">Evidencias</p>
                 <div className="grid grid-cols-3 gap-2">
-                  {data.evidence.filter((file): file is File => file instanceof File).map((file, index) => {
-                    const isImage = file.type.startsWith('image/');
-                    const isVideo = file.type.startsWith('video/');
-                    const preview = URL.createObjectURL(file);
-                    
-                    return (
-                      <div 
-                        key={index} 
-                        className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 cursor-pointer hover:opacity-80 transition-opacity"
-                        onClick={() => {
-                          if (isImage) {
-                            window.open(preview, '_blank');
-                          }
-                        }}
-                      >
-                        {isImage && (
-                          <img 
-                            src={preview} 
-                            alt={`Evidencia ${index + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                        )}
-                        {isVideo && (
-                          <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                            <Camera className="w-6 h-6 text-muted-foreground" />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                  {data.evidence
+                    .filter((file): file is File => file instanceof File)
+                    .map((file, index) => {
+                      const isImage = file.type.startsWith("image/");
+                      const isVideo = file.type.startsWith("video/");
+                      const preview = URL.createObjectURL(file);
+
+                      return (
+                        <div
+                          key={index}
+                          className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => {
+                            if (isImage) {
+                              window.open(preview, "_blank");
+                            }
+                          }}
+                        >
+                          {isImage && (
+                            <img src={preview} alt={`Evidencia ${index + 1}`} className="w-full h-full object-cover" />
+                          )}
+                          {isVideo && (
+                            <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                              <Camera className="w-6 h-6 text-muted-foreground" />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
             )}
@@ -276,9 +261,7 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
             <div>
               <p className="font-bold mb-1">Presupuesto</p>
               {data.noBudget ? (
-                <p className="text-muted-foreground text-sm">
-                  Sin presupuesto definido
-                </p>
+                <p className="text-muted-foreground text-sm">Sin presupuesto definido</p>
               ) : (
                 <p className="text-muted-foreground text-sm">
                   ${data.budgetMin} - ${data.budgetMax}
@@ -305,9 +288,7 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
             <div>
               <p className="font-bold mb-1">Fecha y horario</p>
               <p className="text-muted-foreground text-sm">{formatDate(data.date)}</p>
-              <p className="text-muted-foreground text-sm mt-1">
-                {formatTimeOption(data.timeOption)}
-              </p>
+              <p className="text-muted-foreground text-sm mt-1">{formatTimeOption(data.timeOption)}</p>
             </div>
           </div>
           <button
@@ -328,9 +309,7 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-bold mb-1">{data.location?.label}</p>
-              <p className="text-muted-foreground text-sm">
-                {data.location?.address}
-              </p>
+              <p className="text-muted-foreground text-sm">{data.location?.address}</p>
             </div>
           </div>
           <button
@@ -342,13 +321,12 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
         </div>
       </div>
 
-
       <Button
         onClick={handlePublish}
         disabled={isPublishing}
         className="w-full bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-12 font-semibold"
       >
-        {isPublishing ? "Guardando..." : isEditMode ? "Guardar cambios" : "Publicar solicitud"}
+        {isPublishing ? "Guardando..." : isEditMode ? "Guardar cambios" : "Publicar"}
       </Button>
     </div>
   );
