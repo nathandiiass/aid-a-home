@@ -272,89 +272,87 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
         <TabsContent value="new" className="mt-0">
           <Card className="bg-white rounded-2xl shadow-sm border-0 p-6">
             <div className="space-y-5">
-              <div className="grid grid-cols-2 gap-5">
-                <div className="col-span-2">
-                  <Label htmlFor="state" className="text-sm font-semibold text-gray-900 mb-2 block">
-                    Estado *
-                  </Label>
-                  <Select value={state} onValueChange={setState}>
-                    <SelectTrigger className="h-12 bg-white border-gray-200 rounded-xl">
-                      <SelectValue placeholder="Selecciona un estado" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white z-50">
-                      {ESTADOS_MEXICO.map((estado) => (
-                        <SelectItem key={estado} value={estado}>
-                          {estado}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div>
+                <Label htmlFor="state" className="text-sm font-semibold text-gray-900 mb-2 block">
+                  Estado *
+                </Label>
+                <Select value={state} onValueChange={setState}>
+                  <SelectTrigger className="h-12 bg-white border-gray-200 rounded-xl">
+                    <SelectValue placeholder="Selecciona un estado" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white z-50">
+                    {ESTADOS_MEXICO.map((estado) => (
+                      <SelectItem key={estado} value={estado}>
+                        {estado}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-                <div className="col-span-2">
-                  <Label htmlFor="city" className="text-sm font-semibold text-gray-900 mb-2 block">
-                    Ciudad/Municipio *
-                  </Label>
-                  <Input
-                    id="city"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    placeholder="Ej: Monterrey"
-                    className="h-12 bg-white border-gray-200 rounded-xl"
-                  />
-                </div>
+              <div>
+                <Label htmlFor="city" className="text-sm font-semibold text-gray-900 mb-2 block">
+                  Ciudad/Municipio *
+                </Label>
+                <Input
+                  id="city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Ej: Monterrey"
+                  className="h-12 bg-white border-gray-200 rounded-xl"
+                />
+              </div>
 
-                <div className="col-span-2">
-                  <Label htmlFor="neighborhood" className="text-sm font-semibold text-gray-900 mb-2 block">
-                    Colonia *
-                  </Label>
-                  <Input
-                    id="neighborhood"
-                    value={neighborhood}
-                    onChange={(e) => setNeighborhood(e.target.value)}
-                    placeholder="Ej: Centro"
-                    className="h-12 bg-white border-gray-200 rounded-xl"
-                  />
-                </div>
+              <div>
+                <Label htmlFor="neighborhood" className="text-sm font-semibold text-gray-900 mb-2 block">
+                  Colonia *
+                </Label>
+                <Input
+                  id="neighborhood"
+                  value={neighborhood}
+                  onChange={(e) => setNeighborhood(e.target.value)}
+                  placeholder="Ej: Centro"
+                  className="h-12 bg-white border-gray-200 rounded-xl"
+                />
+              </div>
 
-                <div className="col-span-2">
-                  <Label htmlFor="street" className="text-sm font-semibold text-gray-900 mb-2 block">
-                    Calle *
-                  </Label>
-                  <Input
-                    id="street"
-                    value={street}
-                    onChange={(e) => setStreet(e.target.value)}
-                    placeholder="Ej: Avenida Juárez"
-                    className="h-12 bg-white border-gray-200 rounded-xl"
-                  />
-                </div>
+              <div>
+                <Label htmlFor="street" className="text-sm font-semibold text-gray-900 mb-2 block">
+                  Calle *
+                </Label>
+                <Input
+                  id="street"
+                  value={street}
+                  onChange={(e) => setStreet(e.target.value)}
+                  placeholder="Ej: Avenida Juárez"
+                  className="h-12 bg-white border-gray-200 rounded-xl"
+                />
+              </div>
 
-                <div>
-                  <Label htmlFor="extNumber" className="text-sm font-semibold text-gray-900 mb-2 block">
-                    Número exterior *
-                  </Label>
-                  <Input
-                    id="extNumber"
-                    value={extNumber}
-                    onChange={(e) => setExtNumber(e.target.value)}
-                    placeholder="Ej: 123"
-                    className="h-12 bg-white border-gray-200 rounded-xl"
-                  />
-                </div>
+              <div>
+                <Label htmlFor="extNumber" className="text-sm font-semibold text-gray-900 mb-2 block">
+                  Número exterior *
+                </Label>
+                <Input
+                  id="extNumber"
+                  value={extNumber}
+                  onChange={(e) => setExtNumber(e.target.value)}
+                  placeholder="Ej: 123"
+                  className="h-12 bg-white border-gray-200 rounded-xl"
+                />
+              </div>
 
-                <div>
-                  <Label htmlFor="intNumber" className="text-sm font-semibold text-gray-900 mb-2 block">
-                    Número interior
-                  </Label>
-                  <Input
-                    id="intNumber"
-                    value={intNumber}
-                    onChange={(e) => setIntNumber(e.target.value)}
-                    placeholder="Ej: 4B"
-                    className="h-12 bg-white border-gray-200 rounded-xl"
-                  />
-                </div>
+              <div>
+                <Label htmlFor="intNumber" className="text-sm font-semibold text-gray-900 mb-2 block">
+                  Número interior
+                </Label>
+                <Input
+                  id="intNumber"
+                  value={intNumber}
+                  onChange={(e) => setIntNumber(e.target.value)}
+                  placeholder="Ej: 4B"
+                  className="h-12 bg-white border-gray-200 rounded-xl"
+                />
               </div>
 
               {user && (
