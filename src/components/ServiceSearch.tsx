@@ -125,7 +125,7 @@ const ServiceSearch = () => {
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
         <Input
           type="text"
-          placeholder="Search for &quot;beer&quot;"
+          placeholder="¿Qué especialista necesitas?"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-12 h-12 text-base bg-white border-gray-200 rounded-2xl focus-visible:ring-2 focus-visible:ring-blue-500 shadow-sm"
@@ -178,9 +178,7 @@ const ServiceSearch = () => {
                         className="w-full p-3 text-left hover:bg-gray-50 transition-colors rounded-xl flex items-center gap-3"
                       >
                         <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-                          <span className="text-green-700 font-bold text-sm">
-                            {service.actividad.charAt(0)}
-                          </span>
+                          <span className="text-green-700 font-bold text-sm">{service.actividad.charAt(0)}</span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-gray-900 text-sm">{service.actividad}</p>
