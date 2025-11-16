@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Plus, X, ChevronDown } from 'lucide-react';
+import { ChevronLeft, Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,7 +12,6 @@ import { Logo } from '@/components/Logo';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import confetti from 'canvas-confetti';
 
 interface Specialty {
@@ -787,43 +786,33 @@ export default function SpecialistRegistration() {
         )}
 
         {step === 2 && (
-          <div className="space-y-8 animate-fade-in">
-            <div className="text-center space-y-3 mb-8">
-              <h2 className="text-4xl font-bold text-foreground">Especialidades y Servicios</h2>
-              <p className="text-lg text-muted-foreground">Selecciona tus áreas de expertise y servicios</p>
+          <div className="space-y-6">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-foreground mb-2">Especialidades y Servicios</h2>
+              <p className="text-sm text-muted-foreground">Selecciona tus áreas de especialización</p>
             </div>
 
-            <div className="bg-white rounded-3xl shadow-card border border-border/50 p-8 space-y-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-center gap-3 pb-4 border-b border-border/30">
-                <div className="w-2 h-8 bg-rappi-green rounded-full"></div>
-                <Label className="text-xl font-bold text-foreground">Especialista en: * (Selección múltiple)</Label>
-              </div>
-              <div className="grid grid-cols-1 gap-3">
+            <div className="bg-white rounded-2xl shadow-lg border-0 p-6 space-y-4">
+              <Label className="text-sm font-semibold">Especialista en: * (Selección múltiple)</Label>
+              <div className="grid grid-cols-1 gap-4">
                 {availableSpecialties.map(([category, specialties]) => (
-                  <Collapsible key={category} defaultOpen>
-                    <div className="border-2 border-border rounded-xl overflow-hidden">
-                      <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-rappi-green/5 transition-colors group">
-                        <h3 className="font-bold text-sm text-rappi-green">{category}</h3>
-                        <ChevronDown className="h-5 w-5 text-rappi-green transition-transform group-data-[state=open]:rotate-180" />
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <div className="grid grid-cols-1 gap-2 p-4 pt-0">
-                          {specialties.map((specialty) => (
-                            <div key={specialty} className="flex items-center space-x-3 p-3 border-2 border-border rounded-xl hover:border-rappi-green/30 hover:bg-rappi-green/5 transition-all">
-                              <Checkbox
-                                id={`specialty-${specialty}`}
-                                checked={selectedSpecialties.includes(specialty)}
-                                onCheckedChange={() => toggleSpecialtySelection(specialty)}
-                              />
-                              <Label htmlFor={`specialty-${specialty}`} className="flex-1 cursor-pointer font-normal text-sm">
-                                {specialty}
-                              </Label>
-                            </div>
-                          ))}
+                  <div key={category} className="space-y-3">
+                    <h3 className="font-bold text-sm text-rappi-green">{category}</h3>
+                    <div className="grid grid-cols-1 gap-2 ml-4">
+                      {specialties.map((specialty) => (
+                        <div key={specialty} className="flex items-center space-x-3 p-3 border-2 border-border rounded-xl hover:border-rappi-green/30 hover:bg-rappi-green/5 transition-all">
+                          <Checkbox
+                            id={`specialty-${specialty}`}
+                            checked={selectedSpecialties.includes(specialty)}
+                            onCheckedChange={() => toggleSpecialtySelection(specialty)}
+                          />
+                          <Label htmlFor={`specialty-${specialty}`} className="flex-1 cursor-pointer font-normal text-sm">
+                            {specialty}
+                          </Label>
                         </div>
-                      </CollapsibleContent>
+                      ))}
                     </div>
-                  </Collapsible>
+                  </div>
                 ))}
                 <div className="flex items-center space-x-3 p-3 border-2 border-border rounded-xl hover:border-rappi-green/30 hover:bg-rappi-green/5 transition-all">
                   <Checkbox
@@ -836,7 +825,7 @@ export default function SpecialistRegistration() {
                   </Label>
                 </div>
                 {showOtherSpecialty && (
-                  <div className="flex gap-2 animate-fade-in">
+                  <div className="ml-6 flex gap-2 animate-fade-in">
                     <Input
                       placeholder="Escribe tu especialidad"
                       value={otherSpecialtyText}
