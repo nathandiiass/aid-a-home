@@ -376,7 +376,9 @@ export default function Chat() {
             className="flex items-center gap-3 flex-1 min-w-0 text-left"
             onClick={() => {
               if (!isSpecialistMode && quote?.specialist?.id) {
-                navigate(`/specialist/${quote.specialist.id}/profile?quoteId=${quoteId}`);
+                navigate(`/specialist/${quote.specialist.id}/profile`);
+              } else if (isSpecialistMode && quote?.request?.user_id) {
+                navigate(`/user/${quote.request.user_id}/profile`);
               }
             }}
           >
