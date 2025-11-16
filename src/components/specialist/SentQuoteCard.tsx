@@ -88,63 +88,73 @@ export const SentQuoteCard = ({ quote }: SentQuoteCardProps) => {
 
   return (
     <Card 
-      className="p-4 hover:shadow-md transition-shadow cursor-pointer border border-border"
+      className="bg-white rounded-2xl shadow-md border-0 p-5 hover:shadow-xl transition-all cursor-pointer"
       onClick={handleClick}
     >
-      <div className="space-y-3">
-        {/* Header with title and status badge on top right */}
+      <div className="space-y-4">
+        {/* Header with title and status badge */}
         <div className="flex justify-between items-start gap-3">
-          <h3 className="font-semibold text-foreground text-lg flex-1">
+          <h3 className="font-bold text-foreground text-lg flex-1">
             {request?.service_title || request?.activity}
           </h3>
           {getStatusBadge(quote.status)}
         </div>
 
-        {/* Date */}
-        {getDisplayDate() && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Calendar className="w-4 h-4 text-primary flex-shrink-0" />
-            <span>
-              {format(new Date(getDisplayDate()), "EEE d MMM", { locale: es })}
+        <div className="space-y-3">
+          {/* Date */}
+          {getDisplayDate() && (
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <Calendar className="w-4 h-4 text-gray-600" />
+              </div>
+              <span className="text-sm text-foreground/70">
+                {format(new Date(getDisplayDate()), "EEE d MMM", { locale: es })}
+              </span>
+            </div>
+          )}
+
+          {/* Time */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+              <Clock className="w-4 h-4 text-gray-600" />
+            </div>
+            <span className={`text-sm ${request?.is_urgent ? "text-red-600 font-semibold" : "text-foreground/70"}`}>
+              {request?.is_urgent ? "¡Urgente!" : formatTimeDisplay()}
             </span>
           </div>
-        )}
 
-        {/* Time */}
-        <div className="flex items-center gap-2 text-sm">
-          <Clock className="w-4 h-4 text-primary flex-shrink-0" />
-          <span className={request?.is_urgent ? "text-destructive font-semibold" : "text-muted-foreground"}>
-            {request?.is_urgent ? "¡Urgente!" : formatTimeDisplay()}
-          </span>
-        </div>
-
-        {/* Duration */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Timer className="w-4 h-4 text-primary flex-shrink-0" />
-          <span>{formatDuration()}</span>
-        </div>
-
-        {/* Location */}
-        {location && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
-            <span>
-              {location.neighborhood && `${location.neighborhood}, `}
-              {location.city}
-            </span>
+          {/* Duration */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+              <Timer className="w-4 h-4 text-gray-600" />
+            </div>
+            <span className="text-sm text-foreground/70">{formatDuration()}</span>
           </div>
-        )}
 
-        {/* Price - bottom right */}
-        <div className="flex justify-end pt-2 border-t">
-          <div className="flex items-center gap-2">
-            <DollarSign className="w-5 h-5 text-accent" />
-            <span className="font-bold text-accent text-base">{formatPrice()}</span>
+          {/* Location */}
+          {location && (
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <MapPin className="w-4 h-4 text-gray-600" />
+              </div>
+              <span className="text-sm text-foreground/70">
+                {location.neighborhood && `${location.neighborhood}, `}
+                {location.city}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Price */}
+        <div className="pt-3 mt-3 border-t border-gray-100">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-foreground/50 uppercase tracking-wide">Precio</span>
+            <span className="font-bold text-base text-foreground">{formatPrice()}</span>
           </div>
         </div>
 
         {/* Sent date */}
-        <div className="text-xs text-muted-foreground">
+        <div className="text-xs text-foreground/50 pt-2">
           Enviada el {format(new Date(quote.created_at), "d 'de' MMM, yyyy", { locale: es })}
         </div>
       </div>
