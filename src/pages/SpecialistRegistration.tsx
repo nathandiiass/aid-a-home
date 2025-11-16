@@ -102,6 +102,7 @@ export default function SpecialistRegistration() {
   const [otherSpecialtyText, setOtherSpecialtyText] = useState('');
   const [specialtiesData, setSpecialtiesData] = useState<Specialty[]>([]);
   const [openSpecialties, setOpenSpecialties] = useState<Record<string, boolean>>({});
+  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
   const [professionalDescription, setProfessionalDescription] = useState('');
   const [licenses, setLicenses] = useState<License[]>([]);
   const [selectedMunicipalities, setSelectedMunicipalities] = useState<string[]>([]);
@@ -802,33 +803,66 @@ export default function SpecialistRegistration() {
                 <p className="text-sm text-muted-foreground">Puedes seleccionar múltiples especialidades</p>
               </div>
 
-              <div className="space-y-6">
-                {availableSpecialties.map(([category, specialties]) => (
-                  <div key={category} className="space-y-3">
-                    <h3 className="font-bold text-base text-rappi-green uppercase tracking-wide">{category}</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {specialties.map((specialty) => (
-                        <div 
-                          key={specialty} 
-                          className="flex items-center space-x-3 p-4 border-2 border-border rounded-lg hover:border-rappi-green hover:bg-rappi-green/5 transition-all cursor-pointer"
-                          onClick={() => toggleSpecialtySelection(specialty)}
-                        >
-                          <Checkbox
-                            id={`specialty-${specialty}`}
-                            checked={selectedSpecialties.includes(specialty)}
-                            onCheckedChange={() => toggleSpecialtySelection(specialty)}
-                          />
-                          <Label htmlFor={`specialty-${specialty}`} className="flex-1 cursor-pointer font-medium">
-                            {specialty}
-                          </Label>
+              <div className="space-y-3">
+                {availableSpecialties.map(([category, specialties]) => {
+                  const isOpen = openCategories[category] ?? false;
+                  const categorySelectedCount = specialties.filter(s => selectedSpecialties.includes(s)).length;
+                  
+                  return (
+                    <Collapsible
+                      key={category}
+                      open={isOpen}
+                      onOpenChange={(open) => setOpenCategories(prev => ({ ...prev, [category]: open }))}
+                      className="border-2 border-border rounded-xl overflow-hidden"
+                    >
+                      <CollapsibleTrigger asChild>
+                        <button className="w-full p-4 hover:bg-rappi-green/5 transition-colors">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-3 flex-1">
+                              <h3 className="font-bold text-base text-rappi-green uppercase tracking-wide text-left">
+                                {category}
+                              </h3>
+                              {categorySelectedCount > 0 && (
+                                <span className="text-xs bg-rappi-green text-white px-2 py-1 rounded-full">
+                                  {categorySelectedCount} seleccionada{categorySelectedCount > 1 ? 's' : ''}
+                                </span>
+                              )}
+                            </div>
+                            <ChevronDown 
+                              className={`h-5 w-5 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
+                            />
+                          </div>
+                        </button>
+                      </CollapsibleTrigger>
+
+                      <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
+                        <div className="p-4 pt-0 border-t-2 border-border">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {specialties.map((specialty) => (
+                              <div 
+                                key={specialty} 
+                                className="flex items-center space-x-3 p-4 border-2 border-border rounded-lg hover:border-rappi-green hover:bg-rappi-green/5 transition-all cursor-pointer"
+                                onClick={() => toggleSpecialtySelection(specialty)}
+                              >
+                                <Checkbox
+                                  id={`specialty-${specialty}`}
+                                  checked={selectedSpecialties.includes(specialty)}
+                                  onCheckedChange={() => toggleSpecialtySelection(specialty)}
+                                />
+                                <Label htmlFor={`specialty-${specialty}`} className="flex-1 cursor-pointer font-medium">
+                                  {specialty}
+                                </Label>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                      </CollapsibleContent>
+                    </Collapsible>
+                  );
+                })}
 
                 {/* Otra especialidad */}
-                <div className="pt-4 border-t-2 border-border">
+                <div className="pt-3 border-t-2 border-border">
                   <div 
                     className="flex items-center space-x-3 p-4 border-2 border-border rounded-lg hover:border-rappi-green hover:bg-rappi-green/5 transition-all cursor-pointer"
                     onClick={() => toggleSpecialtySelection('Otro')}
@@ -843,7 +877,7 @@ export default function SpecialistRegistration() {
                     </Label>
                   </div>
                   {showOtherSpecialty && (
-                    <div className="mt-3 ml-12 flex gap-2">
+                    <div className="mt-3 ml-12 flex gap-2 animate-fade-in">
                       <Input
                         placeholder="Escribe tu especialidad"
                         value={otherSpecialtyText}
