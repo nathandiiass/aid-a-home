@@ -139,17 +139,27 @@ export function SpecialistReviewDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto bg-white rounded-2xl">
-        <DialogHeader className="pb-2">
+        <DialogHeader className="pb-3">
           <DialogTitle className="text-xl font-bold text-foreground">
             Evalúa el servicio
           </DialogTitle>
           {(requestTitle || specialistName) && (
-            <div className="text-xs text-muted-foreground space-y-0.5 pt-1">
-              {requestTitle && <p className="font-medium">{requestTitle}</p>}
-              {specialistName && <p>Especialista: {specialistName}</p>}
+            <div className="bg-gray-50 rounded-xl p-3 mt-2 space-y-1.5 border border-gray-100">
+              {requestTitle && (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-0.5">Servicio</p>
+                  <p className="text-sm font-bold text-foreground">{requestTitle}</p>
+                </div>
+              )}
+              {specialistName && (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-0.5">Especialista</p>
+                  <p className="text-sm font-bold text-foreground">{specialistName}</p>
+                </div>
+              )}
             </div>
           )}
-          <DialogDescription className="text-xs text-muted-foreground pt-1">
+          <DialogDescription className="text-xs text-muted-foreground pt-2">
             Tu opinión ayuda a otros usuarios
           </DialogDescription>
         </DialogHeader>
