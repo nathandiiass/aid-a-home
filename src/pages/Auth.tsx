@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,6 +25,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft } from 'lucide-react';
 import { Logo } from '@/components/Logo';
+import { supabase } from '@/integrations/supabase/client';
 
 // Schema for Step 1 - Identity Data
 const step1Schema = z.object({
@@ -70,8 +71,9 @@ export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [step, setStep] = useState(1);
   const [step1Data, setStep1Data] = useState<Step1FormData | null>(null);
+  const [checkingProfile, setCheckingProfile] = useState(false);
   const navigate = useNavigate();
-  const { signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
+  const { user, loading, signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
   const { toast } = useToast();
 
   // Form for Step 1
@@ -107,6 +109,65 @@ export default function Auth() {
     },
   });
 
+  // Check if user is authenticated and has complete profile
+  useEffect(() => {
+    const checkUserProfile = async () => {
+      if (loading || !user || checkingProfile) return;
+      
+      setCheckingProfile(true);
+      
+      try {
+        // Check if user has a complete profile
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error checking profile:', error);
+          setCheckingProfile(false);
+          return;
+        }
+
+        // If profile exists and has required fields, redirect to home
+        if (profile && profile.phone && profile.date_of_birth) {
+          navigate('/', { replace: true });
+          return;
+        }
+
+        // User exists but profile is incomplete (Google sign-up)
+        // Pre-fill form with Google data and show registration
+        const userMetadata = user.user_metadata || {};
+        
+        form1.setValue('firstName', userMetadata.first_name || userMetadata.full_name?.split(' ')[0] || '');
+        form1.setValue('lastNamePaterno', userMetadata.last_name || userMetadata.full_name?.split(' ').slice(1).join(' ') || '');
+        form1.setValue('email', user.email || '');
+        
+        setIsSignUp(true);
+        setStep1Data({
+          firstName: userMetadata.first_name || userMetadata.full_name?.split(' ')[0] || '',
+          lastNamePaterno: userMetadata.last_name || userMetadata.full_name?.split(' ').slice(1).join(' ') || '',
+          lastNameMaterno: '',
+          email: user.email || '',
+          password: '', // No password for OAuth users
+        });
+        setStep(2);
+        
+        toast({
+          title: 'Completa tu registro',
+          description: 'Por favor completa tu información para continuar.',
+        });
+      } catch (error) {
+        console.error('Error in checkUserProfile:', error);
+      } finally {
+        setCheckingProfile(false);
+      }
+    };
+
+    checkUserProfile();
+  }, [user, loading, navigate, toast, form1, checkingProfile]);
+
   const handleGoogleSignIn = async () => {
     const { error } = await signInWithGoogle();
     if (error) {
@@ -131,6 +192,41 @@ export default function Auth() {
       ...data,
     };
 
+    // If user is already authenticated (Google sign-in), just update profile
+    if (user) {
+      try {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: user.id,
+            first_name: fullData.firstName,
+            last_name_paterno: fullData.lastNamePaterno,
+            last_name_materno: fullData.lastNameMaterno,
+            phone: fullData.phone,
+            date_of_birth: fullData.dateOfBirth,
+            gender: fullData.gender,
+            accepted_terms_at: fullData.acceptedTerms ? new Date().toISOString() : null,
+            accepted_privacy_at: fullData.acceptedPrivacy ? new Date().toISOString() : null,
+          });
+
+        if (profileError) throw profileError;
+
+        toast({
+          title: 'Registro completado',
+          description: 'Tu perfil ha sido actualizado exitosamente.',
+        });
+        navigate('/', { replace: true });
+      } catch (error: any) {
+        toast({
+          title: 'Error',
+          description: error.message || 'No se pudo completar el registro.',
+          variant: 'destructive',
+        });
+      }
+      return;
+    }
+
+    // Regular email sign-up
     const metadata = {
       first_name: fullData.firstName,
       last_name_paterno: fullData.lastNamePaterno,
