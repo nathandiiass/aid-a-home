@@ -326,30 +326,52 @@ export default function SpecialistProfile() {
         )}
 
         {/* Specialties and Services - Rappi Style Table */}
-        {specialties.length > 0 && (
-          <div className="space-y-3">
-            <h3 className="font-bold text-base text-gray-900 px-1">
-              Especialidades y servicios
-            </h3>
-            {specialties.map((specialty: any) => (
-              <div key={specialty.id} className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                {/* Header - Category and Experience */}
-                <div className="px-5 py-4 bg-gradient-to-r from-primary to-accent flex items-center justify-between border-b border-gray-100">
-                  <h4 className="font-bold text-base text-white">
-                    {specialty.specialty}
-                  </h4>
-                  {specialty.experience_years && (
-                    <div className="flex items-center gap-2">
-                      <div className="h-px flex-1 bg-white/30 w-12"></div>
-                      <span className="text-sm font-semibold text-white/90">
-                        {specialty.experience_years} {specialty.experience_years === 1 ? 'año' : 'años'} de experiencia
-                      </span>
-                    </div>
-                  )}
-                </div>
+        {specialties.length > 0 && (() => {
+          // Group specialties by category
+          const groupedSpecialties = specialties.reduce((acc: any, specialty: any) => {
+            const category = specialty.specialty;
+            if (!acc[category]) {
+              acc[category] = {
+                category,
+                maxExperience: specialty.experience_years || 0,
+                specialists: []
+              };
+            }
+            // Keep the max experience years for this category
+            if (specialty.experience_years > acc[category].maxExperience) {
+              acc[category].maxExperience = specialty.experience_years;
+            }
+            // Add specialist data with activities
+            acc[category].specialists.push({
+              role_label: specialty.role_label,
+              activities: specialty.activities || []
+            });
+            return acc;
+          }, {});
 
-                {/* Table - Rappi Style */}
-                {specialty.activities && specialty.activities.length > 0 && (
+          return (
+            <div className="space-y-3">
+              <h3 className="font-bold text-base text-gray-900 px-1">
+                Especialidades y servicios
+              </h3>
+              {Object.values(groupedSpecialties).map((group: any) => (
+                <div key={group.category} className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                  {/* Header - Category and Experience */}
+                  <div className="px-5 py-4 bg-gradient-to-r from-primary to-accent flex items-center justify-between border-b border-gray-100">
+                    <h4 className="font-bold text-base text-white">
+                      {group.category}
+                    </h4>
+                    {group.maxExperience > 0 && (
+                      <div className="flex items-center gap-2">
+                        <div className="h-px flex-1 bg-white/30 w-12"></div>
+                        <span className="text-sm font-semibold text-white/90">
+                          {group.maxExperience} {group.maxExperience === 1 ? 'año' : 'años'} de experiencia
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Table - Rappi Style */}
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -366,33 +388,35 @@ export default function SpecialistProfile() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
-                        {specialty.activities.map((activity: any) => (
-                          <tr key={activity.id} className="hover:bg-muted/30 transition-colors">
-                            <td className="py-4 px-5 text-sm font-medium text-gray-900">
-                              {specialty.role_label}
-                            </td>
-                            <td className="py-4 px-5 text-sm text-gray-700">
-                              {activity.activity}
-                            </td>
-                            <td className="py-4 px-5 text-right">
-                              {activity.price_min ? (
-                                <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-rappi-green/10 text-rappi-green border border-rappi-green/20">
-                                  ${activity.price_min.toLocaleString()}
-                                </span>
-                              ) : (
-                                <span className="text-sm text-gray-400 font-medium">—</span>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
+                        {group.specialists.flatMap((specialist: any) =>
+                          specialist.activities.map((activity: any) => (
+                            <tr key={activity.id} className="hover:bg-muted/30 transition-colors">
+                              <td className="py-4 px-5 text-sm font-medium text-gray-900">
+                                {specialist.role_label}
+                              </td>
+                              <td className="py-4 px-5 text-sm text-gray-700">
+                                {activity.activity}
+                              </td>
+                              <td className="py-4 px-5 text-right">
+                                {activity.price_min ? (
+                                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-rappi-green/10 text-rappi-green border border-rappi-green/20">
+                                    ${activity.price_min.toLocaleString()}
+                                  </span>
+                                ) : (
+                                  <span className="text-sm text-gray-400 font-medium">—</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))
+                        )}
                       </tbody>
                     </table>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+                </div>
+              ))}
+            </div>
+          );
+        })()}
 
         {/* Licenses and Certifications */}
         {credentials.length > 0 && (
