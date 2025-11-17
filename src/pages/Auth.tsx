@@ -122,9 +122,9 @@ export default function Auth() {
           .from('profiles')
           .select('*')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
 
-        if (error && error.code !== 'PGRST116') {
+        if (error) {
           console.error('Error checking profile:', error);
           setCheckingProfile(false);
           return;
@@ -137,18 +137,22 @@ export default function Auth() {
         }
 
         // User exists but profile is incomplete (Google sign-up)
-        // Pre-fill form with Google data and show registration
+        // Pre-fill form with data from profile or Google metadata
         const userMetadata = user.user_metadata || {};
         
-        form1.setValue('firstName', userMetadata.first_name || userMetadata.full_name?.split(' ')[0] || '');
-        form1.setValue('lastNamePaterno', userMetadata.last_name || userMetadata.full_name?.split(' ').slice(1).join(' ') || '');
+        const firstName = profile?.first_name || userMetadata.first_name || userMetadata.full_name?.split(' ')[0] || '';
+        const lastName = profile?.last_name_paterno || userMetadata.last_name || userMetadata.full_name?.split(' ').slice(1).join(' ') || '';
+        
+        form1.setValue('firstName', firstName);
+        form1.setValue('lastNamePaterno', lastName);
+        form1.setValue('lastNameMaterno', profile?.last_name_materno || '');
         form1.setValue('email', user.email || '');
         
         setIsSignUp(true);
         setStep1Data({
-          firstName: userMetadata.first_name || userMetadata.full_name?.split(' ')[0] || '',
-          lastNamePaterno: userMetadata.last_name || userMetadata.full_name?.split(' ').slice(1).join(' ') || '',
-          lastNameMaterno: '',
+          firstName,
+          lastNamePaterno: lastName,
+          lastNameMaterno: profile?.last_name_materno || '',
           email: user.email || '',
           password: '', // No password for OAuth users
         });
@@ -177,6 +181,7 @@ export default function Auth() {
         variant: 'destructive',
       });
     }
+    // El redirect y verificación del perfil se maneja automáticamente en el useEffect
   };
 
   const handleStep1Submit = (data: Step1FormData) => {
