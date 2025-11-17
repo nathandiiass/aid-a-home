@@ -55,7 +55,7 @@ export default function OrderDetail() {
         .from('quotes')
         .select(`
           *,
-          specialist:specialist_profiles!inner(
+          specialist:specialist_profiles(
             id,
             user_id,
             phone,
