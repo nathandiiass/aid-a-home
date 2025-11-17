@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { ArrowLeft, Share2, Star, MapPin, FileText, ChevronRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import ReviewSummary from '@/components/specialist/ReviewSummary';
 
 export default function SpecialistProfile() {
   const { specialistId } = useParams();
@@ -27,6 +28,16 @@ export default function SpecialistProfile() {
   const [rating, setRating] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [reviewStats, setReviewStats] = useState({
+    total: 0,
+    average: 0,
+    avgCalidadTrabajo: 0,
+    avgPuntualidad: 0,
+    avgProfesionalismo: 0,
+    avgCumplimiento: 0,
+    avgRelacionCalidadPrecio: 0,
+    porcentajeVolveria: 0,
+  });
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -111,16 +122,36 @@ export default function SpecialistProfile() {
         setWorkZones(workZonesData);
       }
 
-      // Load reviews to calculate rating
+      // Load reviews to calculate rating and stats
       const { data: reviewsData } = await supabase
         .from('reviews')
-        .select('rating')
+        .select('*')
         .eq('specialist_id', targetSpecialistId);
 
       if (reviewsData && reviewsData.length > 0) {
-        const avgRating = reviewsData.reduce((sum, r) => sum + r.rating, 0) / reviewsData.length;
+        const total = reviewsData.length;
+        const avgRating = reviewsData.reduce((sum, r) => sum + r.rating, 0) / total;
         setRating(avgRating);
-        setReviewCount(reviewsData.length);
+        setReviewCount(total);
+        
+        const calidadSum = reviewsData.reduce((sum, r) => sum + (r.calidad_trabajo || 0), 0);
+        const puntualidadSum = reviewsData.reduce((sum, r) => sum + (r.puntualidad || 0), 0);
+        const profesionalismoSum = reviewsData.reduce((sum, r) => sum + (r.profesionalismo || 0), 0);
+        const cumplimientoSum = reviewsData.reduce((sum, r) => sum + (r.cumplimiento_servicio || 0), 0);
+        const relacionSum = reviewsData.reduce((sum, r) => sum + (r.relacion_calidad_precio || 0), 0);
+        
+        const volveriaCount = reviewsData.filter(r => r.volveria_trabajar === true).length;
+
+        setReviewStats({
+          total,
+          average: avgRating,
+          avgCalidadTrabajo: calidadSum / total,
+          avgPuntualidad: puntualidadSum / total,
+          avgProfesionalismo: profesionalismoSum / total,
+          avgCumplimiento: cumplimientoSum / total,
+          avgRelacionCalidadPrecio: relacionSum / total,
+          porcentajeVolveria: (volveriaCount / total) * 100,
+        });
       }
 
       // Load credentials
@@ -312,6 +343,11 @@ export default function SpecialistProfile() {
             <p className="text-xs text-gray-600">Reseñas</p>
           </div>
         </div>
+
+        {/* Review Summary */}
+        {reviewStats.total > 0 && (
+          <ReviewSummary stats={reviewStats} />
+        )}
 
         {/* Professional Description */}
         {specialist?.professional_description && (
