@@ -267,7 +267,7 @@ const ServiceSelector = ({
       {/* Service title */}
       <div className="bg-white rounded-2xl shadow-lg border-0 p-6 space-y-3">
         <Label htmlFor="service-title" className="text-sm font-semibold">Título de servicio solicitado *</Label>
-        <Input id="service-title" placeholder="Ej: Cortar pasto de mi patio" value={serviceTitle} onChange={e => handleTitleChange(e.target.value)} onBlur={e => validateTitle(e.target.value)} className={`h-12 ${errors.title ? "border-destructive" : ""}`} />
+        <Input id="service-title" placeholder="Ejemplo: Reparar fuga de baño" value={serviceTitle} onChange={e => handleTitleChange(e.target.value)} onBlur={e => validateTitle(e.target.value)} className={`h-12 ${errors.title ? "border-destructive" : ""}`} />
         {errors.title && <p className="text-sm text-destructive">{errors.title}</p>}
         
       </div>
