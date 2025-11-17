@@ -170,6 +170,7 @@ export function AutoReviewPrompt() {
       specialistId={pendingReviewOrder.quotes[0].specialist_id}
       requestTitle={displayTitle}
       specialistName={specialistName}
+      completedDate={pendingReviewOrder.updated_at}
       onReviewSubmitted={handleReviewSubmitted}
     />
   );

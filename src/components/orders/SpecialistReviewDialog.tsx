@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Star } from 'lucide-react';
+import { Star, Briefcase, User, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 interface SpecialistReviewDialogProps {
   open: boolean;
@@ -12,6 +14,7 @@ interface SpecialistReviewDialogProps {
   specialistId: string;
   requestTitle?: string;
   specialistName?: string;
+  completedDate?: string;
   onReviewSubmitted: () => void;
 }
 
@@ -28,6 +31,7 @@ export function SpecialistReviewDialog({
   specialistId,
   requestTitle,
   specialistName,
+  completedDate,
   onReviewSubmitted 
 }: SpecialistReviewDialogProps) {
   const { toast } = useToast();
@@ -143,18 +147,35 @@ export function SpecialistReviewDialog({
           <DialogTitle className="text-xl font-bold text-foreground">
             Evalúa el servicio
           </DialogTitle>
-          {(requestTitle || specialistName) && (
-            <div className="bg-gray-50 rounded-xl p-3 mt-2 space-y-1.5 border border-gray-100">
+          {(requestTitle || specialistName || completedDate) && (
+            <div className="bg-gray-50 rounded-xl p-3 mt-2 space-y-2 border border-gray-100">
               {requestTitle && (
-                <div>
-                  <p className="text-xs text-muted-foreground mb-0.5">Servicio</p>
-                  <p className="text-sm font-bold text-foreground">{requestTitle}</p>
+                <div className="flex items-start gap-2">
+                  <Briefcase className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-muted-foreground">Servicio</p>
+                    <p className="text-sm font-bold text-foreground">{requestTitle}</p>
+                  </div>
                 </div>
               )}
               {specialistName && (
-                <div>
-                  <p className="text-xs text-muted-foreground mb-0.5">Especialista</p>
-                  <p className="text-sm font-bold text-foreground">{specialistName}</p>
+                <div className="flex items-start gap-2">
+                  <User className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-muted-foreground">Especialista</p>
+                    <p className="text-sm font-bold text-foreground">{specialistName}</p>
+                  </div>
+                </div>
+              )}
+              {completedDate && (
+                <div className="flex items-start gap-2">
+                  <Calendar className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-muted-foreground">Fecha de finalización</p>
+                    <p className="text-sm font-bold text-foreground">
+                      {format(new Date(completedDate), "d 'de' MMMM 'de' yyyy", { locale: es })}
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
