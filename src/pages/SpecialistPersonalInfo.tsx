@@ -397,10 +397,10 @@ export default function SpecialistPersonalInfo() {
   };
 
   const handleAddCredential = async () => {
-    if (!specialistId || !credentialForm.type || !credentialForm.title || !credentialForm.issuer) {
+    if (!specialistId || !credentialForm.title) {
       toast({
         title: "Error",
-        description: "Por favor completa los campos requeridos",
+        description: "Por favor ingresa el título de la certificación",
         variant: "destructive",
       });
       return;
@@ -435,9 +435,9 @@ export default function SpecialistPersonalInfo() {
         .from('specialist_credentials')
         .insert({
           specialist_id: specialistId,
-          type: credentialForm.type,
+          type: credentialForm.type || 'Certificación',
           title: credentialForm.title,
-          issuer: credentialForm.issuer,
+          issuer: credentialForm.issuer || '',
           description: credentialForm.description || null,
           issued_at: credentialForm.issued_at || null,
           expires_at: credentialForm.expires_at || null,
@@ -1009,34 +1009,14 @@ export default function SpecialistPersonalInfo() {
 
       {/* Add Credential Dialog */}
       <Dialog open={showAddCredentialDialog} onOpenChange={setShowAddCredentialDialog}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Agregar certificación o credencial</DialogTitle>
+            <DialogTitle>Agregar certificación</DialogTitle>
             <DialogDescription>
-              Completa la información de tu certificación profesional
+              Ingresa el título de tu certificación profesional
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="cred-type">Tipo *</Label>
-              <Select 
-                value={credentialForm.type} 
-                onValueChange={(value) => setCredentialForm(prev => ({ ...prev, type: value }))}
-              >
-                <SelectTrigger id="cred-type">
-                  <SelectValue placeholder="Selecciona el tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Certificación">Certificación</SelectItem>
-                  <SelectItem value="Licencia">Licencia</SelectItem>
-                  <SelectItem value="Diploma">Diploma</SelectItem>
-                  <SelectItem value="Título">Título</SelectItem>
-                  <SelectItem value="Curso">Curso</SelectItem>
-                  <SelectItem value="Capacitación">Capacitación</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             <div className="space-y-2">
               <Label htmlFor="cred-title">Título *</Label>
               <Input
@@ -1044,91 +1024,8 @@ export default function SpecialistPersonalInfo() {
                 value={credentialForm.title}
                 onChange={(e) => setCredentialForm(prev => ({ ...prev, title: e.target.value }))}
                 placeholder="Ej: Certificación en Instalación Eléctrica"
+                autoFocus
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="cred-issuer">Emisor / Institución *</Label>
-              <Input
-                id="cred-issuer"
-                value={credentialForm.issuer}
-                onChange={(e) => setCredentialForm(prev => ({ ...prev, issuer: e.target.value }))}
-                placeholder="Ej: SEP, CONOCER, Universidad, etc."
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="cred-description">Descripción</Label>
-              <Textarea
-                id="cred-description"
-                value={credentialForm.description}
-                onChange={(e) => setCredentialForm(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Describe brevemente lo que cubre esta certificación"
-                rows={3}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="cred-issued">Fecha de emisión</Label>
-                <Input
-                  id="cred-issued"
-                  type="date"
-                  value={credentialForm.issued_at}
-                  onChange={(e) => setCredentialForm(prev => ({ ...prev, issued_at: e.target.value }))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cred-expires">Fecha de expiración</Label>
-                <Input
-                  id="cred-expires"
-                  type="date"
-                  value={credentialForm.expires_at}
-                  onChange={(e) => setCredentialForm(prev => ({ ...prev, expires_at: e.target.value }))}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="cred-start">Año de inicio</Label>
-                <Input
-                  id="cred-start"
-                  type="number"
-                  value={credentialForm.start_year}
-                  onChange={(e) => setCredentialForm(prev => ({ ...prev, start_year: e.target.value }))}
-                  placeholder="2020"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cred-end">Año de fin</Label>
-                <Input
-                  id="cred-end"
-                  type="number"
-                  value={credentialForm.end_year}
-                  onChange={(e) => setCredentialForm(prev => ({ ...prev, end_year: e.target.value }))}
-                  placeholder="2024 o dejar vacío"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Adjuntar documento (opcional)</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={(e) => setCredentialFile(e.target.files?.[0] || null)}
-                  className="flex-1"
-                />
-                {credentialFile && (
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    <FileText className="w-3 h-3" />
-                    {credentialFile.name}
-                  </Badge>
-                )}
-              </div>
-              <p className="text-xs text-gray-500">PDF, JPG o PNG - Máximo 5MB</p>
             </div>
 
             <div className="flex gap-3 pt-4">
@@ -1154,10 +1051,10 @@ export default function SpecialistPersonalInfo() {
               </Button>
               <Button
                 onClick={handleAddCredential}
-                disabled={!credentialForm.type || !credentialForm.title || !credentialForm.issuer || saving || uploadingCredential}
+                disabled={!credentialForm.title || saving}
                 className="flex-1 bg-blue-500 hover:bg-blue-600"
               >
-                {uploadingCredential ? 'Subiendo archivo...' : saving ? 'Agregando...' : 'Agregar certificación'}
+                {saving ? 'Agregando...' : 'Agregar'}
               </Button>
             </div>
           </div>
