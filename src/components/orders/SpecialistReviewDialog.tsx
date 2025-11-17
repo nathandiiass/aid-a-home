@@ -151,7 +151,7 @@ export function SpecialistReviewDialog({
             <div className="bg-gray-50 rounded-xl p-3 mt-2 space-y-2 border border-gray-100">
               {requestTitle && (
                 <div className="flex items-start gap-2">
-                  <Briefcase className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                  <Briefcase className="w-4 h-4 text-foreground mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-muted-foreground">Servicio</p>
                     <p className="text-sm font-bold text-foreground">{requestTitle}</p>
@@ -160,7 +160,7 @@ export function SpecialistReviewDialog({
               )}
               {specialistName && (
                 <div className="flex items-start gap-2">
-                  <User className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                  <User className="w-4 h-4 text-foreground mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-muted-foreground">Especialista</p>
                     <p className="text-sm font-bold text-foreground">{specialistName}</p>
@@ -169,7 +169,7 @@ export function SpecialistReviewDialog({
               )}
               {completedDate && (
                 <div className="flex items-start gap-2">
-                  <Calendar className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                  <Calendar className="w-4 h-4 text-foreground mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-muted-foreground">Fecha de finalización</p>
                     <p className="text-sm font-bold text-foreground">
