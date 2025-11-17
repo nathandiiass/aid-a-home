@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Camera, FileText, Save, ChevronRight, Plus } from 'lucide-react';
+import { ArrowLeft, Camera, FileText, Save, ChevronRight, Plus, Award, Upload, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -71,6 +71,18 @@ interface WorkZone {
   state: string;
   cities: string[];
 }
+interface Credential {
+  id: string;
+  type: string;
+  title: string;
+  issuer: string;
+  description: string | null;
+  issued_at: string | null;
+  expires_at: string | null;
+  start_year: number | null;
+  end_year: number | null;
+  attachment_url: string | null;
+}
 export default function SpecialistPersonalInfo() {
   const navigate = useNavigate();
   const {
@@ -92,6 +104,20 @@ export default function SpecialistPersonalInfo() {
   const [availableSpecialties, setAvailableSpecialties] = useState<Array<{categoria: string; especialista: string}>>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedSpecialist, setSelectedSpecialist] = useState<string>('');
+  const [credentials, setCredentials] = useState<Credential[]>([]);
+  const [showAddCredentialDialog, setShowAddCredentialDialog] = useState(false);
+  const [credentialForm, setCredentialForm] = useState({
+    type: '',
+    title: '',
+    issuer: '',
+    description: '',
+    issued_at: '',
+    expires_at: '',
+    start_year: '',
+    end_year: '',
+  });
+  const [uploadingCredential, setUploadingCredential] = useState(false);
+  const [credentialFile, setCredentialFile] = useState<File | null>(null);
   useEffect(() => {
     if (user) {
       loadData();
@@ -205,6 +231,14 @@ export default function SpecialistPersonalInfo() {
       } = await supabase.from('specialist_work_zones').select('*').eq('specialist_id', specialist.id);
       if (zonesError) throw zonesError;
       setWorkZones(zonesData || []);
+
+      // Get credentials
+      const {
+        data: credentialsData,
+        error: credentialsError
+      } = await supabase.from('specialist_credentials').select('*').eq('specialist_id', specialist.id).order('created_at', { ascending: false });
+      if (credentialsError) throw credentialsError;
+      setCredentials(credentialsData || []);
     } catch (error) {
       console.error('Error loading data:', error);
       toast({
@@ -359,6 +393,120 @@ export default function SpecialistPersonalInfo() {
       });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleAddCredential = async () => {
+    if (!specialistId || !credentialForm.type || !credentialForm.title || !credentialForm.issuer) {
+      toast({
+        title: "Error",
+        description: "Por favor completa los campos requeridos",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setSaving(true);
+      let attachmentUrl = null;
+
+      // Upload file if provided
+      if (credentialFile) {
+        setUploadingCredential(true);
+        const fileExt = credentialFile.name.split('.').pop();
+        const filePath = `${user?.id}/credentials/${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('specialist-documents')
+          .upload(filePath, credentialFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('specialist-documents')
+          .getPublicUrl(filePath);
+        
+        attachmentUrl = publicUrl;
+        setUploadingCredential(false);
+      }
+
+      // Create credential
+      const { data: newCredential, error } = await supabase
+        .from('specialist_credentials')
+        .insert({
+          specialist_id: specialistId,
+          type: credentialForm.type,
+          title: credentialForm.title,
+          issuer: credentialForm.issuer,
+          description: credentialForm.description || null,
+          issued_at: credentialForm.issued_at || null,
+          expires_at: credentialForm.expires_at || null,
+          start_year: credentialForm.start_year ? parseInt(credentialForm.start_year) : null,
+          end_year: credentialForm.end_year ? parseInt(credentialForm.end_year) : null,
+          attachment_url: attachmentUrl,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setCredentials(prev => [newCredential, ...prev]);
+      
+      toast({
+        title: "Éxito",
+        description: "Certificación agregada correctamente",
+      });
+
+      // Reset form
+      setShowAddCredentialDialog(false);
+      setCredentialForm({
+        type: '',
+        title: '',
+        issuer: '',
+        description: '',
+        issued_at: '',
+        expires_at: '',
+        start_year: '',
+        end_year: '',
+      });
+      setCredentialFile(null);
+    } catch (error) {
+      console.error('Error adding credential:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo agregar la certificación",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+      setUploadingCredential(false);
+    }
+  };
+
+  const handleDeleteCredential = async (credentialId: string) => {
+    if (!confirm('¿Estás seguro de eliminar esta certificación?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('specialist_credentials')
+        .delete()
+        .eq('id', credentialId);
+
+      if (error) throw error;
+
+      setCredentials(prev => prev.filter(c => c.id !== credentialId));
+      
+      toast({
+        title: "Éxito",
+        description: "Certificación eliminada correctamente",
+      });
+    } catch (error) {
+      console.error('Error deleting credential:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar la certificación",
+        variant: "destructive",
+      });
     }
   };
 
@@ -664,6 +812,86 @@ export default function SpecialistPersonalInfo() {
           </div>
         </div>
 
+        {/* BLOQUE: CERTIFICACIONES */}
+        <div className="bg-white rounded-3xl shadow-sm p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-6 bg-blue-500 rounded-full" />
+              <h2 className="text-lg font-bold text-gray-900">Certificaciones y credenciales</h2>
+            </div>
+            <Button
+              onClick={() => setShowAddCredentialDialog(true)}
+              size="sm"
+              className="bg-blue-500 hover:bg-blue-600 rounded-xl"
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Agregar
+            </Button>
+          </div>
+
+          {credentials.length === 0 ? (
+            <div className="text-center py-8">
+              <Award className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-sm text-gray-500">No hay certificaciones agregadas</p>
+              <p className="text-xs text-gray-400 mt-1">Agrega tus certificaciones y credenciales profesionales</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {credentials.map(credential => (
+                <div key={credential.id} className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <Badge variant="outline" className="mb-2 bg-white border-blue-200 text-blue-700 font-semibold">
+                        {credential.type}
+                      </Badge>
+                      <h3 className="font-bold text-gray-900">{credential.title}</h3>
+                      <p className="text-sm text-gray-600 mt-1">{credential.issuer}</p>
+                      {credential.description && (
+                        <p className="text-sm text-gray-500 mt-2">{credential.description}</p>
+                      )}
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {credential.issued_at && (
+                          <span className="text-xs text-gray-500">
+                            Emitido: {new Date(credential.issued_at).toLocaleDateString()}
+                          </span>
+                        )}
+                        {credential.expires_at && (
+                          <span className="text-xs text-gray-500">
+                            • Expira: {new Date(credential.expires_at).toLocaleDateString()}
+                          </span>
+                        )}
+                        {credential.start_year && (
+                          <span className="text-xs text-gray-500">
+                            {credential.start_year} - {credential.end_year || 'Presente'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      {credential.attachment_url && (
+                        <a
+                          href={credential.attachment_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-9 h-9 rounded-full bg-white hover:bg-blue-100 flex items-center justify-center transition-all"
+                        >
+                          <FileText className="w-4 h-4 text-blue-600" />
+                        </a>
+                      )}
+                      <button
+                        onClick={() => handleDeleteCredential(credential.id)}
+                        className="w-9 h-9 rounded-full bg-white hover:bg-red-100 flex items-center justify-center transition-all"
+                      >
+                        <X className="w-4 h-4 text-red-600" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* BLOQUE 3: DOCUMENTACIÓN */}
         <div className="bg-white rounded-3xl shadow-sm p-6 space-y-4">
           <div className="flex items-center gap-2">
@@ -773,6 +1001,163 @@ export default function SpecialistPersonalInfo() {
                 className="flex-1 bg-rappi-green hover:bg-rappi-green/90"
               >
                 {saving ? 'Agregando...' : 'Agregar'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Credential Dialog */}
+      <Dialog open={showAddCredentialDialog} onOpenChange={setShowAddCredentialDialog}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Agregar certificación o credencial</DialogTitle>
+            <DialogDescription>
+              Completa la información de tu certificación profesional
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="cred-type">Tipo *</Label>
+              <Select 
+                value={credentialForm.type} 
+                onValueChange={(value) => setCredentialForm(prev => ({ ...prev, type: value }))}
+              >
+                <SelectTrigger id="cred-type">
+                  <SelectValue placeholder="Selecciona el tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Certificación">Certificación</SelectItem>
+                  <SelectItem value="Licencia">Licencia</SelectItem>
+                  <SelectItem value="Diploma">Diploma</SelectItem>
+                  <SelectItem value="Título">Título</SelectItem>
+                  <SelectItem value="Curso">Curso</SelectItem>
+                  <SelectItem value="Capacitación">Capacitación</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="cred-title">Título *</Label>
+              <Input
+                id="cred-title"
+                value={credentialForm.title}
+                onChange={(e) => setCredentialForm(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="Ej: Certificación en Instalación Eléctrica"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="cred-issuer">Emisor / Institución *</Label>
+              <Input
+                id="cred-issuer"
+                value={credentialForm.issuer}
+                onChange={(e) => setCredentialForm(prev => ({ ...prev, issuer: e.target.value }))}
+                placeholder="Ej: SEP, CONOCER, Universidad, etc."
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="cred-description">Descripción</Label>
+              <Textarea
+                id="cred-description"
+                value={credentialForm.description}
+                onChange={(e) => setCredentialForm(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Describe brevemente lo que cubre esta certificación"
+                rows={3}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="cred-issued">Fecha de emisión</Label>
+                <Input
+                  id="cred-issued"
+                  type="date"
+                  value={credentialForm.issued_at}
+                  onChange={(e) => setCredentialForm(prev => ({ ...prev, issued_at: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cred-expires">Fecha de expiración</Label>
+                <Input
+                  id="cred-expires"
+                  type="date"
+                  value={credentialForm.expires_at}
+                  onChange={(e) => setCredentialForm(prev => ({ ...prev, expires_at: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="cred-start">Año de inicio</Label>
+                <Input
+                  id="cred-start"
+                  type="number"
+                  value={credentialForm.start_year}
+                  onChange={(e) => setCredentialForm(prev => ({ ...prev, start_year: e.target.value }))}
+                  placeholder="2020"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cred-end">Año de fin</Label>
+                <Input
+                  id="cred-end"
+                  type="number"
+                  value={credentialForm.end_year}
+                  onChange={(e) => setCredentialForm(prev => ({ ...prev, end_year: e.target.value }))}
+                  placeholder="2024 o dejar vacío"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Adjuntar documento (opcional)</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={(e) => setCredentialFile(e.target.files?.[0] || null)}
+                  className="flex-1"
+                />
+                {credentialFile && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <FileText className="w-3 h-3" />
+                    {credentialFile.name}
+                  </Badge>
+                )}
+              </div>
+              <p className="text-xs text-gray-500">PDF, JPG o PNG - Máximo 5MB</p>
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowAddCredentialDialog(false);
+                  setCredentialForm({
+                    type: '',
+                    title: '',
+                    issuer: '',
+                    description: '',
+                    issued_at: '',
+                    expires_at: '',
+                    start_year: '',
+                    end_year: '',
+                  });
+                  setCredentialFile(null);
+                }}
+                className="flex-1"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleAddCredential}
+                disabled={!credentialForm.type || !credentialForm.title || !credentialForm.issuer || saving || uploadingCredential}
+                className="flex-1 bg-blue-500 hover:bg-blue-600"
+              >
+                {uploadingCredential ? 'Subiendo archivo...' : saving ? 'Agregando...' : 'Agregar certificación'}
               </Button>
             </div>
           </div>
