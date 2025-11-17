@@ -325,7 +325,7 @@ export default function SpecialistProfile() {
           </div>
         )}
 
-        {/* Specialties and Services */}
+        {/* Specialties and Services - Rappi Style Table */}
         {specialties.length > 0 && (
           <div className="space-y-3">
             <h3 className="font-bold text-base text-gray-900 px-1">
@@ -333,45 +333,54 @@ export default function SpecialistProfile() {
             </h3>
             {specialties.map((specialty: any) => (
               <div key={specialty.id} className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                {/* Header */}
-                <div className="px-5 py-4 bg-gradient-to-r from-blue-600 to-blue-500 flex items-center justify-between">
+                {/* Header - Category and Experience */}
+                <div className="px-5 py-4 bg-gradient-to-r from-primary to-accent flex items-center justify-between border-b border-gray-100">
                   <h4 className="font-bold text-base text-white">
                     {specialty.specialty}
                   </h4>
                   {specialty.experience_years && (
-                    <Badge className="bg-white/20 text-white border-0 hover:bg-white/20 backdrop-blur-sm">
-                      {specialty.experience_years} {specialty.experience_years === 1 ? 'año' : 'años'}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <div className="h-px flex-1 bg-white/30 w-12"></div>
+                      <span className="text-sm font-semibold text-white/90">
+                        {specialty.experience_years} {specialty.experience_years === 1 ? 'año' : 'años'} de experiencia
+                      </span>
+                    </div>
                   )}
                 </div>
 
-                {/* Table */}
+                {/* Table - Rappi Style */}
                 {specialty.activities && specialty.activities.length > 0 && (
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="bg-gray-50 border-b border-gray-100">
-                          <th className="text-left py-3 px-5 font-semibold text-xs text-gray-700 uppercase tracking-wide">
-                            Servicios que ofrece
+                        <tr className="bg-muted/50">
+                          <th className="text-left py-3 px-5 font-bold text-xs text-foreground uppercase tracking-wider">
+                            Especialista
                           </th>
-                          <th className="text-right py-3 px-5 font-semibold text-xs text-gray-700 uppercase tracking-wide">
+                          <th className="text-left py-3 px-5 font-bold text-xs text-foreground uppercase tracking-wider">
+                            Servicios
+                          </th>
+                          <th className="text-right py-3 px-5 font-bold text-xs text-foreground uppercase tracking-wider">
                             Precio mínimo
                           </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
                         {specialty.activities.map((activity: any) => (
-                          <tr key={activity.id} className="hover:bg-gray-50 transition-colors">
-                            <td className="py-3 px-5 text-sm text-gray-900">
+                          <tr key={activity.id} className="hover:bg-muted/30 transition-colors">
+                            <td className="py-4 px-5 text-sm font-medium text-gray-900">
+                              {specialty.role_label}
+                            </td>
+                            <td className="py-4 px-5 text-sm text-gray-700">
                               {activity.activity}
                             </td>
-                            <td className="py-3 px-5 text-right">
+                            <td className="py-4 px-5 text-right">
                               {activity.price_min ? (
-                                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-50 text-green-700">
+                                <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-rappi-green/10 text-rappi-green border border-rappi-green/20">
                                   ${activity.price_min.toLocaleString()}
                                 </span>
                               ) : (
-                                <span className="text-sm text-gray-400">—</span>
+                                <span className="text-sm text-gray-400 font-medium">—</span>
                               )}
                             </td>
                           </tr>
