@@ -6,6 +6,8 @@ import { InProgressWorks } from "@/components/InProgressWorks";
 import { Logo } from "@/components/Logo";
 import { HowItWorksStep } from "@/components/HowItWorksStep";
 import { Plus } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
 import step1Image from "@/assets/step-1-busca.png";
 import step2Image from "@/assets/step-2-completa.png";
 import step3Image from "@/assets/step-3-recibe.png";
@@ -33,6 +35,7 @@ const howItWorksSteps = [{
 }];
 const Index = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -43,6 +46,15 @@ const Index = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleCreateRequest = () => {
+    if (!user) {
+      toast.info("Inicia sesión para crear una solicitud");
+      navigate("/auth");
+      return;
+    }
+    navigate('/create-request');
+  };
 
   return <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header with search - STICKY with BLUR */}
@@ -83,7 +95,7 @@ const Index = () => {
       
       {/* Floating Action Button */}
       <button
-        onClick={() => navigate('/create-request')}
+        onClick={handleCreateRequest}
         className="fixed bottom-24 right-6 w-14 h-14 bg-rappi-green text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 active:scale-95 z-40 flex items-center justify-center"
         aria-label="Crear nueva solicitud"
       >

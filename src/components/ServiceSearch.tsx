@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
 
 interface Service {
   id: number;
@@ -28,6 +30,7 @@ const ServiceSearch = () => {
   });
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     const searchServices = async () => {
@@ -83,6 +86,11 @@ const ServiceSearch = () => {
   }, [searchTerm]);
 
   const handleSelectEspecialista = (service: Service) => {
+    if (!user) {
+      toast.info("Inicia sesión para crear una solicitud");
+      navigate("/auth");
+      return;
+    }
     navigate("/create-request", {
       state: {
         selectedType: "especialista",
@@ -94,6 +102,11 @@ const ServiceSearch = () => {
   };
 
   const handleSelectActividad = (service: Service) => {
+    if (!user) {
+      toast.info("Inicia sesión para crear una solicitud");
+      navigate("/auth");
+      return;
+    }
     navigate("/create-request", {
       state: {
         selectedType: "actividad",
@@ -106,6 +119,11 @@ const ServiceSearch = () => {
   };
 
   const handleSelectCategoria = (categoria: string) => {
+    if (!user) {
+      toast.info("Inicia sesión para crear una solicitud");
+      navigate("/auth");
+      return;
+    }
     navigate("/create-request", {
       state: {
         selectedType: "categoria",
