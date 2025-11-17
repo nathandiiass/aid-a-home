@@ -68,7 +68,7 @@ export default function OrderDetail() {
       if (quotesError) throw quotesError;
 
       // Fetch profiles separately to avoid FK relationship issues
-      const specialistIds = quotesData?.map(q => q.specialist.user_id).filter(Boolean) || [];
+      const specialistIds = quotesData?.map(q => q.specialist?.user_id).filter(Boolean) || [];
       
       const { data: profilesData } = await supabase
         .from('profiles')
@@ -78,10 +78,10 @@ export default function OrderDetail() {
       // Merge profiles into quotes
       const quotesWithProfiles = quotesData?.map(quote => ({
         ...quote,
-        specialist: {
+        specialist: quote.specialist ? {
           ...quote.specialist,
           profiles: profilesData?.find(p => p.id === quote.specialist.user_id)
-        }
+        } : null
       })) || [];
 
       setQuotes(quotesWithProfiles);
