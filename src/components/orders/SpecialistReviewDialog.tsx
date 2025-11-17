@@ -10,6 +10,8 @@ interface SpecialistReviewDialogProps {
   onOpenChange: (open: boolean) => void;
   requestId: string;
   specialistId: string;
+  requestTitle?: string;
+  specialistName?: string;
   onReviewSubmitted: () => void;
 }
 
@@ -24,6 +26,8 @@ export function SpecialistReviewDialog({
   onOpenChange, 
   requestId,
   specialistId,
+  requestTitle,
+  specialistName,
   onReviewSubmitted 
 }: SpecialistReviewDialogProps) {
   const { toast } = useToast();
@@ -112,7 +116,7 @@ export function SpecialistReviewDialog({
   };
 
   const StarRating = ({ value, onChange }: { value: number; onChange: (v: number) => void }) => (
-    <div className="flex gap-1">
+    <div className="flex gap-0.5">
       {[1, 2, 3, 4, 5].map((star) => (
         <button
           key={star}
@@ -121,7 +125,7 @@ export function SpecialistReviewDialog({
           className="transition-transform hover:scale-110 focus:outline-none"
         >
           <Star
-            className={`w-8 h-8 ${
+            className={`w-6 h-6 ${
               star <= value
                 ? 'fill-yellow-400 text-yellow-400'
                 : 'fill-gray-200 text-gray-200'
@@ -134,21 +138,27 @@ export function SpecialistReviewDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-3xl">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-foreground">
+      <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto bg-white rounded-2xl">
+        <DialogHeader className="pb-2">
+          <DialogTitle className="text-xl font-bold text-foreground">
             Evalúa el servicio
           </DialogTitle>
-          <DialogDescription className="text-muted-foreground">
-            Tu opinión es muy importante para nosotros y ayuda a otros usuarios
+          {(requestTitle || specialistName) && (
+            <div className="text-xs text-muted-foreground space-y-0.5 pt-1">
+              {requestTitle && <p className="font-medium">{requestTitle}</p>}
+              {specialistName && <p>Especialista: {specialistName}</p>}
+            </div>
+          )}
+          <DialogDescription className="text-xs text-muted-foreground pt-1">
+            Tu opinión ayuda a otros usuarios
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-3 py-2">
           {/* Calificaciones por categoría */}
           {ratings.map((rating, index) => (
-            <div key={rating.key} className="space-y-2">
-              <label className="text-sm font-semibold text-foreground">
+            <div key={rating.key} className="space-y-1">
+              <label className="text-xs font-semibold text-foreground">
                 {rating.label}
               </label>
               <StarRating 
@@ -159,17 +169,17 @@ export function SpecialistReviewDialog({
           ))}
 
           {/* Pregunta de volvería a trabajar */}
-          <div className="space-y-3 pt-4 border-t border-border/30">
-            <label className="text-sm font-semibold text-foreground block">
+          <div className="space-y-2 pt-2 border-t border-border/30">
+            <label className="text-xs font-semibold text-foreground block">
               ¿Volverías a trabajar con este especialista?
             </label>
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => setVolveriaTrabajar(true)}
-                className={`flex-1 py-3 px-4 rounded-2xl font-semibold transition-all ${
+                className={`flex-1 py-2 px-3 rounded-xl font-semibold text-sm transition-all ${
                   volveriaTrabajar === true
-                    ? 'bg-rappi-green text-white shadow-lg'
+                    ? 'bg-rappi-green text-white shadow-md'
                     : 'bg-gray-100 text-foreground hover:bg-gray-200'
                 }`}
               >
@@ -178,9 +188,9 @@ export function SpecialistReviewDialog({
               <button
                 type="button"
                 onClick={() => setVolveriaTrabajar(false)}
-                className={`flex-1 py-3 px-4 rounded-2xl font-semibold transition-all ${
+                className={`flex-1 py-2 px-3 rounded-xl font-semibold text-sm transition-all ${
                   volveriaTrabajar === false
-                    ? 'bg-red-500 text-white shadow-lg'
+                    ? 'bg-red-500 text-white shadow-md'
                     : 'bg-gray-100 text-foreground hover:bg-gray-200'
                 }`}
               >
@@ -190,11 +200,11 @@ export function SpecialistReviewDialog({
           </div>
         </div>
 
-        <div className="flex gap-3 pt-4">
+        <div className="flex gap-2 pt-2">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            className="flex-1 rounded-full h-12"
+            className="flex-1 rounded-full h-10 text-sm"
             disabled={submitting}
           >
             Cancelar
@@ -202,7 +212,7 @@ export function SpecialistReviewDialog({
           <Button
             onClick={handleSubmit}
             disabled={!isFormValid() || submitting}
-            className="flex-1 bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-12 font-semibold"
+            className="flex-1 bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-10 font-semibold text-sm"
           >
             {submitting ? 'Enviando...' : 'Enviar evaluación'}
           </Button>

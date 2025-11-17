@@ -5,6 +5,7 @@ import { SpecialistReviewDialog } from './SpecialistReviewDialog';
 export function AutoReviewPrompt() {
   const [pendingReviewOrder, setPendingReviewOrder] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [specialistName, setSpecialistName] = useState<string>('');
 
   useEffect(() => {
     checkForPendingReviews();
@@ -55,6 +56,29 @@ export function AutoReviewPrompt() {
 
       if (orders && orders.length > 0 && !orders[0].reviews?.length) {
         setPendingReviewOrder(orders[0]);
+        
+        // Obtener nombre del especialista
+        if (orders[0].quotes?.[0]?.specialist_id) {
+          const { data: specialistProfile } = await supabase
+            .from('specialist_profiles')
+            .select('user_id')
+            .eq('id', orders[0].quotes[0].specialist_id)
+            .single();
+          
+          if (specialistProfile) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('first_name, last_name_paterno')
+              .eq('id', specialistProfile.user_id)
+              .single();
+            
+            if (profile) {
+              const fullName = `${profile.first_name} ${profile.last_name_paterno || ''}`.trim();
+              setSpecialistName(fullName);
+            }
+          }
+        }
+        
         setDialogOpen(true);
       }
     } catch (error) {
@@ -90,6 +114,27 @@ export function AutoReviewPrompt() {
 
       if (quote) {
         setPendingReviewOrder({ ...order, quotes: [quote] });
+        
+        // Obtener nombre del especialista
+        const { data: specialistProfile } = await supabase
+          .from('specialist_profiles')
+          .select('user_id')
+          .eq('id', quote.specialist_id)
+          .single();
+        
+        if (specialistProfile) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('first_name, last_name_paterno')
+            .eq('id', specialistProfile.user_id)
+            .single();
+          
+          if (profile) {
+            const fullName = `${profile.first_name} ${profile.last_name_paterno || ''}`.trim();
+            setSpecialistName(fullName);
+          }
+        }
+        
         setDialogOpen(true);
       }
     } catch (error) {
@@ -120,6 +165,8 @@ export function AutoReviewPrompt() {
       onOpenChange={handleDialogClose}
       requestId={pendingReviewOrder.id}
       specialistId={pendingReviewOrder.quotes[0].specialist_id}
+      requestTitle={pendingReviewOrder.service_title}
+      specialistName={specialistName}
       onReviewSubmitted={handleReviewSubmitted}
     />
   );
