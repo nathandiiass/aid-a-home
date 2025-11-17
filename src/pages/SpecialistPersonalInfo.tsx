@@ -397,10 +397,10 @@ export default function SpecialistPersonalInfo() {
   };
 
   const handleAddCredential = async () => {
-    if (!specialistId || !credentialForm.title) {
+    if (!specialistId || !credentialForm.title || !credentialFile) {
       toast({
         title: "Error",
-        description: "Por favor ingresa el título de la certificación",
+        description: "Por favor ingresa el título y adjunta el archivo de la certificación",
         variant: "destructive",
       });
       return;
@@ -408,27 +408,23 @@ export default function SpecialistPersonalInfo() {
 
     try {
       setSaving(true);
-      let attachmentUrl = null;
+      setUploadingCredential(true);
 
-      // Upload file if provided
-      if (credentialFile) {
-        setUploadingCredential(true);
-        const fileExt = credentialFile.name.split('.').pop();
-        const filePath = `${user?.id}/credentials/${Date.now()}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('specialist-documents')
-          .upload(filePath, credentialFile);
+      // Upload file (required)
+      const fileExt = credentialFile.name.split('.').pop();
+      const filePath = `${user?.id}/credentials/${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('specialist-documents')
+        .upload(filePath, credentialFile);
 
-        if (uploadError) throw uploadError;
+      if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
-          .from('specialist-documents')
-          .getPublicUrl(filePath);
-        
-        attachmentUrl = publicUrl;
-        setUploadingCredential(false);
-      }
+      const { data: { publicUrl } } = supabase.storage
+        .from('specialist-documents')
+        .getPublicUrl(filePath);
+      
+      setUploadingCredential(false);
 
       // Create credential
       const { data: newCredential, error } = await supabase
@@ -443,7 +439,7 @@ export default function SpecialistPersonalInfo() {
           expires_at: credentialForm.expires_at || null,
           start_year: credentialForm.start_year ? parseInt(credentialForm.start_year) : null,
           end_year: credentialForm.end_year ? parseInt(credentialForm.end_year) : null,
-          attachment_url: attachmentUrl,
+          attachment_url: publicUrl,
         })
         .select()
         .single();
@@ -1028,6 +1024,25 @@ export default function SpecialistPersonalInfo() {
               />
             </div>
 
+            <div className="space-y-2">
+              <Label>Adjuntar documento *</Label>
+              <div className="flex flex-col gap-2">
+                <Input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={(e) => setCredentialFile(e.target.files?.[0] || null)}
+                  className="flex-1"
+                />
+                {credentialFile && (
+                  <Badge variant="secondary" className="flex items-center gap-1 w-fit">
+                    <FileText className="w-3 h-3" />
+                    {credentialFile.name}
+                  </Badge>
+                )}
+              </div>
+              <p className="text-xs text-gray-500">PDF, JPG o PNG - Máximo 5MB</p>
+            </div>
+
             <div className="flex gap-3 pt-4">
               <Button
                 variant="outline"
@@ -1051,10 +1066,10 @@ export default function SpecialistPersonalInfo() {
               </Button>
               <Button
                 onClick={handleAddCredential}
-                disabled={!credentialForm.title || saving}
+                disabled={!credentialForm.title || !credentialFile || saving || uploadingCredential}
                 className="flex-1 bg-blue-500 hover:bg-blue-600"
               >
-                {saving ? 'Agregando...' : 'Agregar'}
+                {uploadingCredential ? 'Subiendo archivo...' : saving ? 'Agregando...' : 'Agregar'}
               </Button>
             </div>
           </div>
