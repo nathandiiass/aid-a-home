@@ -10,8 +10,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { X, Camera, Upload } from "lucide-react";
+import { X, Camera, Upload, Check, ChevronsUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface Service {
   id: number;
@@ -56,6 +71,7 @@ const ServiceSelector = ({
   const [selectedCategoria, setSelectedCategoria] = useState<string>(categoria || "");
   const [errors, setErrors] = useState<{ title?: string; description?: string }>({});
   const [fileError, setFileError] = useState("");
+  const [openEspecialista, setOpenEspecialista] = useState(false);
 
   useEffect(() => {
     const loadServices = async () => {
@@ -246,18 +262,47 @@ const ServiceSelector = ({
       {/* Especialista selector */}
       <div className="bg-white rounded-2xl shadow-lg border-0 p-6 space-y-3">
         <Label htmlFor="especialista" className="text-sm font-semibold">Especialista *</Label>
-        <Select value={especialista} onValueChange={onEspecialistaChange}>
-          <SelectTrigger id="especialista" className="h-12 bg-white">
-            <SelectValue placeholder="Selecciona un especialista" />
-          </SelectTrigger>
-          <SelectContent className="bg-white z-50">
-            {especialistas.map((esp) => (
-              <SelectItem key={esp} value={esp}>
-                {esp}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Popover open={openEspecialista} onOpenChange={setOpenEspecialista}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={openEspecialista}
+              className="w-full h-12 justify-between bg-white"
+            >
+              {especialista || "Selecciona un especialista"}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full p-0 bg-white" align="start">
+            <Command>
+              <CommandInput placeholder="Buscar especialista..." />
+              <CommandList>
+                <CommandEmpty>No se encontró el especialista.</CommandEmpty>
+                <CommandGroup>
+                  {especialistas.map((esp) => (
+                    <CommandItem
+                      key={esp}
+                      value={esp}
+                      onSelect={(currentValue) => {
+                        onEspecialistaChange(currentValue === especialista ? "" : currentValue);
+                        setOpenEspecialista(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          especialista === esp ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {esp}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* Service title */}
