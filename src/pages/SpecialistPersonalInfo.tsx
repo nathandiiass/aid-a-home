@@ -431,14 +431,14 @@ export default function SpecialistPersonalInfo() {
         .from('specialist_credentials')
         .insert({
           specialist_id: specialistId,
-          type: credentialForm.type || 'Certificación',
+          type: 'cert',
           title: credentialForm.title,
-          issuer: credentialForm.issuer || '',
-          description: credentialForm.description || null,
-          issued_at: credentialForm.issued_at || null,
-          expires_at: credentialForm.expires_at || null,
-          start_year: credentialForm.start_year ? parseInt(credentialForm.start_year) : null,
-          end_year: credentialForm.end_year ? parseInt(credentialForm.end_year) : null,
+          issuer: '',
+          description: null,
+          issued_at: null,
+          expires_at: null,
+          start_year: null,
+          end_year: null,
           attachment_url: publicUrl,
         })
         .select()
