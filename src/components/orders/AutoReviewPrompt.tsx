@@ -159,13 +159,16 @@ export function AutoReviewPrompt() {
     return null;
   }
 
+  // Usar service_title o activity como fallback
+  const displayTitle = pendingReviewOrder.service_title || pendingReviewOrder.activity;
+
   return (
     <SpecialistReviewDialog
       open={dialogOpen}
       onOpenChange={handleDialogClose}
       requestId={pendingReviewOrder.id}
       specialistId={pendingReviewOrder.quotes[0].specialist_id}
-      requestTitle={pendingReviewOrder.service_title}
+      requestTitle={displayTitle}
       specialistName={specialistName}
       onReviewSubmitted={handleReviewSubmitted}
     />
