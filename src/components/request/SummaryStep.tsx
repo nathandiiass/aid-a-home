@@ -22,15 +22,6 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
   const isEditMode = !!editOrderId;
 
   const handlePublish = async () => {
-    // Check if user is logged in
-    if (!user) {
-      // Save request data to localStorage
-      localStorage.setItem("pendingRequest", JSON.stringify(data));
-      toast.info("Inicia sesión para publicar tu solicitud");
-      navigate("/auth");
-      return;
-    }
-
     // Validate required fields
     const requestSchema = z.object({
       actividad: z.string().optional(),
