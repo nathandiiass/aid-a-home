@@ -94,15 +94,19 @@ const ServiceSelector = ({
   // Update available tags when categoria changes
   useEffect(() => {
     const loadTags = async () => {
-      if (selectedCategoria) {
+      if (selectedCategoria && categories.length > 0) {
         // Find category by name
         const category = categories.find(cat => cat.category_name === selectedCategoria);
+        console.log('Loading tags for category:', selectedCategoria, 'Found category:', category);
+        
         if (category) {
           const { data, error } = await supabase
             .from('category_tags')
             .select('*')
             .eq('category_id', category.id)
             .order('tag_name');
+          
+          console.log('Tags loaded:', data, 'Error:', error);
           
           if (error) {
             console.error('Error loading tags:', error);
@@ -112,8 +116,11 @@ const ServiceSelector = ({
           
           if (data) {
             setAvailableTags(data);
+          } else {
+            setAvailableTags([]);
           }
         } else {
+          console.log('Category not found in list');
           setAvailableTags([]);
         }
       } else {
