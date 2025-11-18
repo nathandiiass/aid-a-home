@@ -28,6 +28,15 @@ interface CategoryKeyword {
   keyword: string;
 }
 
+interface CategoryWithKeyword extends Category {
+  matchedKeyword?: string;
+}
+
+interface SearchResults {
+  directMatches: Category[];
+  keywordMatches: CategoryWithKeyword[];
+}
+
 interface ServiceSelectorProps {
   especialista: string;
   actividad: string;
@@ -97,7 +106,6 @@ const ServiceSelector = ({
       if (selectedCategoria && categories.length > 0) {
         // Find category by name
         const category = categories.find(cat => cat.category_name === selectedCategoria);
-        console.log('Loading tags for category:', selectedCategoria, 'Found category:', category);
         
         if (category) {
           const { data, error } = await supabase
@@ -105,8 +113,6 @@ const ServiceSelector = ({
             .select('*')
             .eq('category_id', category.id)
             .order('tag_name');
-          
-          console.log('Tags loaded:', data, 'Error:', error);
           
           if (error) {
             console.error('Error loading tags:', error);
@@ -120,7 +126,6 @@ const ServiceSelector = ({
             setAvailableTags([]);
           }
         } else {
-          console.log('Category not found in list');
           setAvailableTags([]);
         }
       } else {
@@ -236,19 +241,42 @@ const ServiceSelector = ({
   };
 
   // Get filtered categories based on search (including keywords)
-  const filteredCategories = categorySearchTerm 
-    ? categories.filter(cat => {
-        const searchLower = categorySearchTerm.toLowerCase();
-        // Check category name and key
-        const matchesName = cat.category_name.toLowerCase().includes(searchLower) ||
-                           cat.category_key.toLowerCase().includes(searchLower);
-        // Check keywords
-        const matchesKeyword = categoryKeywords.some(
-          kw => kw.category_id === cat.id && kw.keyword.toLowerCase().includes(searchLower)
-        );
-        return matchesName || matchesKeyword;
-      })
-    : categories;
+  const getFilteredCategories = () => {
+    if (!categorySearchTerm || categorySearchTerm.length < 2) {
+      return { directMatches: categories, keywordMatches: [] };
+    }
+
+    const searchLower = categorySearchTerm.toLowerCase();
+    
+    // Direct matches in category name or key
+    const directMatches = categories.filter(cat => 
+      cat.category_name.toLowerCase().includes(searchLower) ||
+      cat.category_key.toLowerCase().includes(searchLower)
+    );
+
+    // Keyword matches
+    const keywordMatchIds = new Set<number>();
+    const keywordMatches: CategoryWithKeyword[] = [];
+    
+    categoryKeywords.forEach(kw => {
+      if (kw.keyword.toLowerCase().includes(searchLower)) {
+        if (!keywordMatchIds.has(kw.category_id)) {
+          const category = categories.find(c => c.id === kw.category_id);
+          if (category && !directMatches.find(dm => dm.id === category.id)) {
+            keywordMatchIds.add(kw.category_id);
+            keywordMatches.push({
+              ...category,
+              matchedKeyword: kw.keyword
+            });
+          }
+        }
+      }
+    });
+
+    return { directMatches, keywordMatches };
+  };
+
+  const searchResults = getFilteredCategories();
   return <div className="space-y-4">
       <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
         <h2 className="text-xl font-bold mb-2">¿Qué servicio necesitas?</h2>
@@ -276,20 +304,46 @@ const ServiceSelector = ({
                   onValueChange={setCategorySearchTerm}
                 />
                 <CommandList>
-                  <CommandEmpty>No se encontró la categoría.</CommandEmpty>
-                  
-                  <CommandGroup>
-                    {filteredCategories.map(cat => (
-                      <CommandItem 
-                        key={cat.id} 
-                        value={cat.category_name}
-                        onSelect={() => handleCategoriaFilterChange(cat.category_name)}
-                      >
-                        <Check className={cn("mr-2 h-4 w-4", selectedCategoria === cat.category_name ? "opacity-100" : "opacity-0")} />
-                        {cat.category_name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+                  {searchResults.directMatches.length === 0 && searchResults.keywordMatches.length === 0 ? (
+                    <CommandEmpty>No se encontró la categoría.</CommandEmpty>
+                  ) : (
+                    <>
+                      {searchResults.directMatches.length > 0 && (
+                        <CommandGroup heading="Categorías">
+                          {searchResults.directMatches.map(cat => (
+                            <CommandItem 
+                              key={cat.id} 
+                              value={cat.category_name}
+                              onSelect={() => handleCategoriaFilterChange(cat.category_name)}
+                            >
+                              <Check className={cn("mr-2 h-4 w-4", selectedCategoria === cat.category_name ? "opacity-100" : "opacity-0")} />
+                              {cat.category_name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      )}
+                      
+                      {searchResults.keywordMatches.length > 0 && (
+                        <CommandGroup heading="Categorías relacionadas">
+                          {searchResults.keywordMatches.map(cat => (
+                            <CommandItem 
+                              key={`keyword-${cat.id}`} 
+                              value={cat.category_name}
+                              onSelect={() => handleCategoriaFilterChange(cat.category_name)}
+                            >
+                              <Check className={cn("mr-2 h-4 w-4", selectedCategoria === cat.category_name ? "opacity-100" : "opacity-0")} />
+                              <div className="flex flex-col">
+                                <span>{cat.category_name}</span>
+                                {cat.matchedKeyword && (
+                                  <span className="text-xs text-muted-foreground">{cat.matchedKeyword}</span>
+                                )}
+                              </div>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      )}
+                    </>
+                  )}
                 </CommandList>
               </Command>
             </PopoverContent>
@@ -313,42 +367,31 @@ const ServiceSelector = ({
           </p>
         </div>
         
-        {(() => {
-          console.log('Render check - selectedCategoria:', selectedCategoria, 'availableTags:', availableTags.length);
-          if (!selectedCategoria) {
-            return (
-              <div className="p-4 text-center text-muted-foreground text-sm border-2 border-dashed rounded-xl">
-                Primero selecciona una categoría para ver los servicios disponibles
-              </div>
-            );
-          }
-          
-          if (availableTags.length === 0) {
-            return (
-              <div className="p-4 text-center text-muted-foreground text-sm border-2 border-dashed rounded-xl">
-                No hay servicios disponibles para esta categoría
-              </div>
-            );
-          }
-          
-          return (
-            <div className="flex flex-wrap gap-2">
-              {availableTags.map(tag => (
-                <Badge
-                  key={tag.id}
-                  variant={selectedTags.includes(tag.tag_name) ? "default" : "outline"}
-                  className={cn(
-                    "cursor-pointer transition-all hover:scale-105 py-2 px-4 text-sm",
-                    selectedTags.includes(tag.tag_name) && "bg-primary text-primary-foreground"
-                  )}
-                  onClick={() => handleTagToggle(tag.tag_name)}
-                >
-                  {tag.tag_name}
-                </Badge>
-              ))}
-            </div>
-          );
-        })()}
+        {!selectedCategoria ? (
+          <div className="p-4 text-center text-muted-foreground text-sm border-2 border-dashed rounded-xl">
+            Primero selecciona una categoría para ver los servicios disponibles
+          </div>
+        ) : availableTags.length === 0 ? (
+          <div className="p-4 text-center text-muted-foreground text-sm border-2 border-dashed rounded-xl">
+            No hay servicios disponibles para esta categoría
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {availableTags.map(tag => (
+              <Badge
+                key={tag.id}
+                variant={selectedTags.includes(tag.tag_name) ? "default" : "outline"}
+                className={cn(
+                  "cursor-pointer transition-all hover:scale-105 py-2 px-4 text-sm",
+                  selectedTags.includes(tag.tag_name) && "bg-primary text-primary-foreground"
+                )}
+                onClick={() => handleTagToggle(tag.tag_name)}
+              >
+                {tag.tag_name}
+              </Badge>
+            ))}
+          </div>
+        )}
         
         {selectedTags.length > 0 && (
           <div className="pt-2 border-t">
