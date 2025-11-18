@@ -44,20 +44,20 @@ const ServiceSearch = () => {
 
       setIsSearching(true);
       
-      // Search in servicios_domesticos for especialistas and actividades
+      // Search in servicios_domesticos ONLY for especialistas and actividades
       const { data } = await supabase
         .from("servicios_domesticos")
         .select("*")
         .or(`actividad.ilike.%${searchTerm}%,especialista.ilike.%${searchTerm}%`)
         .limit(30);
 
-      // Search in static categories
+      // Search in static categories (independent from database)
       const categoryResults: SearchResults = searchCategoriesByKeyword(searchTerm);
 
-      if (data) {
-        const especialistasMap = new Map<string, Service>();
-        const actividadesMap = new Map<string, Service>();
+      const especialistasMap = new Map<string, Service>();
+      const actividadesMap = new Map<string, Service>();
 
+      if (data) {
         data.forEach((service) => {
           const lowerSearch = searchTerm.toLowerCase();
 
@@ -69,21 +69,15 @@ const ServiceSearch = () => {
             actividadesMap.set(service.actividad, service);
           }
         });
-
-        setResults({
-          especialistas: Array.from(especialistasMap.values()).slice(0, 5),
-          actividades: Array.from(actividadesMap.values()).slice(0, 8),
-          categoriasDirectas: categoryResults.directMatches.slice(0, 5),
-          categoriasSinonimos: categoryResults.synonymMatches.slice(0, 5),
-        });
-      } else {
-        setResults({
-          especialistas: [],
-          actividades: [],
-          categoriasDirectas: categoryResults.directMatches.slice(0, 5),
-          categoriasSinonimos: categoryResults.synonymMatches.slice(0, 5),
-        });
       }
+
+      setResults({
+        especialistas: Array.from(especialistasMap.values()).slice(0, 5),
+        actividades: Array.from(actividadesMap.values()).slice(0, 8),
+        categoriasDirectas: categoryResults.directMatches.slice(0, 5),
+        categoriasSinonimos: categoryResults.synonymMatches.slice(0, 5),
+      });
+      
       setIsSearching(false);
     };
 
