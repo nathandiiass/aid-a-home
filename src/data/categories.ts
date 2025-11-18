@@ -257,9 +257,13 @@ export const categoryKeywords: CategoryKeyword[] = [
 ];
 
 // Helper function to search categories by keyword
+export interface CategoryWithSynonym extends Category {
+  matchedKeyword?: string;
+}
+
 export interface SearchResults {
   directMatches: Category[];
-  synonymMatches: Category[];
+  synonymMatches: CategoryWithSynonym[];
 }
 
 export const searchCategoriesByKeyword = (searchTerm: string): SearchResults => {
@@ -279,14 +283,21 @@ export const searchCategoriesByKeyword = (searchTerm: string): SearchResults => 
     kw.keyword.toLowerCase().includes(lowerSearch)
   );
   
-  // Get unique category IDs from matching keywords
-  const categoryIds = new Set(matchingKeywords.map(kw => kw.category_id));
-  
   // Get categories from keywords that are NOT in direct matches
   const directMatchIds = new Set(directMatches.map(cat => cat.id));
-  const synonymMatches = categories.filter(cat => 
-    categoryIds.has(cat.id) && !directMatchIds.has(cat.id)
-  );
+  const synonymMatches: CategoryWithSynonym[] = [];
+  
+  matchingKeywords.forEach(kw => {
+    if (!directMatchIds.has(kw.category_id)) {
+      const category = categories.find(cat => cat.id === kw.category_id);
+      if (category && !synonymMatches.find(sm => sm.id === category.id)) {
+        synonymMatches.push({
+          ...category,
+          matchedKeyword: kw.keyword
+        });
+      }
+    }
+  });
   
   return { directMatches, synonymMatches };
 };
