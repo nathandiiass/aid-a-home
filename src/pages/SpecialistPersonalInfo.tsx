@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import CategoryServicesSelector, { SelectedCategory } from '@/components/specialist/CategoryServicesSelector';
 interface ProfileData {
   // Personal data
   person_type: string | null;
@@ -100,10 +101,7 @@ export default function SpecialistPersonalInfo() {
   const [workZones, setWorkZones] = useState<WorkZone[]>([]);
   const [specialistId, setSpecialistId] = useState<string | null>(null);
   const [editingSpecialty, setEditingSpecialty] = useState<string | null>(null);
-  const [showAddSpecialtyDialog, setShowAddSpecialtyDialog] = useState(false);
-  const [availableSpecialties, setAvailableSpecialties] = useState<Array<{categoria: string; especialista: string}>>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [selectedSpecialist, setSelectedSpecialist] = useState<string>('');
+  const [selectedCategories, setSelectedCategories] = useState<SelectedCategory[]>([]);
   const [credentials, setCredentials] = useState<Credential[]>([]);
   const [showAddCredentialDialog, setShowAddCredentialDialog] = useState(false);
   const [credentialForm, setCredentialForm] = useState({
@@ -121,35 +119,40 @@ export default function SpecialistPersonalInfo() {
   useEffect(() => {
     if (user) {
       loadData();
-      loadAvailableSpecialties();
     }
   }, [user]);
 
-  const loadAvailableSpecialties = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('servicios_domesticos')
-        .select('categoria, especialista')
-        .order('categoria', { ascending: true });
-      
-      if (error) throw error;
-      
-      // Get unique categories and specialists
-      const uniqueData = data?.reduce((acc: Array<{categoria: string; especialista: string}>, current) => {
-        const exists = acc.find(item => 
-          item.categoria === current.categoria && item.especialista === current.especialista
-        );
-        if (!exists) {
-          acc.push(current);
-        }
-        return acc;
-      }, []) || [];
-      
-      setAvailableSpecialties(uniqueData);
-    } catch (error) {
-      console.error('Error loading available specialties:', error);
-    }
-  };
+  useEffect(() => {
+    // Convert specialties to SelectedCategory format when loaded
+    const loadCategories = async () => {
+      if (specialties.length === 0) return;
+
+      const [categoriesResult, tagsResult] = await Promise.all([
+        supabase.from('categories').select('*'),
+        supabase.from('category_tags').select('*')
+      ]);
+
+      if (!categoriesResult.data || !tagsResult.data) return;
+
+      const converted: SelectedCategory[] = specialties.map(specialty => {
+        const category = categoriesResult.data.find(c => c.category_name === specialty.specialty);
+        if (!category) return null;
+
+        // Get the tags for this specialty from activities
+        const tags = specialty.activities.map(act => act.activity);
+
+        return {
+          category,
+          selectedTags: tags,
+          experienceYears: specialty.experience_years || undefined
+        };
+      }).filter(Boolean) as SelectedCategory[];
+
+      setSelectedCategories(converted);
+    };
+
+    loadCategories();
+  }, [specialties]);
   const loadData = async () => {
     if (!user) return;
     try {
@@ -318,82 +321,17 @@ export default function SpecialistPersonalInfo() {
     } : s));
     setHasChanges(true);
   };
+  const handleCategoriesChange = (categories: SelectedCategory[]) => {
+    setSelectedCategories(categories);
+    setHasChanges(true);
+  };
+
   const handleWorkZoneChange = (zoneId: string, cities: string[]) => {
     setWorkZones(prev => prev.map(z => z.id === zoneId ? {
       ...z,
       cities
     } : z));
     setHasChanges(true);
-  };
-
-  const handleAddSpecialty = async () => {
-    if (!specialistId || !selectedCategory || !selectedSpecialist) {
-      toast({
-        title: "Error",
-        description: "Por favor selecciona una categoría y especialidad",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Check if specialty already exists
-    const exists = specialties.find(s => 
-      s.specialty === selectedCategory && s.role_label === selectedSpecialist
-    );
-
-    if (exists) {
-      toast({
-        title: "Error",
-        description: "Ya tienes esta especialidad agregada",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      setSaving(true);
-
-      // Create new specialty in database
-      const { data: newSpecialty, error: specialtyError } = await supabase
-        .from('specialist_specialties')
-        .insert({
-          specialist_id: specialistId,
-          specialty: selectedCategory,
-          role_label: selectedSpecialist,
-          experience_years: null,
-        })
-        .select()
-        .single();
-
-      if (specialtyError) throw specialtyError;
-
-      // Add to local state
-      setSpecialties(prev => [...prev, {
-        id: newSpecialty.id,
-        specialty: newSpecialty.specialty,
-        role_label: newSpecialty.role_label,
-        experience_years: newSpecialty.experience_years,
-        activities: [],
-      }]);
-
-      toast({
-        title: "Éxito",
-        description: "Especialidad agregada correctamente",
-      });
-
-      setShowAddSpecialtyDialog(false);
-      setSelectedCategory('');
-      setSelectedSpecialist('');
-    } catch (error) {
-      console.error('Error adding specialty:', error);
-      toast({
-        title: "Error",
-        description: "No se pudo agregar la especialidad",
-        variant: "destructive",
-      });
-    } finally {
-      setSaving(false);
-    }
   };
 
   const handleAddCredential = async () => {
@@ -738,49 +676,10 @@ export default function SpecialistPersonalInfo() {
             <h2 className="text-lg font-bold text-gray-900">Especialidades y servicios</h2>
           </div>
 
-          <div className="space-y-4">
-            {specialties.map(specialty => <div key={specialty.id} className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl p-5 space-y-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1">
-                    <Badge variant="outline" className="mb-2 bg-white border-rappi-green/20 text-rappi-green font-semibold">
-                      {specialty.role_label}
-                    </Badge>
-                    <h3 className="font-bold text-gray-900 text-lg">{specialty.specialty}</h3>
-                  </div>
-                  <button onClick={() => setEditingSpecialty(editingSpecialty === specialty.id ? null : specialty.id)} className="w-9 h-9 rounded-full bg-white hover:bg-gray-50 flex items-center justify-center transition-all active:scale-95 shadow-sm">
-                    <ChevronRight className={`w-4 h-4 text-gray-600 transition-transform ${editingSpecialty === specialty.id ? 'rotate-90' : ''}`} />
-                  </button>
-                </div>
-
-                {editingSpecialty === specialty.id && <div className="space-y-4 pt-2">
-                    <div>
-                      <Label className="text-sm font-semibold text-gray-700 mb-2 block">Años de experiencia</Label>
-                      <Input type="number" value={specialty.experience_years || ''} onChange={e => handleSpecialtyChange(specialty.id, 'experience_years', parseInt(e.target.value) || null)} className="rounded-2xl border-gray-200 bg-white text-sm h-12 focus:border-rappi-green focus:ring-rappi-green" placeholder="5" />
-                    </div>
-
-                    <div className="space-y-3">
-                      <Label className="text-sm font-semibold text-gray-700">Actividades</Label>
-                      {specialty.activities.map(activity => <div key={activity.id} className="bg-white rounded-xl p-4 space-y-3 shadow-sm">
-                          <Input value={activity.activity} onChange={e => handleActivityChange(specialty.id, activity.id, 'activity', e.target.value)} className="rounded-xl border-gray-200 text-sm h-11 font-medium focus:border-rappi-green focus:ring-rappi-green" placeholder="Nombre de la actividad" />
-                          <div>
-                            <Label className="text-xs font-medium text-gray-600 mb-1.5 block">Precio desde</Label>
-                            <Input type="number" value={activity.price_min || ''} onChange={e => handleActivityChange(specialty.id, activity.id, 'price_min', parseFloat(e.target.value) || null)} className="rounded-xl border-gray-200 text-sm h-10 focus:border-rappi-green focus:ring-rappi-green" placeholder="$0" />
-                          </div>
-                        </div>)}
-                    </div>
-                  </div>}
-              </div>)}
-
-            {/* Add Specialty Button */}
-            <Button
-              onClick={() => setShowAddSpecialtyDialog(true)}
-              variant="outline"
-              className="w-full rounded-2xl h-14 border-2 border-dashed border-gray-300 hover:border-rappi-green hover:bg-rappi-green/5 transition-all"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Agregar nueva especialidad
-            </Button>
-          </div>
+          <CategoryServicesSelector
+            value={selectedCategories}
+            onChange={handleCategoriesChange}
+          />
 
           <div className="pt-4 border-t border-gray-100">
             <div className="flex items-center gap-2 mb-4">
@@ -932,76 +831,6 @@ export default function SpecialistPersonalInfo() {
         </div>
       </div>
 
-      {/* Add Specialty Dialog */}
-      <Dialog open={showAddSpecialtyDialog} onOpenChange={setShowAddSpecialtyDialog}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Agregar nueva especialidad</DialogTitle>
-            <DialogDescription>
-              Selecciona una categoría y especialidad para agregar a tu perfil
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="category">Categoría</Label>
-              <Select value={selectedCategory} onValueChange={(value) => {
-                setSelectedCategory(value);
-                setSelectedSpecialist('');
-              }}>
-                <SelectTrigger id="category">
-                  <SelectValue placeholder="Selecciona una categoría" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Array.from(new Set(availableSpecialties.map(s => s.categoria))).map(cat => (
-                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {selectedCategory && (
-              <div className="space-y-2">
-                <Label htmlFor="specialist">Especialidad</Label>
-                <Select value={selectedSpecialist} onValueChange={setSelectedSpecialist}>
-                  <SelectTrigger id="specialist">
-                    <SelectValue placeholder="Selecciona una especialidad" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableSpecialties
-                      .filter(s => s.categoria === selectedCategory)
-                      .map(s => (
-                        <SelectItem key={s.especialista} value={s.especialista}>
-                          {s.especialista}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            <div className="flex gap-3 pt-4">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowAddSpecialtyDialog(false);
-                  setSelectedCategory('');
-                  setSelectedSpecialist('');
-                }}
-                className="flex-1"
-              >
-                Cancelar
-              </Button>
-              <Button
-                onClick={handleAddSpecialty}
-                disabled={!selectedCategory || !selectedSpecialist || saving}
-                className="flex-1 bg-rappi-green hover:bg-rappi-green/90"
-              >
-                {saving ? 'Agregando...' : 'Agregar'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Add Credential Dialog */}
       <Dialog open={showAddCredentialDialog} onOpenChange={setShowAddCredentialDialog}>
