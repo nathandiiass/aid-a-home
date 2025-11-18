@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,16 +8,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { searchCategoriesByKeyword, type Category, type SearchResults } from "@/data/categories";
 
-interface Service {
-  id: number;
-  especialista: string;
-  categoria: string;
-  actividad: string;
-}
-
 interface GroupedResults {
-  especialistas: Service[];
-  actividades: Service[];
   categoriasDirectas: Category[];
   categoriasSinonimos: Category[];
 }
@@ -26,8 +16,6 @@ interface GroupedResults {
 const ServiceSearch = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<GroupedResults>({
-    especialistas: [],
-    actividades: [],
     categoriasDirectas: [],
     categoriasSinonimos: [],
   });
@@ -36,87 +24,28 @@ const ServiceSearch = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    const searchServices = async () => {
+    const searchCategories = () => {
       if (searchTerm.trim().length < 2) {
-        setResults({ especialistas: [], actividades: [], categoriasDirectas: [], categoriasSinonimos: [] });
+        setResults({ categoriasDirectas: [], categoriasSinonimos: [] });
         return;
       }
 
       setIsSearching(true);
       
-      // Search in servicios_domesticos ONLY for especialistas and actividades
-      const { data } = await supabase
-        .from("servicios_domesticos")
-        .select("*")
-        .or(`actividad.ilike.%${searchTerm}%,especialista.ilike.%${searchTerm}%`)
-        .limit(30);
-
-      // Search in static categories (independent from database)
+      // Search ONLY in static categories
       const categoryResults: SearchResults = searchCategoriesByKeyword(searchTerm);
 
-      const especialistasMap = new Map<string, Service>();
-      const actividadesMap = new Map<string, Service>();
-
-      if (data) {
-        data.forEach((service) => {
-          const lowerSearch = searchTerm.toLowerCase();
-
-          if (service.especialista.toLowerCase().includes(lowerSearch)) {
-            especialistasMap.set(service.especialista, service);
-          }
-
-          if (service.actividad.toLowerCase().includes(lowerSearch)) {
-            actividadesMap.set(service.actividad, service);
-          }
-        });
-      }
-
       setResults({
-        especialistas: Array.from(especialistasMap.values()).slice(0, 5),
-        actividades: Array.from(actividadesMap.values()).slice(0, 8),
-        categoriasDirectas: categoryResults.directMatches.slice(0, 5),
-        categoriasSinonimos: categoryResults.synonymMatches.slice(0, 5),
+        categoriasDirectas: categoryResults.directMatches.slice(0, 8),
+        categoriasSinonimos: categoryResults.synonymMatches.slice(0, 8),
       });
       
       setIsSearching(false);
     };
 
-    const debounce = setTimeout(searchServices, 300);
+    const debounce = setTimeout(searchCategories, 300);
     return () => clearTimeout(debounce);
   }, [searchTerm]);
-
-  const handleSelectEspecialista = (service: Service) => {
-    if (!user) {
-      toast.info("Inicia sesión para crear una solicitud");
-      navigate("/auth");
-      return;
-    }
-    navigate("/create-request", {
-      state: {
-        selectedType: "especialista",
-        especialista: service.especialista,
-        categoria: service.categoria,
-        actividad: "",
-      },
-    });
-  };
-
-  const handleSelectActividad = (service: Service) => {
-    if (!user) {
-      toast.info("Inicia sesión para crear una solicitud");
-      navigate("/auth");
-      return;
-    }
-    navigate("/create-request", {
-      state: {
-        selectedType: "actividad",
-        especialista: service.especialista,
-        actividad: service.actividad,
-        categoria: service.categoria,
-        serviceTitle: service.actividad,
-      },
-    });
-  };
 
   const handleSelectCategoria = (categoryName: string) => {
     if (!user) {
@@ -135,8 +64,6 @@ const ServiceSearch = () => {
   };
 
   const hasResults =
-    results.especialistas.length > 0 || 
-    results.actividades.length > 0 || 
     results.categoriasDirectas.length > 0 || 
     results.categoriasSinonimos.length > 0;
 
@@ -160,60 +87,6 @@ const ServiceSearch = () => {
             <div className="p-4 text-center text-gray-500">Buscando...</div>
           ) : hasResults ? (
             <div className="divide-y divide-gray-100">
-              {/* Especialistas */}
-              {results.especialistas.length > 0 && (
-                <div className="p-3">
-                  <p className="text-xs font-bold text-gray-500 uppercase mb-2 px-1">Especialistas</p>
-                  <div className="space-y-1">
-                    {results.especialistas.map((service) => (
-                      <button
-                        key={`esp-${service.id}`}
-                        onClick={() => handleSelectEspecialista(service)}
-                        className="w-full p-3 text-left hover:bg-gray-50 transition-colors rounded-xl flex items-center gap-3"
-                      >
-                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                          <span className="text-blue-600 font-bold text-sm">{service.especialista.charAt(0)}</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-gray-900 text-sm">{service.especialista}</p>
-                          <p className="text-xs text-gray-500">{service.categoria}</p>
-                        </div>
-                        <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 border-0">
-                          Especialista
-                        </Badge>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Actividades */}
-              {results.actividades.length > 0 && (
-                <div className="p-3">
-                  <p className="text-xs font-bold text-gray-500 uppercase mb-2 px-1">Actividades</p>
-                  <div className="space-y-1">
-                    {results.actividades.map((service) => (
-                      <button
-                        key={`act-${service.id}`}
-                        onClick={() => handleSelectActividad(service)}
-                        className="w-full p-3 text-left hover:bg-gray-50 transition-colors rounded-xl flex items-center gap-3"
-                      >
-                        <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-                          <span className="text-green-700 font-bold text-sm">{service.actividad.charAt(0)}</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-gray-900 text-sm">{service.actividad}</p>
-                          <p className="text-xs text-gray-500">{service.especialista}</p>
-                        </div>
-                        <Badge variant="outline" className="text-xs border-gray-300">
-                          Actividad
-                        </Badge>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {/* Categorías - Coincidencias directas */}
               {results.categoriasDirectas.length > 0 && (
                 <div className="p-3">
