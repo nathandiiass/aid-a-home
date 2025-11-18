@@ -582,61 +582,41 @@ export type Database = {
           },
         ]
       }
-      servicios_domesticos: {
+      specialist_categories: {
         Row: {
-          actividad: string
-          categoria: string
+          category_id: number
           created_at: string | null
-          especialista: string
-          id: number
-        }
-        Insert: {
-          actividad: string
-          categoria: string
-          created_at?: string | null
-          especialista: string
-          id?: number
-        }
-        Update: {
-          actividad?: string
-          categoria?: string
-          created_at?: string | null
-          especialista?: string
-          id?: number
-        }
-        Relationships: []
-      }
-      specialist_activities: {
-        Row: {
-          activity: string
-          created_at: string
+          experience_years: number | null
           id: string
-          price_max: number | null
-          price_min: number | null
-          specialty_id: string
+          specialist_id: string
         }
         Insert: {
-          activity: string
-          created_at?: string
+          category_id: number
+          created_at?: string | null
+          experience_years?: number | null
           id?: string
-          price_max?: number | null
-          price_min?: number | null
-          specialty_id: string
+          specialist_id: string
         }
         Update: {
-          activity?: string
-          created_at?: string
+          category_id?: number
+          created_at?: string | null
+          experience_years?: number | null
           id?: string
-          price_max?: number | null
-          price_min?: number | null
-          specialty_id?: string
+          specialist_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "specialist_activities_specialty_id_fkey"
-            columns: ["specialty_id"]
+            foreignKeyName: "specialist_categories_category_id_fkey"
+            columns: ["category_id"]
             isOneToOne: false
-            referencedRelation: "specialist_specialties"
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "specialist_categories_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: false
+            referencedRelation: "specialist_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -816,37 +796,38 @@ export type Database = {
           },
         ]
       }
-      specialist_specialties: {
+      specialist_tags: {
         Row: {
-          created_at: string
-          experience_years: number | null
+          created_at: string | null
           id: string
-          role_label: string
           specialist_id: string
-          specialty: string
+          tag_id: number
         }
         Insert: {
-          created_at?: string
-          experience_years?: number | null
+          created_at?: string | null
           id?: string
-          role_label: string
           specialist_id: string
-          specialty: string
+          tag_id: number
         }
         Update: {
-          created_at?: string
-          experience_years?: number | null
+          created_at?: string | null
           id?: string
-          role_label?: string
           specialist_id?: string
-          specialty?: string
+          tag_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "specialist_specialties_specialist_id_fkey"
+            foreignKeyName: "specialist_tags_specialist_id_fkey"
             columns: ["specialist_id"]
             isOneToOne: false
             referencedRelation: "specialist_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "specialist_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "category_tags"
             referencedColumns: ["id"]
           },
         ]

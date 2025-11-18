@@ -98,13 +98,37 @@ export default function SpecialistProfile() {
         setProfile(profileData);
       }
 
-      // Load specialties and activities
-      const {
-        data: specialtiesData
-      } = await supabase.from('specialist_specialties').select(`
-          *,
-          activities:specialist_activities(*)
-        `).eq('specialist_id', targetSpecialistId);
+      // Load categories and tags
+      const { data: categoriesData } = await supabase
+        .from('specialist_categories')
+        .select(`
+          id,
+          category_id,
+          experience_years,
+          categories(id, category_name)
+        `)
+        .eq('specialist_id', targetSpecialistId);
+
+      const { data: tagsData } = await supabase
+        .from('specialist_tags')
+        .select(`
+          tag_id,
+          category_tags(id, tag_name, category_id)
+        `)
+        .eq('specialist_id', targetSpecialistId);
+
+      const specialtiesData = categoriesData?.map(c => ({
+        id: c.id,
+        specialty: (c.categories as any)?.category_name || '',
+        role_label: (c.categories as any)?.category_name || '',
+        experience_years: c.experience_years,
+        activities: tagsData
+          ?.filter(t => (t.category_tags as any)?.category_id === c.category_id)
+          .map(t => ({
+            id: t.tag_id.toString(),
+            activity: (t.category_tags as any)?.tag_name || ''
+          })) || []
+      })) || [];
       if (specialtiesData) {
         setSpecialties(specialtiesData);
       }

@@ -300,35 +300,42 @@ export default function SpecialistRegistration() {
 
       if (profileError) throw profileError;
 
+      // Insert specialist categories and tags
       for (const selectedCategory of selectedCategories) {
-        // Insert category as specialty
-        const { data: specialtyInserted, error: specialtyError } = await supabase
-          .from('specialist_specialties')
-          .insert([{
+        // Insert category link
+        const { error: categoryError } = await supabase
+          .from('specialist_categories')
+          .insert({
             specialist_id: profile.id,
-            specialty: selectedCategory.category.category_name,
-            role_label: selectedCategory.category.category_name,
+            category_id: selectedCategory.category.id,
             experience_years: selectedCategory.experienceYears || null
-          }])
-          .select()
-          .single();
+          });
 
-        if (specialtyError) throw specialtyError;
+        if (categoryError) throw categoryError;
 
-        // Insert selected tags as activities for this specialty
+        // Insert tags for this category
         if (selectedCategory.selectedTags.length > 0) {
-          const activitiesData = selectedCategory.selectedTags.map(tagName => ({
-            specialty_id: specialtyInserted.id,
-            activity: tagName,
-            price_min: null,
-            price_max: null
-          }));
+          // Get tag IDs from tag names
+          const { data: tagsData, error: tagsError } = await supabase
+            .from('category_tags')
+            .select('id, tag_name')
+            .eq('category_id', selectedCategory.category.id)
+            .in('tag_name', selectedCategory.selectedTags);
 
-          const { error: activitiesError } = await supabase
-            .from('specialist_activities')
-            .insert(activitiesData);
+          if (tagsError) throw tagsError;
 
-          if (activitiesError) throw activitiesError;
+          if (tagsData && tagsData.length > 0) {
+            const tagInserts = tagsData.map(tag => ({
+              specialist_id: profile.id,
+              tag_id: tag.id
+            }));
+
+            const { error: tagInsertError } = await supabase
+              .from('specialist_tags')
+              .insert(tagInserts);
+
+            if (tagInsertError) throw tagInsertError;
+          }
         }
       }
 
