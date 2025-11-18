@@ -105,7 +105,7 @@ export default function SpecialistProfile() {
           id,
           category_id,
           experience_years,
-          categories(id, category_name)
+          categories(id, category_name, category_key)
         `)
         .eq('specialist_id', targetSpecialistId);
 

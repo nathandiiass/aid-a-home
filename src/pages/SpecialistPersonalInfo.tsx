@@ -122,38 +122,6 @@ export default function SpecialistPersonalInfo() {
       loadData();
     }
   }, [user]);
-
-  useEffect(() => {
-    // Convert specialties to SelectedCategory format when loaded
-    const loadCategories = async () => {
-      if (specialties.length === 0) return;
-
-      const [categoriesResult, tagsResult] = await Promise.all([
-        supabase.from('categories').select('*'),
-        supabase.from('category_tags').select('*')
-      ]);
-
-      if (!categoriesResult.data || !tagsResult.data) return;
-
-      const converted: SelectedCategory[] = specialties.map(specialty => {
-        const category = categoriesResult.data.find(c => c.category_name === specialty.specialty);
-        if (!category) return null;
-
-        // Get the tags for this specialty from activities
-        const tags = specialty.activities.map(act => act.activity);
-
-        return {
-          category,
-          selectedTags: tags,
-          experienceYears: specialty.experience_years || undefined
-        };
-      }).filter(Boolean) as SelectedCategory[];
-
-      setSelectedCategories(converted);
-    };
-
-    loadCategories();
-  }, [specialties]);
   const loadData = async () => {
     if (!user) return;
     try {
@@ -217,7 +185,7 @@ export default function SpecialistPersonalInfo() {
           id,
           category_id,
           experience_years,
-          categories(id, category_name)
+          categories(id, category_name, category_key)
         `)
         .eq('specialist_id', specialist.id);
       if (categoriesError) throw categoriesError;
@@ -245,6 +213,23 @@ export default function SpecialistPersonalInfo() {
           })) || []
       })) || [];
       setSpecialties(formattedSpecialties);
+
+      // Convert to SelectedCategory format
+      const convertedCategories: SelectedCategory[] = categoriesData?.map(c => {
+        const categoryData = c.categories as any;
+        return {
+          category: {
+            id: categoryData?.id || 0,
+            category_key: categoryData?.category_key || '',
+            category_name: categoryData?.category_name || ''
+          },
+          selectedTags: tagsData
+            ?.filter(t => (t.category_tags as any)?.category_id === c.category_id)
+            .map(t => (t.category_tags as any)?.tag_name || '') || [],
+          experienceYears: c.experience_years || undefined
+        };
+      }) || [];
+      setSelectedCategories(convertedCategories);
 
       // Get work zones
       const {
@@ -496,8 +481,58 @@ export default function SpecialistPersonalInfo() {
       }).eq('id', specialistId);
       if (specialistError) throw specialistError;
 
-      // Note: Updating categories requires deleting and recreating them
-      // This is a complex operation that should be handled separately
+      // Update categories and tags
+      if (selectedCategories.length > 0) {
+        // Delete existing categories and tags for this specialist
+        await supabase
+          .from('specialist_categories')
+          .delete()
+          .eq('specialist_id', specialistId);
+
+        await supabase
+          .from('specialist_tags')
+          .delete()
+          .eq('specialist_id', specialistId);
+
+        // Insert new categories and tags
+        for (const selectedCategory of selectedCategories) {
+          // Insert category
+          const { error: categoryError } = await supabase
+            .from('specialist_categories')
+            .insert({
+              specialist_id: specialistId,
+              category_id: selectedCategory.category.id,
+              experience_years: selectedCategory.experienceYears || null
+            });
+
+          if (categoryError) throw categoryError;
+
+          // Insert tags for this category
+          if (selectedCategory.selectedTags.length > 0) {
+            // Get tag IDs from tag names
+            const { data: tagsData, error: tagsError } = await supabase
+              .from('category_tags')
+              .select('id, tag_name')
+              .eq('category_id', selectedCategory.category.id)
+              .in('tag_name', selectedCategory.selectedTags);
+
+            if (tagsError) throw tagsError;
+
+            if (tagsData && tagsData.length > 0) {
+              const tagInserts = tagsData.map(tag => ({
+                specialist_id: specialistId,
+                tag_id: tag.id
+              }));
+
+              const { error: tagInsertError } = await supabase
+                .from('specialist_tags')
+                .insert(tagInserts);
+
+              if (tagInsertError) throw tagInsertError;
+            }
+          }
+        }
+      }
 
       // Update work zones
       for (const zone of workZones) {
@@ -509,6 +544,8 @@ export default function SpecialistPersonalInfo() {
         if (zoneError) throw zoneError;
       }
       setHasChanges(false);
+      // Reload data to show updated categories
+      await loadData();
       toast({
         title: "Éxito",
         description: "Tus datos se actualizaron correctamente"
@@ -756,7 +793,10 @@ export default function SpecialistPersonalInfo() {
                   Cancelar
                 </Button>
                 <Button
-                  onClick={() => setIsEditingCategories(false)}
+                  onClick={async () => {
+                    setIsEditingCategories(false);
+                    await handleSave();
+                  }}
                   className="flex-1 bg-rappi-green hover:bg-rappi-green/90 rounded-xl"
                 >
                   Guardar cambios
