@@ -25,7 +25,7 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
     // Validate required fields
     const requestSchema = z.object({
       actividad: z.string().optional(),
-      especialista: z.string().min(1, "Especialista requerido").max(200),
+      categoria: z.string().min(1, "Categoría requerida").max(200),
       serviceTitle: z.string().min(10, "Título debe tener al menos 10 caracteres").max(200),
       serviceDescription: z.string().min(20, "Descripción debe tener al menos 20 caracteres").max(2000),
       budgetMin: z.number().positive().optional(),
@@ -38,7 +38,7 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
       // Validate input
       const validatedData = requestSchema.parse({
         actividad: data.actividad,
-        especialista: data.especialista,
+        categoria: data.categoria,
         serviceTitle: data.serviceTitle,
         serviceDescription: data.serviceDescription,
         budgetMin: data.budgetMin,
@@ -84,7 +84,7 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
           .from("service_requests")
           .update({
             activity: validatedData.actividad || validatedData.serviceTitle,
-            category: validatedData.especialista,
+            category: validatedData.categoria,
             service_title: validatedData.serviceTitle,
             service_description: validatedData.serviceDescription,
             status: "active",
@@ -111,7 +111,7 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
           .insert({
             user_id: user.id,
             activity: validatedData.actividad || validatedData.serviceTitle,
-            category: validatedData.especialista,
+            category: validatedData.categoria,
             service_title: validatedData.serviceTitle,
             service_description: validatedData.serviceDescription,
             status: "active",
@@ -199,7 +199,7 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
                 Editar
               </button>
             </div>
-            <p className="text-muted-foreground text-sm mb-2">{data.especialista}</p>
+            <p className="text-muted-foreground text-sm mb-2">{data.categoria}</p>
             <p className="text-sm text-muted-foreground">{data.serviceDescription}</p>
 
             {/* Evidence section */}

@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 export interface RequestData {
-  especialista: string;
+  categoria: string;
   actividad: string;
   serviceTitle: string;
   serviceDescription: string;
@@ -51,7 +51,7 @@ const CreateRequest = () => {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(!!editOrderId);
   const [requestData, setRequestData] = useState<RequestData>({
-    especialista: initialEspecialista || "",
+    categoria: initialCategoria || "",
     actividad: initialActividad || "",
     serviceTitle: initialServiceTitle || "",
     serviceDescription: "",
@@ -80,7 +80,7 @@ const CreateRequest = () => {
         if (order) {
           // Map order data to request data format
           setRequestData({
-            especialista: order.category || "",
+            categoria: order.category || "",
             actividad: order.activity || "",
             serviceTitle: order.service_title || "",
             serviceDescription: order.service_description || "",
@@ -141,7 +141,7 @@ const CreateRequest = () => {
   const nextStep = () => {
     // Validate required fields for step 0
     if (step === 0) {
-      if (!requestData.especialista || 
+      if (!requestData.categoria || 
           !requestData.serviceTitle?.trim() || 
           requestData.serviceTitle.trim().length < 10 ||
           !requestData.serviceDescription?.trim() ||
@@ -187,7 +187,7 @@ const CreateRequest = () => {
                 {requestData.actividad || "Nueva solicitud"}
               </h1>
               <p className="text-sm text-muted-foreground truncate">
-                {requestData.especialista || "Selecciona un servicio"}
+                {requestData.categoria || "Selecciona un servicio"}
               </p>
             </div>
           </div>
@@ -211,13 +211,12 @@ const CreateRequest = () => {
         {step === 0 && (
           <div className="space-y-4">
             <ServiceSelector
-              especialista={requestData.especialista}
+              categoria={requestData.categoria}
               actividad={requestData.actividad}
               serviceTitle={requestData.serviceTitle}
               serviceDescription={requestData.serviceDescription}
-              categoria={initialCategoria}
               evidence={requestData.evidence}
-              onEspecialistaChange={(value) => updateData({ especialista: value })}
+              onCategoriaChange={(value) => updateData({ categoria: value })}
               onActividadChange={(value) => updateData({ actividad: value })}
               onServiceTitleChange={(value) => updateData({ serviceTitle: value })}
               onServiceDescriptionChange={(value) => updateData({ serviceDescription: value })}
@@ -226,7 +225,7 @@ const CreateRequest = () => {
             <Button
               onClick={nextStep}
               disabled={
-                !requestData.especialista || 
+                !requestData.categoria || 
                 !requestData.serviceTitle?.trim() || 
                 requestData.serviceTitle.trim().length < 10 ||
                 !requestData.serviceDescription?.trim() ||
