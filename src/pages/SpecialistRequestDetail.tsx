@@ -140,7 +140,20 @@ export default function SpecialistRequestDetail() {
             {/* Especialista necesario */}
             <Card className="bg-white rounded-2xl shadow-md border-0 p-5 hover:shadow-xl transition-all">
               <h3 className="text-sm font-semibold text-foreground/60 mb-2">Especialista necesario</h3>
-              <p className="text-lg font-bold text-foreground">{request.category}</p>
+              <p className="text-lg font-bold text-foreground mb-3">{request.category}</p>
+              {request.activity && (
+                <div className="flex flex-wrap gap-2">
+                  {request.activity.split(',').map((tag, index) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="bg-gray-100 text-foreground hover:bg-gray-200"
+                    >
+                      {tag.trim()}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </Card>
 
             {/* Título del servicio */}
