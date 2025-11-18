@@ -1,0 +1,251 @@
+﻿id,category_id,tag_key,tag_name
+1,1,corte_pasto,Corte de pasto
+2,1,poda_arboles,Poda de árboles
+3,1,poda_arbustos,Poda de arbustos y setos
+4,1,deshierbe,Deshierbe y retiro de maleza
+5,1,siembra_pasto,Siembra o resiembra de pasto
+6,1,siembra_plantas,Plantación de plantas y flores
+7,1,siembra_arboles,Plantación de árboles
+8,1,mantenimiento_jardin,Mantenimiento de jardín
+9,1,sistemas_riego_instalacion,Instalar sistema de riego
+10,1,sistemas_riego_reparacion,Reparar sistema de riego
+11,1,diseno_jardines,Diseño de jardines
+12,1,jardineria_azoteas,Jardinería en azoteas
+13,1,fertilizacion_jardin,Fertilización de jardín
+14,1,tala_controlada,Tala controlada
+15,1,limpieza_jardin,Limpieza de jardín
+16,2,desentapar_bano,Destapar baño
+17,2,desentapar_fregadero,Destapar fregadero
+18,2,reparar_fuga_agua,Reparar fuga de agua
+19,2,reparar_fuga_gas,Reparar fuga de gas
+20,2,instalar_lavabo,Instalar lavabo
+21,2,instalar_fregadero,Instalar fregadero
+22,2,instalar_wc,Instalar WC
+23,2,cambiar_mezcladora,Cambiar mezcladora
+24,2,instalar_calentador_gas,Instalar calentador de gas
+25,2,instalar_calentador_electrico,Instalar calentador eléctrico
+26,2,mantenimiento_tinaco,Mantenimiento de tinaco
+27,2,instalacion_bomba_agua,Instalar bomba de agua
+28,2,mantenimiento_drenaje,Mantenimiento de drenaje
+29,2,instalacion_lineas_agua,Instalar líneas de agua
+30,2,instalacion_lineas_gas,Instalar líneas de gas
+31,3,instalar_contacto,Instalar contacto
+32,3,instalar_apagador,Instalar apagador
+33,3,cambiar_lampara,Cambiar lámpara
+34,3,instalar_ventilador_techo,Instalar ventilador de techo
+35,3,revision_corto,Revisión por corto
+36,3,instalar_tablero,Instalar tablero
+37,3,instalar_breaker,Instalar breaker
+38,3,instalar_toma_220,Instalar toma 220V
+39,3,canalizacion_cableado,Canalización de cableado
+40,3,instalar_iluminacion_led,Instalar iluminación LED
+41,3,instalar_timbre,Instalar timbre
+42,3,instalar_sensores_movimiento,Instalar sensores de movimiento
+43,4,levantar_muro,Construcción de muro
+44,4,levantar_barda,Construcción de barda
+45,4,reparar_muro,Reparar muro
+46,4,aplanado_muros,Aplanado de muros
+47,4,resanar_muros,Resanar muros
+48,4,colocar_piso,Colocar piso cerámico
+49,4,colocar_azulejo,Colocar azulejo
+50,4,rellenar_firmes,Firmes de concreto
+51,4,hacer_zapatas,Hacer zapatas
+52,4,demolicion_ligera,Demolición ligera
+53,4,instalar_marcos_puerta,Instalar marco de puerta
+54,4,reparar_escaleras,Reparar escaleras
+55,5,pintar_interior,Pintura interior
+56,5,pintar_exterior,Pintura exterior
+57,5,pintar_fachada,Pintura de fachada
+58,5,raspar_pared,Raspar pared
+59,5,aplicar_sellador,Aplicar sellador
+60,5,aplicar_esmalte,Aplicar esmalte
+61,5,pintar_rejas,Pintar rejas
+62,5,impermeabilizar_azotea,Impermeabilizar azotea
+63,5,impermeabilizar_muro,Impermeabilizar muro
+64,5,aplicar_texturizado,Aplicar texturizado
+65,5,retocar_pintura,Retoques de pintura
+66,6,fabricar_mueble,Fabricar mueble
+67,6,closet_medida,Clóset a medida
+68,6,puertas_madera,Puertas de madera
+69,6,reparar_mueble,Reparar mueble
+70,6,lijar_barnizar,Lijar y barnizar
+71,6,instalar_cocina_integral,Instalar cocina integral
+72,6,puerta_corredera,Puerta corrediza
+73,6,repisa_madera,Repisa de madera
+74,6,frente_barra,Frentes de barra
+75,6,restauracion_mueble,Restauración de mueble
+76,7,fabricar_reja,Fabricar reja
+77,7,fabricar_porton,Fabricar portón
+78,7,fabricar_protecciones,Fabricar protecciones
+79,7,barandal_escalera,Barandal
+80,7,estructura_ligera,Estructura ligera
+81,7,soldadura_puerta,Soldar puerta
+82,7,soldadura_campo,Soldar en campo
+83,7,techo_ligero,Techo ligero
+84,7,soportes_metalicos,Soportes metálicos
+85,8,instalar_ventana_vidrio,Instalar ventana
+86,8,instalar_puerta_vidrio,Instalar puerta vidrio
+87,8,instalar_cancel_bano,Instalar cancel baño
+88,8,cambio_cristal,Cambio de cristal
+89,8,instalar_espejo,Instalar espejo
+90,8,ventanas_aluminio,Ventanas de aluminio
+91,8,puertas_aluminio,Puertas de aluminio
+92,8,corredera_aluminio,Corredera aluminio
+93,8,sellado_ventanas,Sellado de ventanas
+94,9,abrir_puerta,Abrir puerta
+95,9,cambiar_chapa,Cambiar chapa
+96,9,instalar_cerradura_seguridad,Instalar cerradura seguridad
+97,9,duplicado_llaves,Duplicado llaves
+98,9,instalar_cerradura_digital,Cerradura digital
+99,9,ajuste_puertas,Ajuste de puertas
+100,10,limpieza_casa_completa,Limpieza de casa
+101,10,limpieza_sala,Limpieza sala
+102,10,limpieza_cocina,Limpieza cocina
+103,10,limpieza_banos,Limpieza baños
+104,10,limpieza_ventanas,Limpieza ventanas
+105,10,limpieza_patios,Limpieza patios
+106,10,limpieza_post_evento,Limpieza post-evento
+107,10,lavado_colchones,Lavado colchones
+108,10,lavado_sillones,Lavado sillones
+109,10,lavado_tapetes,Lavado tapetes
+110,11,limpieza_oficinas,Limpieza oficinas
+111,11,limpieza_tiendas,Limpieza tiendas
+112,11,limpieza_bodegas,Limpieza bodegas
+113,11,limpieza_naves,Limpieza naves
+114,11,limpieza_post_obra,Limpieza post-obra
+115,11,vidrios_altura,Vidrios en altura
+116,11,limpieza_cocinas_industriales,Cocinas industriales
+117,11,limpieza_banos_publicos,Baños públicos
+118,12,fumigar_cucarachas,Cucarachas
+119,12,fumigar_hormigas,Hormigas
+120,12,fumigar_termitas,Termitas
+121,12,control_roedores,Control de roedores
+122,12,control_mosquitos,Control mosquitos
+123,12,fumigar_alacranes,Alacranes
+124,12,fumigar_jardin,Fumigar jardín
+125,12,mantenimiento_fumigacion,Mantenimiento fumigación
+126,13,mant_minisplit,Mantenimiento minisplit
+127,13,inst_minisplit,Instalación minisplit
+128,13,carga_gas,Carga de gas
+129,13,limpieza_filtros,Limpieza filtros
+130,13,reparacion_compresor,Reparar compresor
+131,13,inst_aire_ventana,Aire de ventana
+132,13,mant_refrigerador,Mantenimiento refri
+133,13,reparar_refrigerador,Reparar refri
+134,14,limpieza_rutina,Limpieza rutina
+135,14,limpieza_profunda,Limpieza profunda
+136,14,control_quimicos,Control químicos
+137,14,mant_filtros,Mantenimiento filtros
+138,14,reparar_bomba,Reparar bomba
+139,14,reparar_fuga_alberca,Reparar fuga alberca
+140,15,cambio_aceite,Cambio aceite
+141,15,revision_frenos,Revisión frenos
+142,15,afinacion,Afinación
+143,15,suspension,Suspensión
+144,15,cambio_bateria,Cambio batería
+145,15,diag_electrico,Diagnóstico eléctrico
+146,15,alineacion_balanceo,Alineación y balanceo
+147,15,lavado_exterior,Lavado exterior
+148,15,lavado_interior,Lavado interior
+149,15,encerado_pulido,Pulido y encerado
+150,15,lavado_tapiceria_auto,Lavar tapicería
+151,15,cambio_parabrisas,Cambio parabrisas
+152,15,cambio_cristales,Cambio cristales
+153,16,mudanza_local,Mudanza local
+154,16,mudanza_foranea,Mudanza foránea
+155,16,fletes_ligeros,Fletes ligeros
+156,16,empaque_muebles,Empaque
+157,16,desempaque_muebles,Desempaque
+158,16,armado_muebles,Armado muebles
+159,16,solo_carga,Solo carga
+160,16,traslado_oficina,Traslado oficina
+161,17,organizacion_evento,Organización evento
+162,17,coordinacion_evento,Coordinación evento
+163,17,banquete_completo,Banquete
+164,17,cocteleria,Coctelería
+165,17,servicio_meseros,Meseros
+166,17,dj_eventos,DJ
+167,17,sonido_iluminacion,Sonido e iluminación
+168,17,renta_mobiliario,Renta mobiliario
+169,17,decoracion_evento,Decoración evento
+170,17,animacion_infantil,Animación infantil
+171,18,foto_social,Foto social
+172,18,foto_producto,Foto producto
+173,18,foto_retrato,Retrato
+174,18,foto_inmobiliaria,Foto inmobiliaria
+175,18,video_eventos,Video eventos
+176,18,video_corporativo,Video corporativo
+177,18,edicion_foto,Edición foto
+178,18,edicion_video,Edición video
+179,19,chef_domicilio,Chef domicilio
+180,19,cocina_eventos,Cocina eventos
+181,19,box_lunch,Box lunch
+182,19,taquizas,Taquizas
+183,19,parrilladas,Parrilladas
+184,19,reposteria_eventos,Repostería
+185,19,pasteles,Pasteles
+186,20,clases_matematicas,Matemáticas
+187,20,clases_ingles,Inglés
+188,20,clases_espanol,Español
+189,20,clases_musica,Música
+190,20,clases_computacion,Computación
+191,20,regularizacion_primaria,Regularización primaria
+192,20,regularizacion_secundaria,Regularización secundaria
+193,20,asesoria_tareas,Tareas
+194,20,preparacion_examen,Exámenes
+195,21,reparacion_pc,Reparación PC
+196,21,formateo_pc,Formateo PC
+197,21,instalar_programas,Instalar programas
+198,21,limpieza_pc,Limpieza PC
+199,21,armado_pc,Armado PC
+200,21,red_domestica,Red doméstica
+201,21,red_oficina,Red oficina
+202,21,instalar_wifi,Router WiFi
+203,21,reparar_celular,Reparar celular
+204,21,cambiar_pantalla,Cambiar pantalla
+205,21,cambiar_bateria,Cambiar batería
+206,21,desarrollo_web,Desarrollo web
+207,21,desarrollo_app,Desarrollo app
+208,22,instalar_cctv,Instalar CCTV
+209,22,mant_cctv,Mantenimiento CCTV
+210,22,config_cctv,Configurar CCTV
+211,22,inst_alarmas,Instalar alarmas
+212,22,inst_sensores,Instalar sensores
+213,22,control_acceso,Control de acceso
+214,22,guardia_eventos,Guardia eventos
+215,22,guardia_fijo,Guardia fijo
+216,23,decoracion_interior,Decoración interior
+217,23,asesoria_color,Asesoría color
+218,23,decoracion_sala,Decoración sala
+219,23,decoracion_recamara,Decoración recámara
+220,23,decoracion_oficinas,Decoración oficinas
+221,23,home_staging,Home staging
+222,23,diseno_mobiliario,Diseño mobiliario
+223,24,instalar_paneles,Instalar paneles
+224,24,mant_paneles,Mantenimiento paneles
+225,24,limpiar_paneles,Limpiar paneles
+226,24,diseno_fotovoltaico,Diseño fotovoltaico
+227,25,mant_edificio,Mantenimiento edificio
+228,25,mant_casa,Mantenimiento casa
+229,25,reparaciones_varias,Reparaciones varias
+230,25,revision_fugas,Revisión fugas
+231,25,revision_electrica,Revisión eléctrica
+232,25,ajuste_puertas,Ajuste de puertas
+233,26,asesoria_legal,Asesoría legal
+234,26,redaccion_contratos,Contratos
+235,26,tramites_gobierno,Trámites
+236,26,contabilidad,Contabilidad
+237,26,declaraciones,Declaraciones
+238,26,nomina,Nómina
+239,26,asesoria_fiscal,Asesoría fiscal
+240,26,finanzas_personales,Finanzas personales
+241,26,asesoria_empresarial,Asesoría empresarial
+242,27,diseno_logo,Diseño logo
+243,27,identidad_visual,Identidad visual
+244,27,piezas_redes,Piezas redes
+245,27,gestion_redes,Gestión redes
+246,27,creacion_contenido,Contenido
+247,27,copywriting,Copywriting
+248,27,folleteria,Folletería
+249,27,presentaciones,Presentaciones
+250,27,edicion_foto_creativa,Edición foto
