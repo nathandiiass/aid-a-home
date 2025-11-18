@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import confetti from 'canvas-confetti';
+import CategoryServicesSelector, { SelectedCategory } from '@/components/specialist/CategoryServicesSelector';
 
 interface Specialty {
   id: string;
@@ -73,8 +74,7 @@ export default function SpecialistRegistration() {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [services, setServices] = useState<any[]>([]);
-  const [availableSpecialties, setAvailableSpecialties] = useState<[string, string[]][]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<SelectedCategory[]>([]);
   
   const [personType, setPersonType] = useState<'fisica' | 'moral'>('fisica');
   const [personalData, setPersonalData] = useState({
@@ -100,7 +100,6 @@ export default function SpecialistRegistration() {
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const [showOtherSpecialty, setShowOtherSpecialty] = useState(false);
   const [otherSpecialtyText, setOtherSpecialtyText] = useState('');
-  const [specialtiesData, setSpecialtiesData] = useState<Specialty[]>([]);
   const [openSpecialties, setOpenSpecialties] = useState<Record<string, boolean>>({});
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
   const [searchSpecialty, setSearchSpecialty] = useState('');
@@ -118,42 +117,9 @@ export default function SpecialistRegistration() {
     if (!authLoading) {
       if (!user) {
         navigate('/auth');
-      } else {
-        fetchServices();
       }
     }
   }, [user, authLoading, navigate]);
-
-  const fetchServices = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('servicios_domesticos')
-        .select('*');
-      
-      if (error) throw error;
-      setServices(data || []);
-      
-      // Group specialties by category
-      const categoriesMap = new Map<string, string[]>();
-      data?.forEach(s => {
-        if (!categoriesMap.has(s.categoria)) {
-          categoriesMap.set(s.categoria, []);
-        }
-        const specialties = categoriesMap.get(s.categoria)!;
-        if (!specialties.includes(s.especialista)) {
-          specialties.push(s.especialista);
-        }
-      });
-      
-      setAvailableSpecialties(Array.from(categoriesMap.entries()));
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive"
-      });
-    }
-  };
 
   const handleFileUpload = (field: 'profilePhoto' | 'idDocument' | 'csfDocument' | 'addressProof', file: File) => {
     if (file.size > 5 * 1024 * 1024) {
@@ -170,81 +136,6 @@ export default function SpecialistRegistration() {
     } else {
       setDocuments({ ...documents, [field]: file });
     }
-  };
-
-  const toggleSpecialtySelection = (specialty: string) => {
-    if (specialty === 'Otro') {
-      setShowOtherSpecialty(!showOtherSpecialty);
-      if (!showOtherSpecialty) {
-        setOtherSpecialtyText('');
-      }
-      return;
-    }
-
-    if (selectedSpecialties.includes(specialty)) {
-      setSelectedSpecialties(selectedSpecialties.filter(s => s !== specialty));
-      setSpecialtiesData(specialtiesData.filter(s => s.specialty !== specialty));
-    } else {
-      setSelectedSpecialties([...selectedSpecialties, specialty]);
-      setSpecialtiesData([...specialtiesData, {
-        id: Date.now().toString(),
-        specialty,
-        roleLabel: '',
-        experienceYears: '',
-        services: []
-      }]);
-    }
-  };
-
-  const handleOtherSpecialtyAdd = () => {
-    if (otherSpecialtyText.trim()) {
-      setSelectedSpecialties([...selectedSpecialties, otherSpecialtyText]);
-      setSpecialtiesData([...specialtiesData, {
-        id: Date.now().toString(),
-        specialty: 'Otro',
-        customSpecialty: otherSpecialtyText,
-        roleLabel: '',
-        experienceYears: '',
-        services: []
-      }]);
-    }
-  };
-
-  const updateSpecialtyData = (specialty: string, field: keyof Specialty, value: any) => {
-    setSpecialtiesData(specialtiesData.map(s => 
-      s.specialty === specialty || s.customSpecialty === specialty
-        ? { ...s, [field]: value }
-        : s
-    ));
-  };
-
-  const addServiceToSpecialty = (specialtyId: string) => {
-    setSpecialtiesData(specialtiesData.map(s => 
-      s.id === specialtyId
-        ? { ...s, services: [...s.services, { id: Date.now().toString(), name: '', priceMin: '', priceMax: '' }] }
-        : s
-    ));
-  };
-
-  const removeServiceFromSpecialty = (specialtyId: string, serviceId: string) => {
-    setSpecialtiesData(specialtiesData.map(s => 
-      s.id === specialtyId
-        ? { ...s, services: s.services.filter(srv => srv.id !== serviceId) }
-        : s
-    ));
-  };
-
-  const updateService = (specialtyId: string, serviceId: string, field: keyof Service, value: string) => {
-    setSpecialtiesData(specialtiesData.map(s => 
-      s.id === specialtyId
-        ? { 
-            ...s, 
-            services: s.services.map(srv => 
-              srv.id === serviceId ? { ...srv, [field]: value } : srv
-            ) 
-          }
-        : s
-    ));
   };
 
   const toggleMunicipality = (municipality: string) => {
@@ -291,27 +182,9 @@ export default function SpecialistRegistration() {
   };
 
   const validateStep2 = () => {
-    if (selectedSpecialties.length === 0) return false;
-    if (showOtherSpecialty && !otherSpecialtyText.trim()) return false;
-    
-    for (const specData of specialtiesData) {
-      if (!specData.experienceYears || parseInt(specData.experienceYears) < 0) return false;
-      if (specData.services.length === 0) return false;
-      
-      // Validate that all services have names
-      for (const service of specData.services) {
-        if (!service.name || service.name.trim().length === 0) return false;
-        // If prices are provided, validate min <= max
-        if (service.priceMin && service.priceMax) {
-          const min = parseFloat(service.priceMin);
-          const max = parseFloat(service.priceMax);
-          if (min > max) return false;
-        }
-      }
-    }
-
-    return professionalDescription.trim().length > 0 && 
-           selectedMunicipalities.length > 0;
+    if (selectedCategories.length === 0) return false;
+    if (!professionalDescription.trim()) return false;
+    return selectedMunicipalities.length > 0;
   };
 
   const validateStep3 = () => {
@@ -420,28 +293,28 @@ export default function SpecialistRegistration() {
 
       if (profileError) throw profileError;
 
-      for (const specData of specialtiesData) {
-        const specialtyName = specData.customSpecialty || specData.specialty;
-        const { data: specialtyDataInserted, error: specialtyError } = await supabase
+      for (const selectedCategory of selectedCategories) {
+        // Insert category as specialty
+        const { data: specialtyInserted, error: specialtyError } = await supabase
           .from('specialist_specialties')
           .insert([{
             specialist_id: profile.id,
-            specialty: specialtyName,
-            role_label: specData.roleLabel,
-            experience_years: parseInt(specData.experienceYears)
+            specialty: selectedCategory.category.category_name,
+            role_label: selectedCategory.category.category_name,
+            experience_years: 1 // Default value
           }])
           .select()
           .single();
 
         if (specialtyError) throw specialtyError;
 
-        // Insert services/activities for this specialty
-        if (specData.services.length > 0) {
-          const activitiesData = specData.services.map(service => ({
-            specialty_id: specialtyDataInserted.id,
-            activity: service.name,
-            price_min: service.priceMin ? parseFloat(service.priceMin) : null,
-            price_max: service.priceMax ? parseFloat(service.priceMax) : null
+        // Insert selected tags as activities for this specialty
+        if (selectedCategory.selectedTags.length > 0) {
+          const activitiesData = selectedCategory.selectedTags.map(tagName => ({
+            specialty_id: specialtyInserted.id,
+            activity: tagName,
+            price_min: null,
+            price_max: null
           }));
 
           const { error: activitiesError } = await supabase
@@ -788,440 +661,68 @@ export default function SpecialistRegistration() {
         )}
 
         {step === 2 && (
-          <div className="space-y-8">
-            {/* Header */}
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold text-foreground">Especialidades y Servicios</h2>
-              <p className="text-muted-foreground">Selecciona tus áreas de especialización y los servicios que ofreces</p>
-            </div>
+          <div className="space-y-6">
+            <CategoryServicesSelector
+              value={selectedCategories}
+              onChange={setSelectedCategories}
+            />
 
-            {/* Selección de especialidades */}
-            <div className="bg-white rounded-xl border-2 border-border p-6 space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label className="text-lg font-semibold">Especialista en: *</Label>
-                  <p className="text-sm text-muted-foreground">Puedes seleccionar múltiples especialidades</p>
-                </div>
-
-                {/* Barra de búsqueda */}
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Buscar categoría o especialidad..."
-                    value={searchSpecialty}
-                    onChange={(e) => setSearchSpecialty(e.target.value)}
-                    className="pl-10"
-                  />
-                  {searchSpecialty && (
-                    <button
-                      onClick={() => setSearchSpecialty('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                {availableSpecialties
-                  .map(([category, specialties]) => {
-                    // Filtrar especialidades que coincidan con la búsqueda
-                    const filteredSpecialties = specialties.filter(specialty =>
-                      specialty.toLowerCase().includes(searchSpecialty.toLowerCase())
-                    );
-                    
-                    // Verificar si la categoría coincide con la búsqueda
-                    const categoryMatches = category.toLowerCase().includes(searchSpecialty.toLowerCase());
-                    
-                    // Mostrar categoría si: no hay búsqueda, la categoría coincide, o tiene especialidades que coinciden
-                    const shouldShow = !searchSpecialty || categoryMatches || filteredSpecialties.length > 0;
-                    
-                    if (!shouldShow) return null;
-                    
-                    // Mostrar todas las especialidades si la categoría coincide, o solo las filtradas
-                    const displaySpecialties = categoryMatches ? specialties : filteredSpecialties;
-                    
-                    const isOpen = openCategories[category] ?? (searchSpecialty ? true : false);
-                    const categorySelectedCount = specialties.filter(s => selectedSpecialties.includes(s)).length;
-                    
-                    return (
-                      <Collapsible
-                        key={category}
-                        open={isOpen}
-                        onOpenChange={(open) => setOpenCategories(prev => ({ ...prev, [category]: open }))}
-                        className="border-2 border-border rounded-xl overflow-hidden"
-                      >
-                        <CollapsibleTrigger asChild>
-                          <button className="w-full p-4 hover:bg-rappi-green/5 transition-colors">
-                            <div className="flex items-center justify-between gap-3">
-                              <div className="flex items-center gap-3 flex-1">
-                                <h3 className="font-bold text-base text-rappi-green uppercase tracking-wide text-left">
-                                  {category}
-                                </h3>
-                                {categorySelectedCount > 0 && (
-                                  <span className="text-xs bg-rappi-green text-white px-2 py-1 rounded-full">
-                                    {categorySelectedCount} seleccionada{categorySelectedCount > 1 ? 's' : ''}
-                                  </span>
-                                )}
-                                {searchSpecialty && displaySpecialties.length > 0 && (
-                                  <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">
-                                    {displaySpecialties.length} resultado{displaySpecialties.length > 1 ? 's' : ''}
-                                  </span>
-                                )}
-                              </div>
-                              <ChevronDown 
-                                className={`h-5 w-5 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
-                              />
-                            </div>
-                          </button>
-                        </CollapsibleTrigger>
-
-                        <CollapsibleContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
-                          <div className="p-4 pt-0 border-t-2 border-border">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              {displaySpecialties.map((specialty) => (
-                                <div 
-                                  key={specialty} 
-                                  className="flex items-center space-x-3 p-4 border-2 border-border rounded-lg hover:border-rappi-green hover:bg-rappi-green/5 transition-all cursor-pointer"
-                                  onClick={() => toggleSpecialtySelection(specialty)}
-                                >
-                                  <Checkbox
-                                    id={`specialty-${specialty}`}
-                                    checked={selectedSpecialties.includes(specialty)}
-                                    onCheckedChange={() => toggleSpecialtySelection(specialty)}
-                                  />
-                                  <Label htmlFor={`specialty-${specialty}`} className="flex-1 cursor-pointer font-medium">
-                                    {specialty}
-                                  </Label>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </CollapsibleContent>
-                      </Collapsible>
-                    );
-                  })
-                  .filter(Boolean)}
-
-                {availableSpecialties.every(([category, specialties]) => {
-                  const filteredSpecialties = specialties.filter(specialty =>
-                    specialty.toLowerCase().includes(searchSpecialty.toLowerCase())
-                  );
-                  const categoryMatches = category.toLowerCase().includes(searchSpecialty.toLowerCase());
-                  return searchSpecialty && !categoryMatches && filteredSpecialties.length === 0;
-                }) && searchSpecialty && (
-                  <div className="p-8 text-center text-muted-foreground">
-                    <p>No se encontraron resultados para "{searchSpecialty}"</p>
-                  </div>
-                )}
-
-                {/* Otra especialidad */}
-                <div className="pt-3 border-t-2 border-border">
-                  <div 
-                    className="flex items-center space-x-3 p-4 border-2 border-border rounded-lg hover:border-rappi-green hover:bg-rappi-green/5 transition-all cursor-pointer"
-                    onClick={() => toggleSpecialtySelection('Otro')}
-                  >
-                    <Checkbox
-                      id="specialty-otro"
-                      checked={showOtherSpecialty}
-                      onCheckedChange={() => toggleSpecialtySelection('Otro')}
-                    />
-                    <Label htmlFor="specialty-otro" className="flex-1 cursor-pointer font-medium">
-                      Otra especialidad
-                    </Label>
-                  </div>
-                  {showOtherSpecialty && (
-                    <div className="mt-3 ml-12 flex gap-2 animate-fade-in">
-                      <Input
-                        placeholder="Escribe tu especialidad"
-                        value={otherSpecialtyText}
-                        onChange={(e) => setOtherSpecialtyText(e.target.value)}
-                        className="flex-1"
-                      />
-                      <Button onClick={handleOtherSpecialtyAdd} className="bg-rappi-green hover:bg-rappi-green/90 text-white">
-                        Agregar
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Detalles de especialidades seleccionadas */}
-            {specialtiesData.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-xl font-bold text-foreground">Detalles de tus especialidades</h3>
-                {specialtiesData.map((specData) => {
-                  const displayName = specData.customSpecialty || specData.specialty;
-                  const isOpen = openSpecialties[specData.id] ?? true;
-                  
-                  return (
-                    <Collapsible
-                      key={specData.id}
-                      open={isOpen}
-                      onOpenChange={(open) => setOpenSpecialties(prev => ({ ...prev, [specData.id]: open }))}
-                      className="bg-white rounded-xl border-2 border-border overflow-hidden"
-                    >
-                      {/* Header colapsable de la especialidad */}
-                      <CollapsibleTrigger asChild>
-                        <button className="w-full p-6 hover:bg-muted/30 transition-colors text-left">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-rappi-green/10 flex items-center justify-center flex-shrink-0">
-                              <span className="text-rappi-green font-bold text-lg">✓</span>
-                            </div>
-                            <h4 className="text-xl font-bold text-foreground flex-1">{displayName}</h4>
-                            <ChevronDown 
-                              className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-                            />
-                          </div>
-                        </button>
-                      </CollapsibleTrigger>
-
-                      <CollapsibleContent className="data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up">
-                        <div className="p-6 pt-0 space-y-6 border-t-2 border-border">
-                          {/* Años de experiencia */}
-                          <div className="space-y-2">
-                            <Label className="text-base font-semibold">Años de experiencia *</Label>
-                            <Input
-                              type="number"
-                              min="0"
-                              value={specData.experienceYears}
-                              onChange={(e) => updateSpecialtyData(displayName, 'experienceYears', e.target.value)}
-                              placeholder="Ejemplo: 5"
-                              className="max-w-xs"
-                            />
-                          </div>
-
-                          {/* Servicios */}
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <div className="space-y-1">
-                                <Label className="text-base font-semibold">Servicios que ofreces *</Label>
-                                <p className="text-sm text-muted-foreground">Agrega los servicios específicos de esta especialidad</p>
-                              </div>
-                              <Button 
-                                onClick={() => addServiceToSpecialty(specData.id)} 
-                                className="bg-rappi-green hover:bg-rappi-green/90 text-white"
-                                size="sm"
-                              >
-                                <Plus className="h-4 w-4 mr-2" />
-                                Agregar
-                              </Button>
-                            </div>
-                            
-                            {specData.services.length === 0 && (
-                              <div className="p-4 bg-muted/50 border-2 border-dashed border-border rounded-lg text-center">
-                                <p className="text-sm text-muted-foreground">
-                                  No hay servicios agregados. Agrega al menos un servicio para continuar.
-                                </p>
-                              </div>
-                            )}
-                            
-                            <div className="space-y-3">
-                              {specData.services.map((service, idx) => (
-                                <div key={service.id} className="bg-muted/30 rounded-lg border-2 border-border p-5 space-y-4">
-                                  {/* Nombre del servicio */}
-                                  <div className="space-y-2">
-                                    <div className="flex items-start justify-between gap-2">
-                                      <Label className="text-sm font-semibold">Nombre del servicio *</Label>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => removeServiceFromSpecialty(specData.id, service.id)}
-                                        className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
-                                      >
-                                        <X className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-                                    <Input
-                                      value={service.name}
-                                      onChange={(e) => updateService(specData.id, service.id, 'name', e.target.value)}
-                                      placeholder="Ejemplo: Instalación de minisplit"
-                                    />
-                                  </div>
-                                  
-                                  {/* Precios */}
-                                  <div className="space-y-2">
-                                    <Label className="text-sm font-semibold">Rango de precios (opcional)</Label>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                      <div className="space-y-2">
-                                        <Label className="text-xs text-muted-foreground">Precio Mínimo</Label>
-                                        <div className="relative">
-                                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                                          <Input
-                                            type="number"
-                                            min="0"
-                                            step="0.01"
-                                            value={service.priceMin}
-                                            onChange={(e) => updateService(specData.id, service.id, 'priceMin', e.target.value)}
-                                            placeholder="0.00"
-                                            className="pl-7"
-                                          />
-                                        </div>
-                                      </div>
-                                      <div className="space-y-2">
-                                        <Label className="text-xs text-muted-foreground">Precio Máximo</Label>
-                                        <div className="relative">
-                                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                                          <Input
-                                            type="number"
-                                            min="0"
-                                            step="0.01"
-                                            value={service.priceMax}
-                                            onChange={(e) => updateService(specData.id, service.id, 'priceMax', e.target.value)}
-                                            placeholder="0.00"
-                                            className="pl-7"
-                                          />
-                                        </div>
-                                      </div>
-                                    </div>
-                                    
-                                    {service.priceMin && service.priceMax && parseFloat(service.priceMin) > parseFloat(service.priceMax) && (
-                                      <p className="text-sm text-destructive">
-                                        El precio mínimo no puede ser mayor al precio máximo
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                            
-                            <p className="text-sm text-muted-foreground">
-                              {specData.services.length} servicio(s) agregado(s)
-                            </p>
-                          </div>
-                        </div>
-                      </CollapsibleContent>
-                    </Collapsible>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Descripción profesional */}
-            <div className="bg-white rounded-xl border-2 border-border p-6 space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="professionalDescription" className="text-base font-semibold">Descripción Profesional *</Label>
-                <p className="text-sm text-muted-foreground">Describe brevemente tu experiencia (máx 200 caracteres)</p>
+            {/* Professional Description */}
+            <div className="bg-white rounded-2xl shadow-lg border-0 p-6 space-y-4">
+              <div>
+                <Label htmlFor="professionalDescription">Descripción profesional *</Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Describe tu experiencia, servicios y qué te hace destacar
+                </p>
               </div>
               <Textarea
                 id="professionalDescription"
                 value={professionalDescription}
                 onChange={(e) => setProfessionalDescription(e.target.value)}
-                placeholder="Describe brevemente tu experiencia profesional..."
-                maxLength={200}
-                rows={4}
-                className="resize-none"
+                placeholder="Ej: Tengo 10 años de experiencia en plomería residencial y comercial..."
+                className="min-h-[120px]"
               />
-              <p className="text-sm text-muted-foreground text-right">{professionalDescription.length}/200</p>
             </div>
 
-            {/* Licencias y certificaciones */}
-            <div className="bg-white rounded-xl border-2 border-border p-6 space-y-4">
-              <div className="space-y-2">
-                <Label className="text-base font-semibold">Licencias / Certificaciones</Label>
-                <p className="text-sm text-muted-foreground">Agrega tus licencias o certificaciones (opcional)</p>
+            {/* Municipalities Coverage */}
+            <div className="bg-white rounded-2xl shadow-lg border-0 p-6 space-y-4">
+              <div>
+                <Label>Cobertura de servicio *</Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Selecciona los municipios donde ofreces tu servicio
+                </p>
               </div>
-
-              {licenses.length > 0 && (
-                <div className="space-y-3">
-                  {licenses.map((license) => (
-                    <div key={license.id} className="p-4 border-2 border-border rounded-lg space-y-3 bg-muted/20">
-                      <div className="flex items-center justify-between">
-                        <Label className="text-sm font-semibold">Licencia/Certificación</Label>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => removeLicense(license.id)}
-                          className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      <Input
-                        placeholder="Nombre de la licencia o certificación"
-                        value={license.name}
-                        onChange={(e) => updateLicense(license.id, 'name', e.target.value)}
-                      />
-                      <Input
-                        type="file"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        onChange={(e) => e.target.files?.[0] && updateLicense(license.id, 'file', e.target.files[0])}
-                      />
-                      {license.file && (
-                        <p className="text-sm text-rappi-green flex items-center gap-2">
-                          <span>✓</span> {license.file.name}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <Button 
-                onClick={addLicense} 
-                variant="outline" 
-                className="w-full border-2 hover:border-rappi-green hover:text-rappi-green"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Agregar Licencia/Certificación
-              </Button>
-            </div>
-
-            {/* Zona de cobertura */}
-            <div className="bg-white rounded-xl border-2 border-border p-6 space-y-4">
-              <div className="space-y-2">
-                <Label className="text-base font-semibold">Zona de Cobertura *</Label>
-                <p className="text-sm text-muted-foreground">Selecciona los municipios donde ofreces tus servicios</p>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="font-semibold">Estado:</span>
-                  <span className="text-rappi-green">Yucatán</span>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold">Municipios:</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-60 overflow-y-auto p-3 bg-muted/20 border-2 border-border rounded-lg">
-                    {YUCATAN_MUNICIPALITIES.map((municipality) => (
-                      <div key={municipality} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`muni-${municipality}`}
-                          checked={selectedMunicipalities.includes(municipality)}
-                          onCheckedChange={() => toggleMunicipality(municipality)}
-                        />
-                        <Label htmlFor={`muni-${municipality}`} className="text-sm cursor-pointer font-normal">
-                          {municipality}
-                        </Label>
-                      </div>
-                    ))}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto p-2">
+                {YUCATAN_MUNICIPALITIES.map((municipality) => (
+                  <div key={municipality} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`mun-${municipality}`}
+                      checked={selectedMunicipalities.includes(municipality)}
+                      onCheckedChange={() => toggleMunicipality(municipality)}
+                    />
+                    <label
+                      htmlFor={`mun-${municipality}`}
+                      className="text-sm cursor-pointer hover:text-rappi-green"
+                    >
+                      {municipality}
+                    </label>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedMunicipalities.length} municipio(s) seleccionado(s)
-                  </p>
-                </div>
+                ))}
               </div>
+              {selectedMunicipalities.length > 0 && (
+                <p className="text-sm text-muted-foreground">
+                  {selectedMunicipalities.length} municipio{selectedMunicipalities.length > 1 ? 's' : ''} seleccionado{selectedMunicipalities.length > 1 ? 's' : ''}
+                </p>
+              )}
             </div>
 
-            {/* Botones de navegación */}
-            <div className="flex gap-4 pt-4">
-              <Button 
-                onClick={() => setStep(step - 1)} 
-                variant="outline" 
-                className="w-full h-12 border-2 hover:border-rappi-green hover:text-rappi-green rounded-full font-semibold"
-              >
-                Atrás
-              </Button>
-              <Button 
-                onClick={handleNext} 
-                className="w-full h-12 bg-rappi-green hover:bg-rappi-green/90 text-white font-semibold rounded-full" 
-                disabled={!validateStep2()}
-              >
-                Siguiente
-              </Button>
-            </div>
+            <Button
+              onClick={handleNext}
+              disabled={!validateStep2()}
+              className="w-full h-12 bg-rappi-green hover:bg-rappi-green/90 text-white"
+            >
+              Continuar a documentación
+            </Button>
           </div>
          )}
 
