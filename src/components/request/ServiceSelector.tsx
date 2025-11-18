@@ -9,8 +9,18 @@ import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { categories, searchCategoriesByKeyword, type SearchResults } from "@/data/categories";
-import { categoryTags, getTagsByCategoryId, type CategoryTag } from "@/data/category_tags";
+interface Category {
+  id: number;
+  category_key: string;
+  category_name: string;
+}
+
+interface CategoryTag {
+  id: number;
+  category_id: number;
+  tag_key: string;
+  tag_name: string;
+}
 
 interface ServiceSelectorProps {
   especialista: string;
@@ -40,6 +50,7 @@ const ServiceSelector = ({
 }: ServiceSelectorProps) => {
   const [selectedTags, setSelectedTags] = useState<string[]>(especialista ? especialista.split(',').filter(Boolean) : []);
   const [availableTags, setAvailableTags] = useState<CategoryTag[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoria, setSelectedCategoria] = useState<string>(categoria || "");
   const [errors, setErrors] = useState<{
     title?: string;
@@ -49,25 +60,63 @@ const ServiceSelector = ({
   const [openCategoria, setOpenCategoria] = useState(false);
   const [categorySearchTerm, setCategorySearchTerm] = useState("");
 
+  // Load categories on mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('category_name');
+      
+      if (error) {
+        console.error('Error loading categories:', error);
+        return;
+      }
+      
+      if (data) {
+        setCategories(data);
+      }
+    };
+    
+    loadCategories();
+  }, []);
+
   // Update available tags when categoria changes
   useEffect(() => {
-    if (selectedCategoria) {
-      // Find category by name
-      const category = categories.find(cat => cat.category_name === selectedCategoria);
-      if (category) {
-        const tags = getTagsByCategoryId(category.id);
-        setAvailableTags(tags);
+    const loadTags = async () => {
+      if (selectedCategoria) {
+        // Find category by name
+        const category = categories.find(cat => cat.category_name === selectedCategoria);
+        if (category) {
+          const { data, error } = await supabase
+            .from('category_tags')
+            .select('*')
+            .eq('category_id', category.id)
+            .order('tag_name');
+          
+          if (error) {
+            console.error('Error loading tags:', error);
+            setAvailableTags([]);
+            return;
+          }
+          
+          if (data) {
+            setAvailableTags(data);
+          }
+        } else {
+          setAvailableTags([]);
+        }
       } else {
         setAvailableTags([]);
       }
-    } else {
-      setAvailableTags([]);
-    }
+      
+      // Clear selected tags when category changes
+      setSelectedTags([]);
+      onEspecialistaChange("");
+    };
     
-    // Clear selected tags when category changes
-    setSelectedTags([]);
-    onEspecialistaChange("");
-  }, [selectedCategoria]);
+    loadTags();
+  }, [selectedCategoria, categories]);
   
   const handleCategoriaFilterChange = (categoryName: string) => {
     setSelectedCategoria(categoryName);
@@ -170,9 +219,12 @@ const ServiceSelector = ({
   };
 
   // Get filtered categories based on search
-  const searchResults: SearchResults = categorySearchTerm 
-    ? searchCategoriesByKeyword(categorySearchTerm)
-    : { directMatches: categories, synonymMatches: [] };
+  const filteredCategories = categorySearchTerm 
+    ? categories.filter(cat => 
+        cat.category_name.toLowerCase().includes(categorySearchTerm.toLowerCase()) ||
+        cat.category_key.toLowerCase().includes(categorySearchTerm.toLowerCase())
+      )
+    : categories;
   return <div className="space-y-4">
       <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
         <h2 className="text-xl font-bold mb-2">¿Qué servicio necesitas?</h2>
@@ -202,35 +254,18 @@ const ServiceSelector = ({
                 <CommandList>
                   <CommandEmpty>No se encontró la categoría.</CommandEmpty>
                   
-                  {searchResults.directMatches.length > 0 && (
-                    <CommandGroup heading="Coincidencias directas">
-                      {searchResults.directMatches.map(cat => (
-                        <CommandItem 
-                          key={cat.id} 
-                          value={cat.category_name}
-                          onSelect={() => handleCategoriaFilterChange(cat.category_name)}
-                        >
-                          <Check className={cn("mr-2 h-4 w-4", selectedCategoria === cat.category_name ? "opacity-100" : "opacity-0")} />
-                          {cat.category_name}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  )}
-                  
-                  {searchResults.synonymMatches.length > 0 && (
-                    <CommandGroup heading="Coincidencias por sinónimo">
-                      {searchResults.synonymMatches.map(cat => (
-                        <CommandItem 
-                          key={cat.id} 
-                          value={cat.category_name}
-                          onSelect={() => handleCategoriaFilterChange(cat.category_name)}
-                        >
-                          <Check className={cn("mr-2 h-4 w-4", selectedCategoria === cat.category_name ? "opacity-100" : "opacity-0")} />
-                          {cat.category_name}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  )}
+                  <CommandGroup>
+                    {filteredCategories.map(cat => (
+                      <CommandItem 
+                        key={cat.id} 
+                        value={cat.category_name}
+                        onSelect={() => handleCategoriaFilterChange(cat.category_name)}
+                      >
+                        <Check className={cn("mr-2 h-4 w-4", selectedCategoria === cat.category_name ? "opacity-100" : "opacity-0")} />
+                        {cat.category_name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
                 </CommandList>
               </Command>
             </PopoverContent>
