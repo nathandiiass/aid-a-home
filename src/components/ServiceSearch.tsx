@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { searchCategoriesByKeyword, type Category, type SearchResults } from "@/data/categories";
 
 interface Service {
   id: number;
@@ -18,7 +19,8 @@ interface Service {
 interface GroupedResults {
   especialistas: Service[];
   actividades: Service[];
-  categorias: { categoria: string; services: Service[] }[];
+  categoriasDirectas: Category[];
+  categoriasSinonimos: Category[];
 }
 
 const ServiceSearch = () => {
@@ -26,7 +28,8 @@ const ServiceSearch = () => {
   const [results, setResults] = useState<GroupedResults>({
     especialistas: [],
     actividades: [],
-    categorias: [],
+    categoriasDirectas: [],
+    categoriasSinonimos: [],
   });
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
@@ -35,21 +38,25 @@ const ServiceSearch = () => {
   useEffect(() => {
     const searchServices = async () => {
       if (searchTerm.trim().length < 2) {
-        setResults({ especialistas: [], actividades: [], categorias: [] });
+        setResults({ especialistas: [], actividades: [], categoriasDirectas: [], categoriasSinonimos: [] });
         return;
       }
 
       setIsSearching(true);
+      
+      // Search in servicios_domesticos for especialistas and actividades
       const { data } = await supabase
         .from("servicios_domesticos")
         .select("*")
-        .or(`actividad.ilike.%${searchTerm}%,especialista.ilike.%${searchTerm}%,categoria.ilike.%${searchTerm}%`)
+        .or(`actividad.ilike.%${searchTerm}%,especialista.ilike.%${searchTerm}%`)
         .limit(30);
+
+      // Search in static categories
+      const categoryResults: SearchResults = searchCategoriesByKeyword(searchTerm);
 
       if (data) {
         const especialistasMap = new Map<string, Service>();
         const actividadesMap = new Map<string, Service>();
-        const categoriasMap = new Map<string, Service[]>();
 
         data.forEach((service) => {
           const lowerSearch = searchTerm.toLowerCase();
@@ -61,21 +68,20 @@ const ServiceSearch = () => {
           if (service.actividad.toLowerCase().includes(lowerSearch)) {
             actividadesMap.set(service.actividad, service);
           }
-
-          if (service.categoria.toLowerCase().includes(lowerSearch)) {
-            if (!categoriasMap.has(service.categoria)) {
-              categoriasMap.set(service.categoria, []);
-            }
-            categoriasMap.get(service.categoria)?.push(service);
-          }
         });
 
         setResults({
           especialistas: Array.from(especialistasMap.values()).slice(0, 5),
           actividades: Array.from(actividadesMap.values()).slice(0, 8),
-          categorias: Array.from(categoriasMap.entries())
-            .map(([categoria, services]) => ({ categoria, services }))
-            .slice(0, 3),
+          categoriasDirectas: categoryResults.directMatches.slice(0, 5),
+          categoriasSinonimos: categoryResults.synonymMatches.slice(0, 5),
+        });
+      } else {
+        setResults({
+          especialistas: [],
+          actividades: [],
+          categoriasDirectas: categoryResults.directMatches.slice(0, 5),
+          categoriasSinonimos: categoryResults.synonymMatches.slice(0, 5),
         });
       }
       setIsSearching(false);
@@ -118,7 +124,7 @@ const ServiceSearch = () => {
     });
   };
 
-  const handleSelectCategoria = (categoria: string) => {
+  const handleSelectCategoria = (categoryName: string) => {
     if (!user) {
       toast.info("Inicia sesión para crear una solicitud");
       navigate("/auth");
@@ -127,7 +133,7 @@ const ServiceSearch = () => {
     navigate("/create-request", {
       state: {
         selectedType: "categoria",
-        categoria,
+        categoria: categoryName,
         especialista: "",
         actividad: "",
       },
@@ -135,7 +141,10 @@ const ServiceSearch = () => {
   };
 
   const hasResults =
-    results.especialistas.length > 0 || results.actividades.length > 0 || results.categorias.length > 0;
+    results.especialistas.length > 0 || 
+    results.actividades.length > 0 || 
+    results.categoriasDirectas.length > 0 || 
+    results.categoriasSinonimos.length > 0;
 
   return (
     <div className="relative w-full">
@@ -211,26 +220,51 @@ const ServiceSearch = () => {
                 </div>
               )}
 
-              {/* Categorías */}
-              {results.categorias.length > 0 && (
+              {/* Categorías - Coincidencias directas */}
+              {results.categoriasDirectas.length > 0 && (
                 <div className="p-3">
                   <p className="text-xs font-bold text-gray-500 uppercase mb-2 px-1">Categorías</p>
                   <div className="space-y-1">
-                    {results.categorias.map(({ categoria, services }) => (
+                    {results.categoriasDirectas.map((category) => (
                       <button
-                        key={categoria}
-                        onClick={() => handleSelectCategoria(categoria)}
+                        key={`direct-${category.id}`}
+                        onClick={() => handleSelectCategoria(category.category_name)}
                         className="w-full p-3 text-left hover:bg-gray-50 transition-colors rounded-xl flex items-center gap-3"
                       >
                         <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                          <span className="text-purple-700 font-bold text-sm">{categoria.charAt(0)}</span>
+                          <span className="text-purple-700 font-bold text-sm">{category.category_name.charAt(0)}</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-gray-900 text-sm">{categoria}</p>
-                          <p className="text-xs text-gray-500">{services.length} especialista(s)</p>
+                          <p className="font-semibold text-gray-900 text-sm">{category.category_name}</p>
                         </div>
                         <Badge variant="secondary" className="text-xs bg-purple-50 text-purple-700 border-0">
                           Categoría
+                        </Badge>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Categorías - Coincidencias por sinónimo */}
+              {results.categoriasSinonimos.length > 0 && (
+                <div className="p-3">
+                  <p className="text-xs font-bold text-gray-500 uppercase mb-2 px-1">Categorías relacionadas</p>
+                  <div className="space-y-1">
+                    {results.categoriasSinonimos.map((category) => (
+                      <button
+                        key={`synonym-${category.id}`}
+                        onClick={() => handleSelectCategoria(category.category_name)}
+                        className="w-full p-3 text-left hover:bg-gray-50 transition-colors rounded-xl flex items-center gap-3"
+                      >
+                        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+                          <span className="text-purple-700 font-bold text-sm">{category.category_name.charAt(0)}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-gray-900 text-sm">{category.category_name}</p>
+                        </div>
+                        <Badge variant="outline" className="text-xs border-purple-300 text-purple-700">
+                          Relacionada
                         </Badge>
                       </button>
                     ))}

@@ -192,8 +192,6 @@ const ServiceSelector = ({
   const searchResults: SearchResults = categorySearchTerm 
     ? searchCategoriesByKeyword(categorySearchTerm)
     : { directMatches: categories, synonymMatches: [] };
-  
-  console.log('Component searchResults:', searchResults);
   return <div className="space-y-4">
       <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
         <h2 className="text-xl font-bold mb-2">¿Qué servicio necesitas?</h2>

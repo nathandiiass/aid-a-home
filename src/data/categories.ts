@@ -288,11 +288,5 @@ export const searchCategoriesByKeyword = (searchTerm: string): SearchResults => 
     categoryIds.has(cat.id) && !directMatchIds.has(cat.id)
   );
   
-  console.log('Search term:', lowerSearch);
-  console.log('Direct matches:', directMatches.map(c => c.category_name));
-  console.log('Matching keywords:', matchingKeywords);
-  console.log('Category IDs from keywords:', Array.from(categoryIds));
-  console.log('Synonym matches:', synonymMatches.map(c => c.category_name));
-  
   return { directMatches, synonymMatches };
 };
