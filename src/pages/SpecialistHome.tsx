@@ -69,24 +69,25 @@ export default function SpecialistHome() {
         return;
       }
 
-      // Get specialist specialties (categories)
-      const { data: specialties, error: specialtiesError } = await supabase
-        .from('specialist_specialties')
-        .select(`
-          specialty,
-          specialist_activities (
-            activity
-          )
-        `)
+      // Get specialist categories
+      const { data: specialistCategories, error: categoriesError } = await supabase
+        .from('specialist_categories')
+        .select('category_id, categories(category_name)')
         .eq('specialist_id', profile.id);
 
-      if (specialtiesError) throw specialtiesError;
+      if (categoriesError) throw categoriesError;
+
+      // Get specialist tags (activities)
+      const { data: specialistTags, error: tagsError } = await supabase
+        .from('specialist_tags')
+        .select('tag_id, category_tags(tag_name)')
+        .eq('specialist_id', profile.id);
+
+      if (tagsError) throw tagsError;
 
       // Extract categories and activities
-      const categories = specialties?.map(s => s.specialty) || [];
-      const activities = specialties?.flatMap(s => 
-        s.specialist_activities?.map((a: any) => a.activity) || []
-      ) || [];
+      const categories = specialistCategories?.map(sc => (sc.categories as any)?.category_name).filter(Boolean) || [];
+      const activities = specialistTags?.map(st => (st.category_tags as any)?.tag_name).filter(Boolean) || [];
 
       setSpecialistData({ categories, activities });
 
