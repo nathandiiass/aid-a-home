@@ -102,6 +102,7 @@ export default function SpecialistPersonalInfo() {
   const [specialistId, setSpecialistId] = useState<string | null>(null);
   const [editingSpecialty, setEditingSpecialty] = useState<string | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<SelectedCategory[]>([]);
+  const [isEditingCategories, setIsEditingCategories] = useState(false);
   const [credentials, setCredentials] = useState<Credential[]>([]);
   const [showAddCredentialDialog, setShowAddCredentialDialog] = useState(false);
   const [credentialForm, setCredentialForm] = useState({
@@ -671,15 +672,98 @@ export default function SpecialistPersonalInfo() {
 
         {/* BLOQUE 2: ESPECIALIDADES Y ZONAS */}
         <div className="bg-white rounded-3xl shadow-sm p-6 space-y-6">
-          <div className="flex items-center gap-2">
-            <div className="w-1 h-6 bg-rappi-green rounded-full" />
-            <h2 className="text-lg font-bold text-gray-900">Especialidades y servicios</h2>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-6 bg-rappi-green rounded-full" />
+              <h2 className="text-lg font-bold text-gray-900">Especialidades y servicios</h2>
+            </div>
+            {!isEditingCategories && selectedCategories.length > 0 && (
+              <Button
+                onClick={() => setIsEditingCategories(true)}
+                variant="outline"
+                size="sm"
+                className="rounded-xl"
+              >
+                Editar
+              </Button>
+            )}
           </div>
 
-          <CategoryServicesSelector
-            value={selectedCategories}
-            onChange={handleCategoriesChange}
-          />
+          {!isEditingCategories ? (
+            // Vista de solo lectura
+            <div className="space-y-4">
+              {selectedCategories.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-sm text-gray-500 mb-4">No tienes especialidades registradas</p>
+                  <Button
+                    onClick={() => setIsEditingCategories(true)}
+                    variant="outline"
+                    className="rounded-xl"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Agregar especialidades
+                  </Button>
+                </div>
+              ) : (
+                selectedCategories.map((selectedCat, idx) => (
+                  <div key={idx} className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl p-5 space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <Badge variant="outline" className="mb-2 bg-white border-rappi-green/20 text-rappi-green font-semibold">
+                          {selectedCat.category.category_name}
+                        </Badge>
+                        {selectedCat.experienceYears && (
+                          <p className="text-sm text-gray-600 mt-1">
+                            {selectedCat.experienceYears} {selectedCat.experienceYears === 1 ? 'año' : 'años'} de experiencia
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {selectedCat.selectedTags.length > 0 && (
+                      <div>
+                        <Label className="text-xs text-gray-500 mb-2 block">Servicios específicos</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedCat.selectedTags.map((tag, tagIdx) => (
+                            <Badge key={tagIdx} variant="secondary" className="bg-white text-gray-700">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          ) : (
+            // Modo de edición
+            <div className="space-y-4">
+              <CategoryServicesSelector
+                value={selectedCategories}
+                onChange={handleCategoriesChange}
+              />
+              <div className="flex gap-3 pt-4">
+                <Button
+                  onClick={() => {
+                    setIsEditingCategories(false);
+                    // Recargar datos originales si se cancela
+                    loadData();
+                  }}
+                  variant="outline"
+                  className="flex-1 rounded-xl"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={() => setIsEditingCategories(false)}
+                  className="flex-1 bg-rappi-green hover:bg-rappi-green/90 rounded-xl"
+                >
+                  Guardar cambios
+                </Button>
+              </div>
+            </div>
+          )}
 
           <div className="pt-4 border-t border-gray-100">
             <div className="flex items-center gap-2 mb-4">
