@@ -10,12 +10,8 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { categories, searchCategoriesByKeyword, type SearchResults } from "@/data/categories";
-interface Service {
-  id: number;
-  especialista: string;
-  categoria: string;
-  actividad: string;
-}
+import { categoryTags, getTagsByCategoryId, type CategoryTag } from "@/data/category_tags";
+
 interface ServiceSelectorProps {
   especialista: string;
   actividad: string;
@@ -42,71 +38,56 @@ const ServiceSelector = ({
   onServiceDescriptionChange,
   onEvidenceChange
 }: ServiceSelectorProps) => {
-  const [allServices, setAllServices] = useState<Service[]>([]);
-  const [especialistas, setEspecialistas] = useState<string[]>([]);
-  const [allEspecialistas, setAllEspecialistas] = useState<string[]>([]);
-  const [actividades, setActividades] = useState<string[]>([]);
-  const [selectedActividad, setSelectedActividad] = useState<string>(actividad || "");
+  const [selectedTags, setSelectedTags] = useState<string[]>(especialista ? especialista.split(',').filter(Boolean) : []);
+  const [availableTags, setAvailableTags] = useState<CategoryTag[]>([]);
   const [selectedCategoria, setSelectedCategoria] = useState<string>(categoria || "");
   const [errors, setErrors] = useState<{
     title?: string;
     description?: string;
   }>({});
   const [fileError, setFileError] = useState("");
-  const [openEspecialista, setOpenEspecialista] = useState(false);
   const [openCategoria, setOpenCategoria] = useState(false);
   const [categorySearchTerm, setCategorySearchTerm] = useState("");
+
+  // Update available tags when categoria changes
   useEffect(() => {
-    const loadServices = async () => {
-      const {
-        data
-      } = await supabase.from("servicios_domesticos").select("*").order("especialista", {
-        ascending: true
-      });
-      if (data) {
-        setAllServices(data);
-        const uniqueEsp = Array.from(new Set(data.map(s => s.especialista)));
-        const uniqueAct = Array.from(new Set(data.map(s => s.actividad)));
-        setAllEspecialistas(uniqueEsp);
-        setEspecialistas(uniqueEsp);
-        setActividades(uniqueAct);
+    if (selectedCategoria) {
+      // Find category by name
+      const category = categories.find(cat => cat.category_name === selectedCategoria);
+      if (category) {
+        const tags = getTagsByCategoryId(category.id);
+        setAvailableTags(tags);
+      } else {
+        setAvailableTags([]);
       }
-    };
-    loadServices();
-  }, []);
-
-  // Filter especialistas based on selected actividad or categoria
-  useEffect(() => {
-    let filteredEspecialistas = [...allEspecialistas];
-    if (selectedActividad) {
-      const filtered = allServices.filter(s => s.actividad === selectedActividad);
-      filteredEspecialistas = Array.from(new Set(filtered.map(s => s.especialista)));
-    } else if (selectedCategoria) {
-      const filtered = allServices.filter(s => s.categoria === selectedCategoria);
-      filteredEspecialistas = Array.from(new Set(filtered.map(s => s.especialista)));
+    } else {
+      setAvailableTags([]);
     }
-    setEspecialistas(filteredEspecialistas);
-
-    // Clear especialista if it's not in the filtered list
-    if (especialista && !filteredEspecialistas.includes(especialista)) {
-      onEspecialistaChange("");
-    }
-  }, [selectedActividad, selectedCategoria, allServices, allEspecialistas]);
-  const handleActividadFilterChange = (value: string) => {
-    setSelectedActividad(value);
-    setSelectedCategoria(""); // Clear categoria filter
-  };
+    
+    // Clear selected tags when category changes
+    setSelectedTags([]);
+    onEspecialistaChange("");
+  }, [selectedCategoria]);
+  
   const handleCategoriaFilterChange = (categoryName: string) => {
     setSelectedCategoria(categoryName);
-    setSelectedActividad(""); // Clear actividad filter
     setCategorySearchTerm("");
     setOpenCategoria(false);
   };
+  
   const clearFilters = () => {
-    setSelectedActividad("");
     setSelectedCategoria("");
-    setEspecialistas(allEspecialistas);
   };
+  
+  const handleTagToggle = (tagName: string) => {
+    const newTags = selectedTags.includes(tagName)
+      ? selectedTags.filter(t => t !== tagName)
+      : [...selectedTags, tagName];
+    
+    setSelectedTags(newTags);
+    onEspecialistaChange(newTags.join(','));
+  };
+  
   const validateTitle = (value: string) => {
     if (!value.trim()) {
       setErrors(prev => ({
@@ -256,42 +237,67 @@ const ServiceSelector = ({
           </Popover>
         </div>
 
-        {(selectedActividad || selectedCategoria) && <Badge variant="secondary" className="gap-2 py-2 px-3">
-            Filtrado por: {selectedActividad || selectedCategoria}
+        {selectedCategoria && <Badge variant="secondary" className="gap-2 py-2 px-3">
+            Filtrado por: {selectedCategoria}
             <button onClick={clearFilters} className="ml-1 hover:bg-muted rounded-full p-0.5">
               <X className="w-3 h-3" />
             </button>
           </Badge>}
       </div>
 
-      {/* Especialista selector */}
+      {/* Tags selector */}
       <div className="bg-white rounded-2xl shadow-lg border-0 p-6 space-y-3">
-        <Label htmlFor="especialista" className="text-sm font-semibold">Especialista *</Label>
-        <Popover open={openEspecialista} onOpenChange={setOpenEspecialista}>
-          <PopoverTrigger asChild>
-            <Button variant="outline" role="combobox" aria-expanded={openEspecialista} className="w-full h-12 justify-between bg-white">
-              {especialista || "Selecciona un especialista"}
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-full p-0 bg-white" align="start">
-            <Command>
-              <CommandInput placeholder="Buscar especialista..." />
-              <CommandList>
-                <CommandEmpty>No se encontró el especialista.</CommandEmpty>
-                <CommandGroup>
-                  {especialistas.map(esp => <CommandItem key={esp} value={esp} onSelect={currentValue => {
-                  onEspecialistaChange(currentValue === especialista ? "" : currentValue);
-                  setOpenEspecialista(false);
-                }}>
-                      <Check className={cn("mr-2 h-4 w-4", especialista === esp ? "opacity-100" : "opacity-0")} />
-                      {esp}
-                    </CommandItem>)}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
+        <div>
+          <Label className="text-sm font-semibold">Servicios específicos *</Label>
+          <p className="text-xs text-muted-foreground mt-1">
+            Selecciona uno o más servicios que necesitas
+          </p>
+        </div>
+        
+        {!selectedCategoria ? (
+          <div className="p-4 text-center text-muted-foreground text-sm border-2 border-dashed rounded-xl">
+            Primero selecciona una categoría para ver los servicios disponibles
+          </div>
+        ) : availableTags.length === 0 ? (
+          <div className="p-4 text-center text-muted-foreground text-sm border-2 border-dashed rounded-xl">
+            No hay servicios disponibles para esta categoría
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {availableTags.map(tag => (
+              <Badge
+                key={tag.id}
+                variant={selectedTags.includes(tag.tag_name) ? "default" : "outline"}
+                className={cn(
+                  "cursor-pointer transition-all hover:scale-105 py-2 px-4 text-sm",
+                  selectedTags.includes(tag.tag_name) && "bg-primary text-primary-foreground"
+                )}
+                onClick={() => handleTagToggle(tag.tag_name)}
+              >
+                {tag.tag_name}
+              </Badge>
+            ))}
+          </div>
+        )}
+        
+        {selectedTags.length > 0 && (
+          <div className="pt-2 border-t">
+            <p className="text-xs text-muted-foreground mb-2">Seleccionados ({selectedTags.length}):</p>
+            <div className="flex flex-wrap gap-2">
+              {selectedTags.map(tagName => (
+                <Badge key={tagName} variant="secondary" className="gap-2 py-1.5 px-3">
+                  {tagName}
+                  <button 
+                    onClick={() => handleTagToggle(tagName)} 
+                    className="hover:bg-muted rounded-full p-0.5"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Service title */}
