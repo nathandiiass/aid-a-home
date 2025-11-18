@@ -296,36 +296,36 @@ const ServiceSelector = ({
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0 bg-white rounded-2xl shadow-2xl border-0" align="start">
+            <PopoverContent className="w-[calc(100vw-2rem)] md:w-full p-0 bg-white rounded-2xl shadow-2xl border-0" align="start">
               <Command shouldFilter={false} className="rounded-2xl">
                 <CommandInput 
                   placeholder="Buscar categoría o sinónimo..." 
                   value={categorySearchTerm}
                   onValueChange={setCategorySearchTerm}
-                  className="border-0"
+                  className="border-0 h-10"
                 />
-                <CommandList className="max-h-[500px]">
+                <CommandList className="max-h-[400px]">
                   {searchResults.directMatches.length === 0 && searchResults.keywordMatches.length === 0 ? (
                     <CommandEmpty>No se encontró la categoría.</CommandEmpty>
                   ) : (
                     <div className="divide-y divide-gray-100">
                       {searchResults.directMatches.length > 0 && (
-                        <div className="p-3">
-                          <p className="text-xs font-bold text-gray-500 uppercase mb-2 px-1">Categorías</p>
-                          <div className="space-y-1">
+                        <div className="p-2">
+                          <p className="text-[10px] font-bold text-gray-500 uppercase mb-1.5 px-1">Categorías</p>
+                          <div className="space-y-0.5">
                             {searchResults.directMatches.map(cat => (
                               <button
                                 key={cat.id}
                                 onClick={() => handleCategoriaFilterChange(cat.category_name)}
-                                className="w-full p-3 text-left hover:bg-gray-50 transition-colors rounded-xl flex items-center gap-3"
+                                className="w-full p-2 text-left hover:bg-gray-50 transition-colors rounded-lg flex items-center gap-2"
                               >
-                                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                                  <span className="text-purple-700 font-bold text-sm">{cat.category_name.charAt(0)}</span>
+                                <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+                                  <span className="text-purple-700 font-bold text-xs">{cat.category_name.charAt(0)}</span>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="font-medium text-gray-900">{cat.category_name}</p>
+                                  <p className="font-medium text-gray-900 text-sm">{cat.category_name}</p>
                                 </div>
-                                <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full shrink-0">
+                                <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-medium rounded-full shrink-0">
                                   Categoría
                                 </span>
                               </button>
@@ -335,25 +335,25 @@ const ServiceSelector = ({
                       )}
                       
                       {searchResults.keywordMatches.length > 0 && (
-                        <div className="p-3">
-                          <p className="text-xs font-bold text-gray-500 uppercase mb-2 px-1">Categorías relacionadas</p>
-                          <div className="space-y-1">
+                        <div className="p-2">
+                          <p className="text-[10px] font-bold text-gray-500 uppercase mb-1.5 px-1">Categorías relacionadas</p>
+                          <div className="space-y-0.5">
                             {searchResults.keywordMatches.map(cat => (
                               <button
                                 key={`keyword-${cat.id}`}
                                 onClick={() => handleCategoriaFilterChange(cat.category_name)}
-                                className="w-full p-3 text-left hover:bg-gray-50 transition-colors rounded-xl flex items-center gap-3"
+                                className="w-full p-2 text-left hover:bg-gray-50 transition-colors rounded-lg flex items-center gap-2"
                               >
-                                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                                  <span className="text-purple-700 font-bold text-sm">{cat.category_name.charAt(0)}</span>
+                                <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+                                  <span className="text-purple-700 font-bold text-xs">{cat.category_name.charAt(0)}</span>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="font-medium text-gray-900">{cat.category_name}</p>
+                                  <p className="font-medium text-gray-900 text-sm">{cat.category_name}</p>
                                   {cat.matchedKeyword && (
-                                    <p className="text-sm text-gray-500">{cat.matchedKeyword}</p>
+                                    <p className="text-xs text-gray-500 truncate">{cat.matchedKeyword}</p>
                                   )}
                                 </div>
-                                <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full shrink-0">
+                                <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-medium rounded-full shrink-0">
                                   Relacionada
                                 </span>
                               </button>
