@@ -200,6 +200,21 @@ const SummaryStep = ({ data, goToStep }: SummaryStepProps) => {
               </button>
             </div>
             <p className="text-muted-foreground text-sm mb-2">{data.categoria}</p>
+            
+            {/* Servicios específicos */}
+            {data.actividad && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {data.actividad.split(',').filter(Boolean).map((tag, index) => (
+                  <span 
+                    key={index}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary"
+                  >
+                    {tag.trim()}
+                  </span>
+                ))}
+              </div>
+            )}
+            
             <p className="text-sm text-muted-foreground">{data.serviceDescription}</p>
 
             {/* Evidence section */}
