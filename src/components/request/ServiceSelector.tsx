@@ -247,7 +247,6 @@ const ServiceSelector = ({
     }
 
     const searchLower = categorySearchTerm.toLowerCase();
-    console.log('Searching for:', searchLower, 'Total keywords loaded:', categoryKeywords.length);
     
     // Direct matches in category name or key
     const directMatches = categories.filter(cat => 
@@ -261,7 +260,6 @@ const ServiceSelector = ({
     
     categoryKeywords.forEach(kw => {
       if (kw.keyword.toLowerCase().includes(searchLower)) {
-        console.log('Keyword match found:', kw.keyword, 'for category_id:', kw.category_id);
         if (!keywordMatchIds.has(kw.category_id)) {
           const category = categories.find(c => c.id === kw.category_id);
           if (category && !directMatches.find(dm => dm.id === category.id)) {
@@ -270,13 +268,11 @@ const ServiceSelector = ({
               ...category,
               matchedKeyword: kw.keyword
             });
-            console.log('Added keyword match:', category.category_name);
           }
         }
       }
     });
 
-    console.log('Search results - Direct:', directMatches.length, 'Keywords:', keywordMatches.length);
     return { directMatches, keywordMatches };
   };
 
@@ -300,53 +296,72 @@ const ServiceSelector = ({
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0 bg-white" align="start">
-              <Command shouldFilter={false}>
+            <PopoverContent className="w-full p-0 bg-white rounded-2xl shadow-2xl border-0" align="start">
+              <Command shouldFilter={false} className="rounded-2xl">
                 <CommandInput 
                   placeholder="Buscar categoría o sinónimo..." 
                   value={categorySearchTerm}
                   onValueChange={setCategorySearchTerm}
+                  className="border-0"
                 />
-                <CommandList>
+                <CommandList className="max-h-[500px]">
                   {searchResults.directMatches.length === 0 && searchResults.keywordMatches.length === 0 ? (
                     <CommandEmpty>No se encontró la categoría.</CommandEmpty>
                   ) : (
-                    <>
+                    <div className="divide-y divide-gray-100">
                       {searchResults.directMatches.length > 0 && (
-                        <CommandGroup heading="Categorías">
-                          {searchResults.directMatches.map(cat => (
-                            <CommandItem 
-                              key={cat.id} 
-                              value={cat.category_name}
-                              onSelect={() => handleCategoriaFilterChange(cat.category_name)}
-                            >
-                              <Check className={cn("mr-2 h-4 w-4", selectedCategoria === cat.category_name ? "opacity-100" : "opacity-0")} />
-                              {cat.category_name}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
+                        <div className="p-3">
+                          <p className="text-xs font-bold text-gray-500 uppercase mb-2 px-1">Categorías</p>
+                          <div className="space-y-1">
+                            {searchResults.directMatches.map(cat => (
+                              <button
+                                key={cat.id}
+                                onClick={() => handleCategoriaFilterChange(cat.category_name)}
+                                className="w-full p-3 text-left hover:bg-gray-50 transition-colors rounded-xl flex items-center gap-3"
+                              >
+                                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+                                  <span className="text-purple-700 font-bold text-sm">{cat.category_name.charAt(0)}</span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-gray-900">{cat.category_name}</p>
+                                </div>
+                                <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full shrink-0">
+                                  Categoría
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       )}
                       
                       {searchResults.keywordMatches.length > 0 && (
-                        <CommandGroup heading="Categorías relacionadas">
-                          {searchResults.keywordMatches.map(cat => (
-                            <CommandItem 
-                              key={`keyword-${cat.id}`} 
-                              value={cat.category_name}
-                              onSelect={() => handleCategoriaFilterChange(cat.category_name)}
-                            >
-                              <Check className={cn("mr-2 h-4 w-4", selectedCategoria === cat.category_name ? "opacity-100" : "opacity-0")} />
-                              <div className="flex flex-col">
-                                <span>{cat.category_name}</span>
-                                {cat.matchedKeyword && (
-                                  <span className="text-xs text-muted-foreground">{cat.matchedKeyword}</span>
-                                )}
-                              </div>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
+                        <div className="p-3">
+                          <p className="text-xs font-bold text-gray-500 uppercase mb-2 px-1">Categorías relacionadas</p>
+                          <div className="space-y-1">
+                            {searchResults.keywordMatches.map(cat => (
+                              <button
+                                key={`keyword-${cat.id}`}
+                                onClick={() => handleCategoriaFilterChange(cat.category_name)}
+                                className="w-full p-3 text-left hover:bg-gray-50 transition-colors rounded-xl flex items-center gap-3"
+                              >
+                                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+                                  <span className="text-purple-700 font-bold text-sm">{cat.category_name.charAt(0)}</span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-gray-900">{cat.category_name}</p>
+                                  {cat.matchedKeyword && (
+                                    <p className="text-sm text-gray-500">{cat.matchedKeyword}</p>
+                                  )}
+                                </div>
+                                <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full shrink-0">
+                                  Relacionada
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       )}
-                    </>
+                    </div>
                   )}
                 </CommandList>
               </Command>
