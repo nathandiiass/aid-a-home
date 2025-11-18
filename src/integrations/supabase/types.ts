@@ -14,6 +14,88 @@ export type Database = {
   }
   public: {
     Tables: {
+      categories: {
+        Row: {
+          category_key: string
+          category_name: string
+          created_at: string | null
+          id: number
+        }
+        Insert: {
+          category_key: string
+          category_name: string
+          created_at?: string | null
+          id: number
+        }
+        Update: {
+          category_key?: string
+          category_name?: string
+          created_at?: string | null
+          id?: number
+        }
+        Relationships: []
+      }
+      category_keywords: {
+        Row: {
+          category_id: number
+          created_at: string | null
+          id: number
+          keyword: string
+        }
+        Insert: {
+          category_id: number
+          created_at?: string | null
+          id: number
+          keyword: string
+        }
+        Update: {
+          category_id?: number
+          created_at?: string | null
+          id?: number
+          keyword?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "category_keywords_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      category_tags: {
+        Row: {
+          category_id: number
+          created_at: string | null
+          id: number
+          tag_key: string
+          tag_name: string
+        }
+        Insert: {
+          category_id: number
+          created_at?: string | null
+          id: number
+          tag_key: string
+          tag_name: string
+        }
+        Update: {
+          category_id?: number
+          created_at?: string | null
+          id?: number
+          tag_key?: string
+          tag_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "category_tags_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_reviews: {
         Row: {
           average_score: number | null

@@ -1,1 +1,4 @@
 project_id = "vegyzdfbudqftyrpoadq"
+
+[functions.seed-catalog-data]
+verify_jwt = false
