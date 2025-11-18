@@ -22,10 +22,17 @@ interface ServiceRequest {
   price_min: number | null;
   price_max: number | null;
   location_id: string | null;
+  created_at: string;
   locations?: {
     neighborhood: string;
     city: string;
   };
+  relevance_score?: number;
+}
+
+interface SpecialistData {
+  categories: string[];
+  activities: string[];
 }
 
 export default function SpecialistHome() {
@@ -33,7 +40,7 @@ export default function SpecialistHome() {
   const navigate = useNavigate();
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [specialistCategories, setSpecialistCategories] = useState<string[]>([]);
+  const [specialistData, setSpecialistData] = useState<SpecialistData>({ categories: [], activities: [] });
   const { isSpecialistMode } = useSpecialistMode();
 
   useEffect(() => {
@@ -62,16 +69,26 @@ export default function SpecialistHome() {
         return;
       }
 
-      // Get specialist specialties
+      // Get specialist specialties (categories)
       const { data: specialties, error: specialtiesError } = await supabase
         .from('specialist_specialties')
-        .select('specialty')
+        .select(`
+          specialty,
+          specialist_activities (
+            activity
+          )
+        `)
         .eq('specialist_id', profile.id);
 
       if (specialtiesError) throw specialtiesError;
 
+      // Extract categories and activities
       const categories = specialties?.map(s => s.specialty) || [];
-      setSpecialistCategories(categories);
+      const activities = specialties?.flatMap(s => 
+        s.specialist_activities?.map((a: any) => a.activity) || []
+      ) || [];
+
+      setSpecialistData({ categories, activities });
 
       // Load active requests matching specialist's categories
       if (categories.length > 0) {
@@ -85,7 +102,7 @@ export default function SpecialistHome() {
 
         const quotedRequestIds = existingQuotes?.map(q => q.request_id) || [];
 
-        // Load active requests, excluding those already quoted
+        // Load active requests matching categories
         const { data: requestsData, error: requestsError } = await supabase
           .from('service_requests')
           .select(`
@@ -102,9 +119,36 @@ export default function SpecialistHome() {
         if (requestsError) throw requestsError;
 
         // Filter out requests that already have quotes from this specialist
-        const filteredRequests = requestsData?.filter(
+        let filteredRequests: ServiceRequest[] = (requestsData?.filter(
           req => !quotedRequestIds.includes(req.id)
-        ) || [];
+        ) || []).map(request => {
+          let score = 0;
+          
+          // Base score: category match
+          if (categories.includes(request.category)) {
+            score += 1;
+          }
+          
+          // Bonus score: activity (tag) match
+          if (activities.includes(request.activity)) {
+            score += 1;
+          }
+          
+          return {
+            ...request,
+            relevance_score: score
+          } as ServiceRequest;
+        });
+
+        // Sort by relevance score (descending), then by created_at (newest first)
+        filteredRequests.sort((a, b) => {
+          const scoreA = a.relevance_score ?? 0;
+          const scoreB = b.relevance_score ?? 0;
+          if (scoreB !== scoreA) {
+            return scoreB - scoreA;
+          }
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        });
 
         setRequests(filteredRequests);
       }
@@ -152,7 +196,7 @@ export default function SpecialistHome() {
         <div className="pt-2">
           <h1 className="text-2xl font-bold text-foreground mb-1">Solicitudes disponibles</h1>
           <p className="text-foreground/60 text-sm">
-            {specialistCategories.join(', ')}
+            {specialistData.categories.join(', ')}
           </p>
         </div>
 
