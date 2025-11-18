@@ -247,6 +247,7 @@ const ServiceSelector = ({
     }
 
     const searchLower = categorySearchTerm.toLowerCase();
+    console.log('Searching for:', searchLower, 'Total keywords loaded:', categoryKeywords.length);
     
     // Direct matches in category name or key
     const directMatches = categories.filter(cat => 
@@ -260,6 +261,7 @@ const ServiceSelector = ({
     
     categoryKeywords.forEach(kw => {
       if (kw.keyword.toLowerCase().includes(searchLower)) {
+        console.log('Keyword match found:', kw.keyword, 'for category_id:', kw.category_id);
         if (!keywordMatchIds.has(kw.category_id)) {
           const category = categories.find(c => c.id === kw.category_id);
           if (category && !directMatches.find(dm => dm.id === category.id)) {
@@ -268,11 +270,13 @@ const ServiceSelector = ({
               ...category,
               matchedKeyword: kw.keyword
             });
+            console.log('Added keyword match:', category.category_name);
           }
         }
       }
     });
 
+    console.log('Search results - Direct:', directMatches.length, 'Keywords:', keywordMatches.length);
     return { directMatches, keywordMatches };
   };
 
