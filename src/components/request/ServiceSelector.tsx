@@ -184,7 +184,7 @@ const ServiceSelector = ({
       {/* Filter dropdowns */}
       <div className="bg-white rounded-2xl shadow-lg border-0 p-6 space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="filter-categoria" className="text-sm font-semibold">Filtrar por categoría</Label>
+          <Label htmlFor="filter-categoria" className="text-sm font-semibold">Filtrar por categoría *</Label>
           <Popover open={openCategoria} onOpenChange={setOpenCategoria}>
             <PopoverTrigger asChild>
               <Button variant="outline" role="combobox" aria-expanded={openCategoria} className="w-full h-12 justify-between bg-white">
@@ -248,7 +248,7 @@ const ServiceSelector = ({
       {/* Tags selector */}
       <div className="bg-white rounded-2xl shadow-lg border-0 p-6 space-y-3">
         <div>
-          <Label className="text-sm font-semibold">Servicios específicos *</Label>
+          <Label className="text-sm font-semibold">Servicios específicos (opcional)</Label>
           <p className="text-xs text-muted-foreground mt-1">
             Selecciona uno o más servicios que necesitas
           </p>
