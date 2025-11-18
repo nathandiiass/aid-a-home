@@ -197,7 +197,19 @@ const ServiceSelector = ({
       {/* Filter dropdowns */}
       <div className="bg-white rounded-2xl shadow-lg border-0 p-6 space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          
+          <div className="space-y-2">
+            <Label htmlFor="filter-actividad" className="text-sm font-semibold">Filtrar por actividad</Label>
+            <Select value={selectedActividad} onValueChange={handleActividadFilterChange}>
+              <SelectTrigger id="filter-actividad" className="h-12 bg-white">
+                <SelectValue placeholder="Todas" />
+              </SelectTrigger>
+              <SelectContent className="bg-white z-50">
+                {actividades.map(act => <SelectItem key={act} value={act}>
+                    {act}
+                  </SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
 
           <div className="space-y-2">
             <Label htmlFor="filter-categoria" className="text-sm font-semibold">Filtrar por categoría</Label>
