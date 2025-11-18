@@ -38,32 +38,30 @@ interface SearchResults {
 }
 
 interface ServiceSelectorProps {
-  especialista: string;
+  categoria: string;
   actividad: string;
   serviceTitle: string;
   serviceDescription: string;
-  categoria?: string;
   evidence: File[];
-  onEspecialistaChange: (value: string) => void;
+  onCategoriaChange: (value: string) => void;
   onActividadChange: (value: string) => void;
   onServiceTitleChange: (value: string) => void;
   onServiceDescriptionChange: (value: string) => void;
   onEvidenceChange: (files: File[]) => void;
 }
 const ServiceSelector = ({
-  especialista,
+  categoria,
   actividad,
   serviceTitle,
   serviceDescription,
-  categoria,
   evidence,
-  onEspecialistaChange,
+  onCategoriaChange,
   onActividadChange,
   onServiceTitleChange,
   onServiceDescriptionChange,
   onEvidenceChange
 }: ServiceSelectorProps) => {
-  const [selectedTags, setSelectedTags] = useState<string[]>(especialista ? especialista.split(',').filter(Boolean) : []);
+  const [selectedTags, setSelectedTags] = useState<string[]>(actividad ? actividad.split(',').filter(Boolean) : []);
   const [availableTags, setAvailableTags] = useState<CategoryTag[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryKeywords, setCategoryKeywords] = useState<CategoryKeyword[]>([]);
@@ -134,7 +132,7 @@ const ServiceSelector = ({
       
       // Clear selected tags when category changes
       setSelectedTags([]);
-      onEspecialistaChange("");
+      onActividadChange("");
     };
     
     loadTags();
@@ -144,10 +142,12 @@ const ServiceSelector = ({
     setSelectedCategoria(categoryName);
     setCategorySearchTerm("");
     setOpenCategoria(false);
+    onCategoriaChange(categoryName);
   };
   
   const clearFilters = () => {
     setSelectedCategoria("");
+    onCategoriaChange("");
   };
   
   const handleTagToggle = (tagName: string) => {
@@ -156,7 +156,7 @@ const ServiceSelector = ({
       : [...selectedTags, tagName];
     
     setSelectedTags(newTags);
-    onEspecialistaChange(newTags.join(','));
+    onActividadChange(newTags.join(','));
   };
   
   const validateTitle = (value: string) => {
