@@ -73,7 +73,15 @@ const ServiceSelector = ({
   const [fileError, setFileError] = useState("");
   const [openCategoria, setOpenCategoria] = useState(false);
   const [categorySearchTerm, setCategorySearchTerm] = useState("");
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [hasLoadedInitialTags, setHasLoadedInitialTags] = useState(false);
+
+  // Sync selectedTags with actividad prop changes
+  useEffect(() => {
+    if (actividad) {
+      const tags = actividad.split(',').filter(Boolean);
+      setSelectedTags(tags);
+    }
+  }, [actividad]);
 
   // Load categories and keywords on mount
   useEffect(() => {
@@ -121,6 +129,7 @@ const ServiceSelector = ({
           
           if (data) {
             setAvailableTags(data);
+            setHasLoadedInitialTags(true);
           } else {
             setAvailableTags([]);
           }
@@ -131,12 +140,11 @@ const ServiceSelector = ({
         setAvailableTags([]);
       }
       
-      // Only clear selected tags if this is not the initial load or if user is changing category manually
-      if (!isInitialLoad) {
+      // Only clear selected tags if we've already loaded tags once before and user is manually changing category
+      // Don't clear on initial load when we're editing an order
+      if (hasLoadedInitialTags && selectedCategoria !== categoria) {
         setSelectedTags([]);
         onActividadChange("");
-      } else {
-        setIsInitialLoad(false);
       }
     };
     
