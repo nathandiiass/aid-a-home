@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { X, Camera, Upload, Check, ChevronsUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { categories, searchCategoriesByKeyword } from "@/data/categories";
 interface Service {
   id: number;
   especialista: string;
@@ -46,7 +46,6 @@ const ServiceSelector = ({
   const [especialistas, setEspecialistas] = useState<string[]>([]);
   const [allEspecialistas, setAllEspecialistas] = useState<string[]>([]);
   const [actividades, setActividades] = useState<string[]>([]);
-  const [categorias, setCategorias] = useState<string[]>([]);
   const [selectedActividad, setSelectedActividad] = useState<string>(actividad || "");
   const [selectedCategoria, setSelectedCategoria] = useState<string>(categoria || "");
   const [errors, setErrors] = useState<{
@@ -55,6 +54,8 @@ const ServiceSelector = ({
   }>({});
   const [fileError, setFileError] = useState("");
   const [openEspecialista, setOpenEspecialista] = useState(false);
+  const [openCategoria, setOpenCategoria] = useState(false);
+  const [categorySearchTerm, setCategorySearchTerm] = useState("");
   useEffect(() => {
     const loadServices = async () => {
       const {
@@ -66,11 +67,9 @@ const ServiceSelector = ({
         setAllServices(data);
         const uniqueEsp = Array.from(new Set(data.map(s => s.especialista)));
         const uniqueAct = Array.from(new Set(data.map(s => s.actividad)));
-        const uniqueCat = Array.from(new Set(data.map(s => s.categoria)));
         setAllEspecialistas(uniqueEsp);
         setEspecialistas(uniqueEsp);
         setActividades(uniqueAct);
-        setCategorias(uniqueCat);
       }
     };
     loadServices();
@@ -97,9 +96,11 @@ const ServiceSelector = ({
     setSelectedActividad(value);
     setSelectedCategoria(""); // Clear categoria filter
   };
-  const handleCategoriaFilterChange = (value: string) => {
-    setSelectedCategoria(value);
+  const handleCategoriaFilterChange = (categoryName: string) => {
+    setSelectedCategoria(categoryName);
     setSelectedActividad(""); // Clear actividad filter
+    setCategorySearchTerm("");
+    setOpenCategoria(false);
   };
   const clearFilters = () => {
     setSelectedActividad("");
@@ -186,6 +187,11 @@ const ServiceSelector = ({
   const removeFile = (index: number) => {
     onEvidenceChange(evidence.filter((_, i) => i !== index));
   };
+
+  // Get filtered categories based on search
+  const filteredCategories = categorySearchTerm 
+    ? searchCategoriesByKeyword(categorySearchTerm)
+    : categories;
   return <div className="space-y-4">
       <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
         <h2 className="text-xl font-bold mb-2">¿Qué servicio necesitas?</h2>
@@ -196,22 +202,40 @@ const ServiceSelector = ({
 
       {/* Filter dropdowns */}
       <div className="bg-white rounded-2xl shadow-lg border-0 p-6 space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          
-
-          <div className="space-y-2">
-            <Label htmlFor="filter-categoria" className="text-sm font-semibold">Filtrar por categoría</Label>
-            <Select value={selectedCategoria} onValueChange={handleCategoriaFilterChange}>
-              <SelectTrigger id="filter-categoria" className="h-12 bg-white">
-                <SelectValue placeholder="Todas" />
-              </SelectTrigger>
-              <SelectContent className="bg-white z-50">
-                {categorias.map(cat => <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="filter-categoria" className="text-sm font-semibold">Filtrar por categoría</Label>
+          <Popover open={openCategoria} onOpenChange={setOpenCategoria}>
+            <PopoverTrigger asChild>
+              <Button variant="outline" role="combobox" aria-expanded={openCategoria} className="w-full h-12 justify-between bg-white">
+                {selectedCategoria || "Todas las categorías"}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0 bg-white" align="start">
+              <Command>
+                <CommandInput 
+                  placeholder="Buscar categoría o sinónimo..." 
+                  value={categorySearchTerm}
+                  onValueChange={setCategorySearchTerm}
+                />
+                <CommandList>
+                  <CommandEmpty>No se encontró la categoría.</CommandEmpty>
+                  <CommandGroup>
+                    {filteredCategories.map(cat => (
+                      <CommandItem 
+                        key={cat.id} 
+                        value={cat.category_name}
+                        onSelect={() => handleCategoriaFilterChange(cat.category_name)}
+                      >
+                        <Check className={cn("mr-2 h-4 w-4", selectedCategoria === cat.category_name ? "opacity-100" : "opacity-0")} />
+                        {cat.category_name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
 
         {(selectedActividad || selectedCategoria) && <Badge variant="secondary" className="gap-2 py-2 px-3">

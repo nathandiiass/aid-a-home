@@ -1,0 +1,213 @@
+﻿id,category_id,keyword
+1,1,jardin
+2,1,jardín
+3,1,jardinero
+4,1,podar
+5,1,poda
+6,1,cortar pasto
+7,1,césped
+8,1,zacate
+9,1,áreas verdes
+10,1,plantas
+11,1,flores
+12,1,árboles
+13,1,riego
+14,1,sistema de riego
+15,2,plomero
+16,2,fontanero
+17,2,tubería
+18,2,tuberias
+19,2,fugas
+20,2,fuga de agua
+21,2,fuga de gas
+22,2,drenaje
+23,2,baño tapado
+24,2,drenaje tapado
+25,2,calentador
+26,2,tinaco
+27,3,electricista
+28,3,corto
+29,3,cortos
+30,3,apagadores
+31,3,contactos
+32,3,luz
+33,3,focos
+34,3,lámparas
+35,3,breaker
+36,3,fusible
+37,3,instalación eléctrica
+38,4,albañil
+39,4,albanil
+40,4,construcción
+41,4,resanar
+42,4,aplanar
+43,4,barda
+44,4,muro
+45,4,piso
+46,4,azulejo
+47,4,cemento
+48,4,concreto
+49,5,pintor
+50,5,pintura
+51,5,impermeabilizar
+52,5,impermeable
+53,5,fachada
+54,5,sellador
+55,5,esmalte
+56,5,acabado
+57,6,carpintero
+58,6,madera
+59,6,mueble
+60,6,clóset
+61,6,closet
+62,6,cocina integral
+63,6,puerta
+64,6,repisa
+65,6,barniz
+66,7,herrero
+67,7,soldador
+68,7,rejas
+69,7,portones
+70,7,protectores
+71,7,estructura metálica
+72,7,soldadura
+73,8,vidriero
+74,8,vidrio
+75,8,cristal
+76,8,cancel
+77,8,aluminio
+78,8,ventanas
+79,8,puertas corredizas
+80,9,cerrajero
+81,9,llaves
+82,9,chapa
+83,9,abrir puerta
+84,9,cerradura
+85,9,cerradura digital
+86,10,limpieza
+87,10,limpiar
+88,10,servicio de limpieza
+89,10,aseo
+90,10,lavado colchones
+91,10,lavado sillones
+92,11,limpieza industrial
+93,11,limpieza oficinas
+94,11,limpieza negocios
+95,11,limpieza bodegas
+96,11,limpieza tiendas
+97,12,fumigar
+98,12,fumigación
+99,12,plagas
+100,12,cucarachas
+101,12,hormigas
+102,12,ratas
+103,12,alacranes
+104,12,desinfectar
+105,13,aire acondicionado
+106,13,aires acondicionados
+107,13,aire
+108,13,clima
+109,13,climas
+110,13,minisplit
+111,13,mini split
+112,13,mini-split
+113,13,aire lavado
+114,13,lavado de minisplit
+115,13,servicio de clima
+116,13,técnico en clima
+117,14,alberca
+118,14,piscina
+119,14,pileta
+120,14,limpieza de alberca
+121,14,bomba de alberca
+122,14,filtro de alberca
+123,15,mecánico
+124,15,mecanico
+125,15,auto
+126,15,carro
+127,15,coche
+128,15,afinación
+129,15,frenos
+130,15,pulido
+131,15,lavado de autos
+132,16,mudanza
+133,16,flete
+134,16,transportar
+135,16,camión de mudanza
+136,16,cargadores
+137,17,evento
+138,17,eventos
+139,17,meseros
+140,17,dj
+141,17,banquetes
+142,17,fiestas
+143,17,sonido
+144,17,iluminación
+145,18,foto
+146,18,fotógrafo
+147,18,fotos
+148,18,cámara
+149,18,video
+150,18,videógrafo
+151,18,sesión
+152,19,chef
+153,19,cocinero
+154,19,taquiza
+155,19,comida
+156,19,catering
+157,19,banquete
+158,19,repostería
+159,19,postres
+160,20,profesor
+161,20,maestro
+162,20,clases
+163,20,tutor
+164,20,regularización
+165,20,asesor
+166,20,clases de inglés
+167,20,clases de matemáticas
+168,21,computadora
+169,21,pc
+170,21,laptop
+171,21,celular
+172,21,reparar celular
+173,21,cambiar pantalla
+174,21,wifi
+175,21,internet
+176,21,redes
+177,22,cámaras
+178,22,cctv
+179,22,seguridad
+180,22,alarmas
+181,22,sensores
+182,22,guardias
+183,22,circuito cerrado
+184,23,decorador
+185,23,decoración
+186,23,interiores
+187,23,diseño interior
+188,23,home staging
+189,24,paneles solares
+190,24,solar
+191,24,fotovoltaico
+192,24,energía solar
+193,24,instalación solar
+194,25,mantenimiento
+195,25,handyman
+196,25,casa
+197,25,reparaciones
+198,25,arreglos
+199,25,servicios generales
+200,26,abogado
+201,26,contador
+202,26,trámites
+203,26,contratos
+204,26,fiscal
+205,26,gestoría
+206,26,gestor
+207,27,diseño gráfico
+208,27,marketing
+209,27,redes sociales
+210,27,community manager
+211,27,logos
+212,27,publicidad
