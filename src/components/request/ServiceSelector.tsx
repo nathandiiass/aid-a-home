@@ -73,6 +73,7 @@ const ServiceSelector = ({
   const [fileError, setFileError] = useState("");
   const [openCategoria, setOpenCategoria] = useState(false);
   const [categorySearchTerm, setCategorySearchTerm] = useState("");
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Load categories and keywords on mount
   useEffect(() => {
@@ -130,9 +131,13 @@ const ServiceSelector = ({
         setAvailableTags([]);
       }
       
-      // Clear selected tags when category changes
-      setSelectedTags([]);
-      onActividadChange("");
+      // Only clear selected tags if this is not the initial load or if user is changing category manually
+      if (!isInitialLoad) {
+        setSelectedTags([]);
+        onActividadChange("");
+      } else {
+        setIsInitialLoad(false);
+      }
     };
     
     loadTags();
