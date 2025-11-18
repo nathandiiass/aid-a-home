@@ -21,6 +21,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
 
+interface DeleteSpecialistResponse {
+  success: boolean;
+  message: string;
+  deleted_records?: any;
+  specialist_id?: string;
+  active_orders?: number;
+}
+
 export default function SpecialistAccount() {
   const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
@@ -76,6 +84,8 @@ export default function SpecialistAccount() {
   };
 
   const [showDeactivateDialog, setShowDeactivateDialog] = useState(false);
+  const [showDeleteAccountDialog, setShowDeleteAccountDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleSpecialistModeToggle = async (checked: boolean) => {
     if (!checked) {
@@ -91,6 +101,46 @@ export default function SpecialistAccount() {
       description: "Has vuelto al modo usuario"
     });
     navigate('/profile');
+  };
+
+  const handleDeleteSpecialistAccount = async () => {
+    if (!user) return;
+    
+    setIsDeleting(true);
+    try {
+      const { data, error } = await supabase.rpc('delete_specialist_role', {
+        p_user_id: user.id
+      });
+
+      if (error) throw error;
+
+      const response = data as unknown as DeleteSpecialistResponse;
+
+      if (response.success) {
+        toast({
+          title: "Cuenta de especialista eliminada",
+          description: "Tu perfil de especialista ha sido eliminado exitosamente",
+        });
+        await toggleSpecialistMode(false);
+        navigate('/profile');
+      } else {
+        toast({
+          title: "No se pudo eliminar la cuenta",
+          description: response.message,
+          variant: "destructive"
+        });
+      }
+    } catch (error: any) {
+      console.error('Error deleting specialist account:', error);
+      toast({
+        title: "Error",
+        description: "Ocurrió un error al eliminar tu cuenta de especialista",
+        variant: "destructive"
+      });
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteAccountDialog(false);
+    }
   };
 
   if (loading) {
@@ -313,6 +363,25 @@ export default function SpecialistAccount() {
               </div>
             </div>
 
+            {/* Delete Specialist Account Section */}
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-red-100">
+              <div className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <h3 className="font-bold text-gray-900">Zona de peligro</h3>
+                  <p className="text-sm text-gray-600">
+                    Elimina permanentemente tu cuenta de especialista. Esta acción no se puede deshacer.
+                  </p>
+                </div>
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  onClick={() => setShowDeleteAccountDialog(true)}
+                >
+                  Eliminar cuenta de especialista
+                </Button>
+              </div>
+            </div>
+
             <AlertDialog open={showDeactivateDialog} onOpenChange={setShowDeactivateDialog}>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -328,6 +397,37 @@ export default function SpecialistAccount() {
                     className="bg-red-600 hover:bg-red-700"
                   >
                     Desactivar
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog open={showDeleteAccountDialog} onOpenChange={setShowDeleteAccountDialog}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>¿Eliminar cuenta de especialista?</AlertDialogTitle>
+                  <AlertDialogDescription className="space-y-3">
+                    <p>Esta acción eliminará permanentemente:</p>
+                    <ul className="list-disc list-inside space-y-1 text-sm">
+                      <li>Tu perfil de especialista</li>
+                      <li>Tus especialidades y servicios</li>
+                      <li>Tus credenciales y documentos</li>
+                      <li>Historial de cotizaciones</li>
+                      <li>Reseñas recibidas</li>
+                    </ul>
+                    <p className="font-semibold text-red-600">
+                      Esta acción no se puede deshacer. Si tienes órdenes activas, no podrás eliminar tu cuenta.
+                    </p>
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={handleDeleteSpecialistAccount}
+                    disabled={isDeleting}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    {isDeleting ? "Eliminando..." : "Eliminar permanentemente"}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
