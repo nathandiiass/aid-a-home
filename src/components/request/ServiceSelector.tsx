@@ -313,31 +313,42 @@ const ServiceSelector = ({
           </p>
         </div>
         
-        {!selectedCategoria ? (
-          <div className="p-4 text-center text-muted-foreground text-sm border-2 border-dashed rounded-xl">
-            Primero selecciona una categoría para ver los servicios disponibles
-          </div>
-        ) : availableTags.length === 0 ? (
-          <div className="p-4 text-center text-muted-foreground text-sm border-2 border-dashed rounded-xl">
-            No hay servicios disponibles para esta categoría
-          </div>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {availableTags.map(tag => (
-              <Badge
-                key={tag.id}
-                variant={selectedTags.includes(tag.tag_name) ? "default" : "outline"}
-                className={cn(
-                  "cursor-pointer transition-all hover:scale-105 py-2 px-4 text-sm",
-                  selectedTags.includes(tag.tag_name) && "bg-primary text-primary-foreground"
-                )}
-                onClick={() => handleTagToggle(tag.tag_name)}
-              >
-                {tag.tag_name}
-              </Badge>
-            ))}
-          </div>
-        )}
+        {(() => {
+          console.log('Render check - selectedCategoria:', selectedCategoria, 'availableTags:', availableTags.length);
+          if (!selectedCategoria) {
+            return (
+              <div className="p-4 text-center text-muted-foreground text-sm border-2 border-dashed rounded-xl">
+                Primero selecciona una categoría para ver los servicios disponibles
+              </div>
+            );
+          }
+          
+          if (availableTags.length === 0) {
+            return (
+              <div className="p-4 text-center text-muted-foreground text-sm border-2 border-dashed rounded-xl">
+                No hay servicios disponibles para esta categoría
+              </div>
+            );
+          }
+          
+          return (
+            <div className="flex flex-wrap gap-2">
+              {availableTags.map(tag => (
+                <Badge
+                  key={tag.id}
+                  variant={selectedTags.includes(tag.tag_name) ? "default" : "outline"}
+                  className={cn(
+                    "cursor-pointer transition-all hover:scale-105 py-2 px-4 text-sm",
+                    selectedTags.includes(tag.tag_name) && "bg-primary text-primary-foreground"
+                  )}
+                  onClick={() => handleTagToggle(tag.tag_name)}
+                >
+                  {tag.tag_name}
+                </Badge>
+              ))}
+            </div>
+          );
+        })()}
         
         {selectedTags.length > 0 && (
           <div className="pt-2 border-t">
