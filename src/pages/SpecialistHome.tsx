@@ -131,7 +131,13 @@ export default function SpecialistHome() {
           }
           
           // Bonus score: activity (tag) match
-          if (activities.includes(request.activity)) {
+          // Handle multiple tags separated by commas
+          const requestActivities = request.activity.split(',').map(a => a.trim());
+          const hasActivityMatch = requestActivities.some(reqActivity => 
+            activities.includes(reqActivity)
+          );
+          
+          if (hasActivityMatch) {
             score += 1;
           }
           
