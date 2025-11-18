@@ -206,85 +206,180 @@ export default function SpecialistHome() {
             <p className="text-foreground/60">No hay solicitudes disponibles en este momento</p>
           </Card>
         ) : (
-          <div className="space-y-4">
-            {requests.map((request) => (
-              <Card key={request.id} className="bg-white rounded-2xl shadow-md border-0 p-5 hover:shadow-xl transition-all">
-                <div className="space-y-4">
-                  {/* Header */}
-                  <div>
-                    <h3 className="font-bold text-lg text-foreground mb-1">
-                      {request.service_title || request.activity}
-                    </h3>
-                    {request.is_urgent && (
-                      <span className="inline-block bg-red-100 text-red-600 text-xs font-semibold px-3 py-1 rounded-full">
-                        ¡Urgente!
-                      </span>
-                    )}
-                  </div>
-                  
-                  {/* Details */}
-                  <div className="space-y-3">
-                    {request.scheduled_date && (
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                          <Calendar className="w-4 h-4 text-gray-600" />
-                        </div>
-                        <span className="text-sm text-foreground/70">
-                          {new Date(request.scheduled_date).toLocaleDateString('es-MX', {
-                            weekday: 'short',
-                            day: 'numeric',
-                            month: 'short'
-                          })}
-                        </span>
-                      </div>
-                    )}
-
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                        <Clock className="w-4 h-4 text-gray-600" />
-                      </div>
-                      <span className={`text-sm ${request.is_urgent ? "text-red-600 font-semibold" : "text-foreground/70"}`}>
-                        {formatTimeDisplay(request)}
-                      </span>
-                    </div>
-
-                    {request.locations && (
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                          <MapPin className="w-4 h-4 text-gray-600" />
-                        </div>
-                        <span className="text-sm text-foreground/70">
-                          {request.locations.neighborhood}, {request.locations.city}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Price */}
-                    {(request.price_min || request.price_max) && (
-                      <div className="pt-3 mt-3 border-t border-gray-100">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-foreground/50 uppercase tracking-wide">Presupuesto</span>
-                          <span className="font-bold text-base text-foreground">
-                            {request.price_min && request.price_max
-                              ? `$${request.price_min.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - $${request.price_max.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`
-                              : request.price_min
-                              ? `Desde $${request.price_min.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`
-                              : `Hasta $${request.price_max.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <Button
-                    onClick={() => navigate(`/specialist/requests/${request.id}`)}
-                    className="w-full bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-11 font-semibold"
-                  >
-                    Ver solicitud
-                  </Button>
+          <div className="space-y-8">
+            {/* Sección: Recomendados para ti */}
+            {requests.filter(r => (r.relevance_score ?? 0) >= 2).length > 0 && (
+              <div className="space-y-4">
+                <div>
+                  <h2 className="text-xl font-bold text-foreground">Recomendados para ti</h2>
+                  <p className="text-sm text-foreground/60">Solicitudes que coinciden con tus servicios específicos</p>
                 </div>
-              </Card>
-            ))}
+                <div className="space-y-4">
+                  {requests.filter(r => (r.relevance_score ?? 0) >= 2).map((request) => (
+                    <Card key={request.id} className="bg-white rounded-2xl shadow-md border-0 p-5 hover:shadow-xl transition-all">
+                      <div className="space-y-4">
+                        {/* Header */}
+                        <div>
+                          <h3 className="font-bold text-lg text-foreground mb-1">
+                            {request.service_title || request.activity}
+                          </h3>
+                          {request.is_urgent && (
+                            <span className="inline-block bg-red-100 text-red-600 text-xs font-semibold px-3 py-1 rounded-full">
+                              ¡Urgente!
+                            </span>
+                          )}
+                        </div>
+                        
+                        {/* Details */}
+                        <div className="space-y-3">
+                          {request.scheduled_date && (
+                            <div className="flex items-center gap-3">
+                              <Calendar className="w-5 h-5 text-foreground/60" />
+                              <span className="text-sm text-foreground/80">
+                                {new Date(request.scheduled_date).toLocaleDateString('es-MX', { 
+                                  weekday: 'long', 
+                                  year: 'numeric', 
+                                  month: 'long', 
+                                  day: 'numeric' 
+                                })}
+                              </span>
+                            </div>
+                          )}
+                          
+                          <div className="flex items-center gap-3">
+                            <Clock className="w-5 h-5 text-foreground/60" />
+                            <span className="text-sm text-foreground/80">
+                              {formatTimeDisplay(request)}
+                            </span>
+                          </div>
+                          
+                          {request.locations && (
+                            <div className="flex items-center gap-3">
+                              <MapPin className="w-5 h-5 text-foreground/60" />
+                              <span className="text-sm text-foreground/80">
+                                {request.locations.neighborhood ? 
+                                  `${request.locations.neighborhood}, ${request.locations.city}` : 
+                                  request.locations.city}
+                              </span>
+                            </div>
+                          )}
+                          
+                          {(request.price_min || request.price_max) && (
+                            <div className="flex items-center gap-3">
+                              <DollarSign className="w-5 h-5 text-foreground/60" />
+                              <span className="text-sm text-foreground/80">
+                                {request.price_min && request.price_max 
+                                  ? `$${request.price_min.toLocaleString()} - $${request.price_max.toLocaleString()}`
+                                  : request.price_min 
+                                    ? `Desde $${request.price_min.toLocaleString()}`
+                                    : `Hasta $${request.price_max?.toLocaleString()}`}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Actions */}
+                        <div className="pt-2">
+                          <Button 
+                            onClick={() => navigate(`/specialist/request/${request.id}`)}
+                            className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl"
+                          >
+                            Ver solicitud
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Sección: Otras solicitudes */}
+            {requests.filter(r => (r.relevance_score ?? 0) < 2).length > 0 && (
+              <div className="space-y-4">
+                <div>
+                  <h2 className="text-xl font-bold text-foreground">Otras solicitudes</h2>
+                  <p className="text-sm text-foreground/60">Solicitudes relacionadas con tus categorías</p>
+                </div>
+                <div className="space-y-4">
+                  {requests.filter(r => (r.relevance_score ?? 0) < 2).map((request) => (
+                    <Card key={request.id} className="bg-white rounded-2xl shadow-md border-0 p-5 hover:shadow-xl transition-all">
+                      <div className="space-y-4">
+                        {/* Header */}
+                        <div>
+                          <h3 className="font-bold text-lg text-foreground mb-1">
+                            {request.service_title || request.activity}
+                          </h3>
+                          {request.is_urgent && (
+                            <span className="inline-block bg-red-100 text-red-600 text-xs font-semibold px-3 py-1 rounded-full">
+                              ¡Urgente!
+                            </span>
+                          )}
+                        </div>
+                        
+                        {/* Details */}
+                        <div className="space-y-3">
+                          {request.scheduled_date && (
+                            <div className="flex items-center gap-3">
+                              <Calendar className="w-5 h-5 text-foreground/60" />
+                              <span className="text-sm text-foreground/80">
+                                {new Date(request.scheduled_date).toLocaleDateString('es-MX', { 
+                                  weekday: 'long', 
+                                  year: 'numeric', 
+                                  month: 'long', 
+                                  day: 'numeric' 
+                                })}
+                              </span>
+                            </div>
+                          )}
+                          
+                          <div className="flex items-center gap-3">
+                            <Clock className="w-5 h-5 text-foreground/60" />
+                            <span className="text-sm text-foreground/80">
+                              {formatTimeDisplay(request)}
+                            </span>
+                          </div>
+                          
+                          {request.locations && (
+                            <div className="flex items-center gap-3">
+                              <MapPin className="w-5 h-5 text-foreground/60" />
+                              <span className="text-sm text-foreground/80">
+                                {request.locations.neighborhood ? 
+                                  `${request.locations.neighborhood}, ${request.locations.city}` : 
+                                  request.locations.city}
+                              </span>
+                            </div>
+                          )}
+                          
+                          {(request.price_min || request.price_max) && (
+                            <div className="flex items-center gap-3">
+                              <DollarSign className="w-5 h-5 text-foreground/60" />
+                              <span className="text-sm text-foreground/80">
+                                {request.price_min && request.price_max 
+                                  ? `$${request.price_min.toLocaleString()} - $${request.price_max.toLocaleString()}`
+                                  : request.price_min 
+                                    ? `Desde $${request.price_min.toLocaleString()}`
+                                    : `Hasta $${request.price_max?.toLocaleString()}`}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Actions */}
+                        <div className="pt-2">
+                          <Button 
+                            onClick={() => navigate(`/specialist/request/${request.id}`)}
+                            className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl"
+                          >
+                            Ver solicitud
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
