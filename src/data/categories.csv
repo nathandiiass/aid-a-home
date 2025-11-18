@@ -1,0 +1,28 @@
+﻿id,category_key,category_name
+1,jardineria,Jardinería
+2,plomeria,Plomería
+3,electricidad,Electricidad
+4,albanileria_construccion_ligera,Albañilería y construcción ligera
+5,pintura_impermeabilizacion,Pintura e impermeabilización
+6,carpinteria_muebles,Carpintería y muebles
+7,herreria_soldadura,Herrería y soldadura
+8,vidrieria_aluminio,Vidriería y aluminio
+9,cerrajeria,Cerrajería
+10,limpieza_hogar,Limpieza del hogar
+11,limpieza_comercial,Limpieza comercial e industrial
+12,fumigacion,Fumigación y control de plagas
+13,climatizacion,Climatización (A/C y refrigeración)
+14,albercas,Albercas
+15,automotriz,Servicios automotrices
+16,mudanzas_fletes,Mudanzas y fletes
+17,eventos_banquetes,Eventos y banquetes
+18,fotografia_video,Fotografía y video
+19,gastronomia,Gastronomía
+20,educacion_clases,Educación y clases particulares
+21,tecnologia_computacion,Tecnología y computación
+22,seguridad_fisica_electronica,Seguridad física y electrónica
+23,decoracion_interiores,Decoración y diseño de interiores
+24,energia_solar,Energía solar
+25,mantenimiento_general,Mantenimiento general
+26,servicios_profesionales,Servicios profesionales
+27,creativo_digital,Creativo digital y marketing
