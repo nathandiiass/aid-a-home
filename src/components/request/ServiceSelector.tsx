@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { categories, searchCategoriesByKeyword } from "@/data/categories";
+import { categories, searchCategoriesByKeyword, type SearchResults } from "@/data/categories";
 interface Service {
   id: number;
   especialista: string;
@@ -189,9 +189,9 @@ const ServiceSelector = ({
   };
 
   // Get filtered categories based on search
-  const filteredCategories = categorySearchTerm 
+  const searchResults: SearchResults = categorySearchTerm 
     ? searchCategoriesByKeyword(categorySearchTerm)
-    : categories;
+    : { directMatches: categories, synonymMatches: [] };
   return <div className="space-y-4">
       <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
         <h2 className="text-xl font-bold mb-2">¿Qué servicio necesitas?</h2>
@@ -220,18 +220,36 @@ const ServiceSelector = ({
                 />
                 <CommandList>
                   <CommandEmpty>No se encontró la categoría.</CommandEmpty>
-                  <CommandGroup>
-                    {filteredCategories.map(cat => (
-                      <CommandItem 
-                        key={cat.id} 
-                        value={cat.category_name}
-                        onSelect={() => handleCategoriaFilterChange(cat.category_name)}
-                      >
-                        <Check className={cn("mr-2 h-4 w-4", selectedCategoria === cat.category_name ? "opacity-100" : "opacity-0")} />
-                        {cat.category_name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+                  
+                  {searchResults.directMatches.length > 0 && (
+                    <CommandGroup heading="Coincidencias directas">
+                      {searchResults.directMatches.map(cat => (
+                        <CommandItem 
+                          key={cat.id} 
+                          value={cat.category_name}
+                          onSelect={() => handleCategoriaFilterChange(cat.category_name)}
+                        >
+                          <Check className={cn("mr-2 h-4 w-4", selectedCategoria === cat.category_name ? "opacity-100" : "opacity-0")} />
+                          {cat.category_name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
+                  
+                  {searchResults.synonymMatches.length > 0 && (
+                    <CommandGroup heading="Coincidencias por sinónimo">
+                      {searchResults.synonymMatches.map(cat => (
+                        <CommandItem 
+                          key={cat.id} 
+                          value={cat.category_name}
+                          onSelect={() => handleCategoriaFilterChange(cat.category_name)}
+                        >
+                          <Check className={cn("mr-2 h-4 w-4", selectedCategoria === cat.category_name ? "opacity-100" : "opacity-0")} />
+                          {cat.category_name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
                 </CommandList>
               </Command>
             </PopoverContent>
