@@ -296,7 +296,7 @@ const ServiceSelector = ({
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[calc(100vw-2rem)] md:w-full p-0 bg-white rounded-2xl shadow-2xl border-0" align="start">
+            <PopoverContent className="p-0 bg-white rounded-2xl shadow-2xl border-0" align="start" sideOffset={4}>
               <Command shouldFilter={false} className="rounded-2xl">
                 <CommandInput 
                   placeholder="Buscar categoría o sinónimo..." 
@@ -323,7 +323,7 @@ const ServiceSelector = ({
                                   <span className="text-purple-700 font-bold text-xs">{cat.category_name.charAt(0)}</span>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="font-medium text-gray-900 text-sm">{cat.category_name}</p>
+                                  <p className="font-medium text-gray-900 text-sm truncate">{cat.category_name}</p>
                                 </div>
                                 <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-medium rounded-full shrink-0">
                                   Categoría
@@ -348,7 +348,7 @@ const ServiceSelector = ({
                                   <span className="text-purple-700 font-bold text-xs">{cat.category_name.charAt(0)}</span>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="font-medium text-gray-900 text-sm">{cat.category_name}</p>
+                                  <p className="font-medium text-gray-900 text-sm truncate">{cat.category_name}</p>
                                   {cat.matchedKeyword && (
                                     <p className="text-xs text-gray-500 truncate">{cat.matchedKeyword}</p>
                                   )}
