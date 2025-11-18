@@ -182,9 +182,45 @@ export default function SpecialistRegistration() {
   };
 
   const validateStep2 = () => {
-    if (selectedCategories.length === 0) return false;
-    if (!professionalDescription.trim()) return false;
-    return selectedMunicipalities.length > 0;
+    if (selectedCategories.length === 0) {
+      toast({
+        title: "Error",
+        description: "Debes seleccionar al menos una categoría",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    // Validar que todas las categorías seleccionadas tengan años de experiencia
+    const categoriesWithoutExperience = selectedCategories.filter(sc => !sc.experienceYears);
+    if (categoriesWithoutExperience.length > 0) {
+      toast({
+        title: "Error",
+        description: "Debes especificar los años de experiencia para todas las categorías seleccionadas",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    if (!professionalDescription.trim()) {
+      toast({
+        title: "Error",
+        description: "La descripción profesional es requerida",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    if (selectedMunicipalities.length === 0) {
+      toast({
+        title: "Error",
+        description: "Debes seleccionar al menos un municipio de cobertura",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    return true;
   };
 
   const validateStep3 = () => {
@@ -301,7 +337,7 @@ export default function SpecialistRegistration() {
             specialist_id: profile.id,
             specialty: selectedCategory.category.category_name,
             role_label: selectedCategory.category.category_name,
-            experience_years: 1 // Default value
+            experience_years: selectedCategory.experienceYears || null
           }])
           .select()
           .single();

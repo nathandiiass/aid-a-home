@@ -5,6 +5,7 @@ import { X, Plus, ChevronDown, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 interface Category {
@@ -23,6 +24,7 @@ interface CategoryTag {
 export interface SelectedCategory {
   category: Category;
   selectedTags: string[];
+  experienceYears?: number;
 }
 
 interface CategoryServicesSelectorProps {
@@ -61,9 +63,17 @@ const CategoryServicesSelector = ({ value, onChange }: CategoryServicesSelectorP
     if (isCategorySelected(category.id)) {
       onChange(value.filter(sc => sc.category.id !== category.id));
     } else {
-      onChange([...value, { category, selectedTags: [] }]);
+      onChange([...value, { category, selectedTags: [], experienceYears: undefined }]);
       setOpenCategories(prev => ({ ...prev, [category.id]: true }));
     }
+  };
+
+  const updateExperienceYears = (categoryId: number, years: number | undefined) => {
+    onChange(value.map(sc =>
+      sc.category.id === categoryId
+        ? { ...sc, experienceYears: years }
+        : sc
+    ));
   };
 
   const toggleTag = (categoryId: number, tagName: string) => {
@@ -157,7 +167,7 @@ const CategoryServicesSelector = ({ value, onChange }: CategoryServicesSelectorP
                     </div>
                   </div>
                   
-                  {isSelected && tags.length > 0 && (
+                  {isSelected && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -168,26 +178,48 @@ const CategoryServicesSelector = ({ value, onChange }: CategoryServicesSelectorP
                   )}
                 </div>
 
-                {isSelected && tags.length > 0 && isOpen && (
-                  <div className="border-t-2 border-border p-4 bg-gray-50">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase mb-3">
-                      Servicios específicos (opcional)
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {tags.map(tag => (
-                        <Badge
-                          key={tag.id}
-                          variant={selectedCat?.selectedTags.includes(tag.tag_name) ? "default" : "outline"}
-                          className={cn(
-                            "cursor-pointer transition-all hover:scale-105 py-2 px-4 text-sm",
-                            selectedCat?.selectedTags.includes(tag.tag_name) && "bg-primary text-primary-foreground"
-                          )}
-                          onClick={() => toggleTag(category.id, tag.tag_name)}
-                        >
-                          {tag.tag_name}
-                        </Badge>
-                      ))}
+                {isSelected && isOpen && (
+                  <div className="border-t-2 border-border p-4 bg-gray-50 space-y-4">
+                    <div>
+                      <Label className="text-xs font-semibold text-muted-foreground uppercase mb-2 block">
+                        Años de experiencia *
+                      </Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="50"
+                        placeholder="Ej: 5"
+                        value={selectedCat?.experienceYears || ''}
+                        onChange={(e) => {
+                          const years = e.target.value ? parseInt(e.target.value) : undefined;
+                          updateExperienceYears(category.id, years);
+                        }}
+                        className="max-w-[200px]"
+                      />
                     </div>
+                    
+                    {tags.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase mb-3">
+                          Servicios específicos (opcional)
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {tags.map(tag => (
+                            <Badge
+                              key={tag.id}
+                              variant={selectedCat?.selectedTags.includes(tag.tag_name) ? "default" : "outline"}
+                              className={cn(
+                                "cursor-pointer transition-all hover:scale-105 py-2 px-4 text-sm",
+                                selectedCat?.selectedTags.includes(tag.tag_name) && "bg-primary text-primary-foreground"
+                              )}
+                              onClick={() => toggleTag(category.id, tag.tag_name)}
+                            >
+                              {tag.tag_name}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
