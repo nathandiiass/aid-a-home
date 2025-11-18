@@ -142,7 +142,15 @@ export type Database = {
           updated_at?: string
           volveria_trabajar_con_cliente?: boolean
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "client_reviews_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: false
+            referencedRelation: "specialist_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       locations: {
         Row: {
@@ -679,7 +687,15 @@ export type Database = {
           type?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "specialist_credentials_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: false
+            referencedRelation: "specialist_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       specialist_profiles: {
         Row: {
@@ -900,6 +916,7 @@ export type Database = {
         Args: { p_request_id: string; p_user_id: string }
         Returns: Json
       }
+      delete_specialist_role: { Args: { p_user_id: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
