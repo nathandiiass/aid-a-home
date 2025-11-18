@@ -22,6 +22,12 @@ interface CategoryTag {
   tag_name: string;
 }
 
+interface CategoryKeyword {
+  id: number;
+  category_id: number;
+  keyword: string;
+}
+
 interface ServiceSelectorProps {
   especialista: string;
   actividad: string;
@@ -51,6 +57,7 @@ const ServiceSelector = ({
   const [selectedTags, setSelectedTags] = useState<string[]>(especialista ? especialista.split(',').filter(Boolean) : []);
   const [availableTags, setAvailableTags] = useState<CategoryTag[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryKeywords, setCategoryKeywords] = useState<CategoryKeyword[]>([]);
   const [selectedCategoria, setSelectedCategoria] = useState<string>(categoria || "");
   const [errors, setErrors] = useState<{
     title?: string;
@@ -60,25 +67,28 @@ const ServiceSelector = ({
   const [openCategoria, setOpenCategoria] = useState(false);
   const [categorySearchTerm, setCategorySearchTerm] = useState("");
 
-  // Load categories on mount
+  // Load categories and keywords on mount
   useEffect(() => {
-    const loadCategories = async () => {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('category_name');
+    const loadData = async () => {
+      const [categoriesResult, keywordsResult] = await Promise.all([
+        supabase.from('categories').select('*').order('category_name'),
+        supabase.from('category_keywords').select('*')
+      ]);
       
-      if (error) {
-        console.error('Error loading categories:', error);
-        return;
+      if (categoriesResult.error) {
+        console.error('Error loading categories:', categoriesResult.error);
+      } else if (categoriesResult.data) {
+        setCategories(categoriesResult.data);
       }
       
-      if (data) {
-        setCategories(data);
+      if (keywordsResult.error) {
+        console.error('Error loading keywords:', keywordsResult.error);
+      } else if (keywordsResult.data) {
+        setCategoryKeywords(keywordsResult.data);
       }
     };
     
-    loadCategories();
+    loadData();
   }, []);
 
   // Update available tags when categoria changes
@@ -218,12 +228,19 @@ const ServiceSelector = ({
     onEvidenceChange(evidence.filter((_, i) => i !== index));
   };
 
-  // Get filtered categories based on search
+  // Get filtered categories based on search (including keywords)
   const filteredCategories = categorySearchTerm 
-    ? categories.filter(cat => 
-        cat.category_name.toLowerCase().includes(categorySearchTerm.toLowerCase()) ||
-        cat.category_key.toLowerCase().includes(categorySearchTerm.toLowerCase())
-      )
+    ? categories.filter(cat => {
+        const searchLower = categorySearchTerm.toLowerCase();
+        // Check category name and key
+        const matchesName = cat.category_name.toLowerCase().includes(searchLower) ||
+                           cat.category_key.toLowerCase().includes(searchLower);
+        // Check keywords
+        const matchesKeyword = categoryKeywords.some(
+          kw => kw.category_id === cat.id && kw.keyword.toLowerCase().includes(searchLower)
+        );
+        return matchesName || matchesKeyword;
+      })
     : categories;
   return <div className="space-y-4">
       <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
