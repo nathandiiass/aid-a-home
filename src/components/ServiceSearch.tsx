@@ -6,11 +6,11 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import { searchCategoriesByKeyword, type Category, type SearchResults } from "@/data/categories";
+import { searchCategoriesByKeyword, type Category, type CategoryWithSynonym, type SearchResults } from "@/data/categories";
 
 interface GroupedResults {
   categoriasDirectas: Category[];
-  categoriasSinonimos: Category[];
+  categoriasSinonimos: CategoryWithSynonym[];
 }
 
 const ServiceSearch = () => {
@@ -129,6 +129,9 @@ const ServiceSearch = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-gray-900 text-sm">{category.category_name}</p>
+                          {category.matchedKeyword && (
+                            <p className="text-xs text-gray-500 mt-0.5">Sinónimo: {category.matchedKeyword}</p>
+                          )}
                         </div>
                         <Badge variant="outline" className="text-xs border-purple-300 text-purple-700">
                           Relacionada
