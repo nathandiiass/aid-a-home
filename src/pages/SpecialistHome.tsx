@@ -281,7 +281,7 @@ export default function SpecialistHome() {
                         {/* Actions */}
                         <div className="pt-2">
                           <Button 
-                            onClick={() => navigate(`/specialist/request/${request.id}`)}
+                            onClick={() => navigate(`/specialist/requests/${request.id}`)}
                             className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl"
                           >
                             Ver solicitud
@@ -368,7 +368,7 @@ export default function SpecialistHome() {
                         {/* Actions */}
                         <div className="pt-2">
                           <Button 
-                            onClick={() => navigate(`/specialist/request/${request.id}`)}
+                            onClick={() => navigate(`/specialist/requests/${request.id}`)}
                             className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl"
                           >
                             Ver solicitud
