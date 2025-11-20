@@ -84,6 +84,13 @@ interface Credential {
   end_year: number | null;
   attachment_url: string | null;
 }
+
+interface PortfolioItem {
+  id: string;
+  title: string;
+  image_url: string;
+  created_at: string;
+}
 export default function SpecialistPersonalInfo() {
   const navigate = useNavigate();
   const {
@@ -117,6 +124,15 @@ export default function SpecialistPersonalInfo() {
   });
   const [uploadingCredential, setUploadingCredential] = useState(false);
   const [credentialFile, setCredentialFile] = useState<File | null>(null);
+  
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
+  const [showAddPortfolioDialog, setShowAddPortfolioDialog] = useState(false);
+  const [portfolioForm, setPortfolioForm] = useState({
+    title: '',
+  });
+  const [uploadingPortfolio, setUploadingPortfolio] = useState(false);
+  const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
+  
   useEffect(() => {
     if (user) {
       loadData();
@@ -246,6 +262,14 @@ export default function SpecialistPersonalInfo() {
       } = await supabase.from('specialist_credentials').select('*').eq('specialist_id', specialist.id).order('created_at', { ascending: false });
       if (credentialsError) throw credentialsError;
       setCredentials(credentialsData || []);
+
+      // Get portfolio items
+      const {
+        data: portfolioData,
+        error: portfolioError
+      } = await supabase.from('specialist_portfolio').select('*').eq('specialist_id', specialist.id).order('created_at', { ascending: false });
+      if (portfolioError) throw portfolioError;
+      setPortfolioItems(portfolioData || []);
     } catch (error) {
       console.error('Error loading data:', error);
       toast({
@@ -443,6 +467,102 @@ export default function SpecialistPersonalInfo() {
       toast({
         title: "Error",
         description: "No se pudo eliminar la certificación",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAddPortfolio = async () => {
+    if (!specialistId || !portfolioForm.title || !portfolioFile) {
+      toast({
+        title: "Error",
+        description: "Por favor ingresa el título y adjunta una imagen",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setUploadingPortfolio(true);
+
+      // Upload image
+      const fileExt = portfolioFile.name.split('.').pop();
+      const filePath = `${user?.id}/portfolio/${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('specialist-documents')
+        .upload(filePath, portfolioFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('specialist-documents')
+        .getPublicUrl(filePath);
+      
+      setUploadingPortfolio(false);
+
+      // Create portfolio item
+      const { data: newPortfolio, error } = await supabase
+        .from('specialist_portfolio')
+        .insert({
+          specialist_id: specialistId,
+          title: portfolioForm.title,
+          image_url: publicUrl,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setPortfolioItems(prev => [newPortfolio, ...prev]);
+      
+      toast({
+        title: "Éxito",
+        description: "Elemento agregado al portafolio correctamente",
+      });
+
+      // Reset form
+      setShowAddPortfolioDialog(false);
+      setPortfolioForm({
+        title: '',
+      });
+      setPortfolioFile(null);
+    } catch (error) {
+      console.error('Error adding portfolio:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo agregar el elemento al portafolio",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+      setUploadingPortfolio(false);
+    }
+  };
+
+  const handleDeletePortfolio = async (portfolioId: string) => {
+    if (!confirm('¿Estás seguro de eliminar este elemento del portafolio?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('specialist_portfolio')
+        .delete()
+        .eq('id', portfolioId);
+
+      if (error) throw error;
+
+      setPortfolioItems(prev => prev.filter(p => p.id !== portfolioId));
+      
+      toast({
+        title: "Éxito",
+        description: "Elemento eliminado del portafolio correctamente",
+      });
+    } catch (error) {
+      console.error('Error deleting portfolio:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar el elemento del portafolio",
         variant: "destructive",
       });
     }
@@ -911,6 +1031,57 @@ export default function SpecialistPersonalInfo() {
           )}
         </div>
 
+        {/* BLOQUE: PORTAFOLIO */}
+        <div className="bg-white rounded-3xl shadow-sm p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-6 bg-purple-500 rounded-full" />
+              <h2 className="text-lg font-bold text-gray-900">Portafolio</h2>
+            </div>
+            <Button
+              onClick={() => setShowAddPortfolioDialog(true)}
+              size="sm"
+              className="bg-purple-500 hover:bg-purple-600 rounded-xl"
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Agregar
+            </Button>
+          </div>
+
+          {portfolioItems.length === 0 ? (
+            <div className="text-center py-8">
+              <Camera className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-sm text-gray-500">No hay imágenes en el portafolio</p>
+              <p className="text-xs text-gray-400 mt-1">Agrega imágenes de tus trabajos previos</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {portfolioItems.map(item => (
+                <div key={item.id} className="relative group">
+                  <div className="aspect-square rounded-2xl overflow-hidden bg-gray-100">
+                    <img 
+                      src={item.image_url} 
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute bottom-0 left-0 right-0 p-3">
+                      <p className="text-white font-semibold text-sm mb-2">{item.title}</p>
+                      <button
+                        onClick={() => handleDeletePortfolio(item.id)}
+                        className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center transition-all"
+                      >
+                        <X className="w-4 h-4 text-white" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* BLOQUE 3: DOCUMENTACIÓN */}
         <div className="bg-white rounded-3xl shadow-sm p-6 space-y-4">
           <div className="flex items-center gap-2">
@@ -1023,6 +1194,69 @@ export default function SpecialistPersonalInfo() {
                 className="flex-1 bg-blue-500 hover:bg-blue-600"
               >
                 {uploadingCredential ? 'Subiendo archivo...' : saving ? 'Agregando...' : 'Agregar'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Portfolio Dialog */}
+      <Dialog open={showAddPortfolioDialog} onOpenChange={setShowAddPortfolioDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Agregar al portafolio</DialogTitle>
+            <DialogDescription>
+              Agrega una imagen de tus trabajos con un título descriptivo
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <Label>Título *</Label>
+              <Input
+                placeholder="Ej: Instalación de sistema eléctrico"
+                value={portfolioForm.title}
+                onChange={(e) => setPortfolioForm({ ...portfolioForm, title: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Adjuntar imagen *</Label>
+              <div className="flex flex-col gap-2">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setPortfolioFile(e.target.files?.[0] || null)}
+                  className="flex-1"
+                />
+                {portfolioFile && (
+                  <Badge variant="secondary" className="flex items-center gap-1 w-fit">
+                    <Camera className="w-3 h-3" />
+                    {portfolioFile.name}
+                  </Badge>
+                )}
+              </div>
+              <p className="text-xs text-gray-500">JPG, PNG o WEBP - Máximo 5MB</p>
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowAddPortfolioDialog(false);
+                  setPortfolioForm({ title: '' });
+                  setPortfolioFile(null);
+                }}
+                className="flex-1"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleAddPortfolio}
+                disabled={!portfolioForm.title || !portfolioFile || saving || uploadingPortfolio}
+                className="flex-1 bg-purple-500 hover:bg-purple-600"
+              >
+                {uploadingPortfolio ? 'Subiendo imagen...' : saving ? 'Agregando...' : 'Agregar'}
               </Button>
             </div>
           </div>
