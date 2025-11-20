@@ -38,6 +38,7 @@ export default function SpecialistRequestDetail() {
   const navigate = useNavigate();
   const [request, setRequest] = useState<RequestDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [specialistActivities, setSpecialistActivities] = useState<string[]>([]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -69,6 +70,34 @@ export default function SpecialistRequestDetail() {
 
       if (error) throw error;
       setRequest(data);
+
+      // Load specialist's activities
+      if (user?.id) {
+        const { data: specialistProfile } = await supabase
+          .from('specialist_profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .single();
+
+        if (specialistProfile) {
+          const { data: specialistTags } = await supabase
+            .from('specialist_tags')
+            .select(`
+              tag_id,
+              category_tags (
+                tag_name
+              )
+            `)
+            .eq('specialist_id', specialistProfile.id);
+
+          if (specialistTags) {
+            const activities = specialistTags
+              .map((tag: any) => tag.category_tags?.tag_name)
+              .filter(Boolean);
+            setSpecialistActivities(activities);
+          }
+        }
+      }
     } catch (error: any) {
       console.error('Error loading request:', error);
     } finally {
@@ -143,15 +172,22 @@ export default function SpecialistRequestDetail() {
               <p className="text-lg font-bold text-foreground mb-3">{request.category}</p>
               {request.activity && (
                 <div className="flex flex-wrap gap-2">
-                  {request.activity.split(',').map((tag, index) => (
-                    <Badge
-                      key={index}
-                      variant="secondary"
-                      className="bg-gray-100 text-foreground hover:bg-gray-200"
-                    >
-                      {tag.trim()}
-                    </Badge>
-                  ))}
+                  {request.activity.split(',').map((tag, index) => {
+                    const trimmedTag = tag.trim();
+                    const isMatch = specialistActivities.includes(trimmedTag);
+                    return (
+                      <Badge
+                        key={index}
+                        variant={isMatch ? "default" : "secondary"}
+                        className={isMatch 
+                          ? "bg-green-600 text-white hover:bg-green-700" 
+                          : "bg-gray-100 text-foreground hover:bg-gray-200"
+                        }
+                      >
+                        {trimmedTag}
+                      </Badge>
+                    );
+                  })}
                 </div>
               )}
             </Card>
