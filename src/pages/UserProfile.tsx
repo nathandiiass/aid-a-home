@@ -125,7 +125,7 @@ export default function UserProfile() {
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-white rounded-2xl shadow-lg p-5 text-center space-y-2">
             <div className="flex items-center justify-center gap-1">
-              <Star className="h-5 w-5 fill-rappi-green text-rappi-green" />
+              <Star className="h-5 w-5 fill-amber-500 text-amber-500" />
               <span className="text-3xl font-bold text-gray-900">
                 {clientStats?.averageRating ? clientStats.averageRating.toFixed(1) : '0.0'}
               </span>
@@ -153,7 +153,7 @@ export default function UserProfile() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-700">Claridad en necesidades</span>
                 <div className="flex items-center gap-2">
-                  {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`h-4 w-4 ${star <= Math.round(clientStats.avgClaridadNecesidades) ? 'fill-rappi-green text-rappi-green' : 'fill-gray-200 text-gray-200'}`} />)}
+                  {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`h-4 w-4 ${star <= Math.round(clientStats.avgClaridadNecesidades) ? 'fill-amber-500 text-amber-500' : 'fill-gray-200 text-gray-200'}`} />)}
                   <span className="text-sm font-bold text-gray-900 w-8 text-right">
                     {clientStats.avgClaridadNecesidades.toFixed(1)}
                   </span>
@@ -164,7 +164,7 @@ export default function UserProfile() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-700">Puntualidad y disponibilidad</span>
                 <div className="flex items-center gap-2">
-                  {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`h-4 w-4 ${star <= Math.round(clientStats.avgPuntualidad) ? 'fill-rappi-green text-rappi-green' : 'fill-gray-200 text-gray-200'}`} />)}
+                  {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`h-4 w-4 ${star <= Math.round(clientStats.avgPuntualidad) ? 'fill-amber-500 text-amber-500' : 'fill-gray-200 text-gray-200'}`} />)}
                   <span className="text-sm font-bold text-gray-900 w-8 text-right">
                     {clientStats.avgPuntualidad.toFixed(1)}
                   </span>
@@ -175,7 +175,7 @@ export default function UserProfile() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-700">Respeto y profesionalismo</span>
                 <div className="flex items-center gap-2">
-                  {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`h-4 w-4 ${star <= Math.round(clientStats.avgRespeto) ? 'fill-rappi-green text-rappi-green' : 'fill-gray-200 text-gray-200'}`} />)}
+                  {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`h-4 w-4 ${star <= Math.round(clientStats.avgRespeto) ? 'fill-amber-500 text-amber-500' : 'fill-gray-200 text-gray-200'}`} />)}
                   <span className="text-sm font-bold text-gray-900 w-8 text-right">
                     {clientStats.avgRespeto.toFixed(1)}
                   </span>
@@ -186,7 +186,7 @@ export default function UserProfile() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-700">Facilitó condiciones de trabajo</span>
                 <div className="flex items-center gap-2">
-                  {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`h-4 w-4 ${star <= Math.round(clientStats.avgFacilito) ? 'fill-rappi-green text-rappi-green' : 'fill-gray-200 text-gray-200'}`} />)}
+                  {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`h-4 w-4 ${star <= Math.round(clientStats.avgFacilito) ? 'fill-amber-500 text-amber-500' : 'fill-gray-200 text-gray-200'}`} />)}
                   <span className="text-sm font-bold text-gray-900 w-8 text-right">
                     {clientStats.avgFacilito.toFixed(1)}
                   </span>
@@ -197,7 +197,7 @@ export default function UserProfile() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-700">Claridad en pago</span>
                 <div className="flex items-center gap-2">
-                  {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`h-4 w-4 ${star <= Math.round(clientStats.avgPago) ? 'fill-rappi-green text-rappi-green' : 'fill-gray-200 text-gray-200'}`} />)}
+                  {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`h-4 w-4 ${star <= Math.round(clientStats.avgPago) ? 'fill-amber-500 text-amber-500' : 'fill-gray-200 text-gray-200'}`} />)}
                   <span className="text-sm font-bold text-gray-900 w-8 text-right">
                     {clientStats.avgPago.toFixed(1)}
                   </span>
