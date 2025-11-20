@@ -468,12 +468,14 @@ export default function SpecialistProfile() {
           </div>}
       </div>
 
-      {/* Floating CTA Button - Centered */}
-      <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
-        <Button onClick={() => setShowConfirmDialog(true)} className="h-14 px-8 rounded-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold text-base shadow-2xl hover:shadow-green-500/50 active:scale-95 transition-all pointer-events-auto">
-          Contratar especialista
-        </Button>
-      </div>
+      {/* Floating CTA Button - Centered - Only show if not viewing own profile */}
+      {user?.id !== specialist?.user_id && (
+        <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+          <Button onClick={() => setShowConfirmDialog(true)} className="h-14 px-8 rounded-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold text-base shadow-2xl hover:shadow-green-500/50 active:scale-95 transition-all pointer-events-auto">
+            Contratar especialista
+          </Button>
+        </div>
+      )}
 
       {/* Confirmation Dialog */}
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
