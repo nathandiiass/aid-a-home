@@ -345,6 +345,9 @@ export default function SpecialistProfile() {
           return acc;
         }, {});
         return <div className="space-y-3">
+              <h3 className="font-bold text-lg text-gray-900 px-1 mb-3">
+                Especialidades y servicios
+              </h3>
               {Object.values(groupedSpecialties).map((group: any) => (
                 <div key={group.category} className="bg-white rounded-2xl shadow-sm">
                   {/* Header - Clean Rappi Style */}
