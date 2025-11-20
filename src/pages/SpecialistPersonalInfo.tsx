@@ -269,7 +269,20 @@ export default function SpecialistPersonalInfo() {
         error: portfolioError
       } = await supabase.from('specialist_portfolio').select('*').eq('specialist_id', specialist.id).order('created_at', { ascending: false });
       if (portfolioError) throw portfolioError;
-      setPortfolioItems(portfolioData || []);
+      
+      // Generate public URLs for portfolio images
+      const portfolioWithUrls = portfolioData?.map(item => {
+        // If URL doesn't start with http, it's a storage path that needs to be converted
+        if (item.image_url && !item.image_url.startsWith('http')) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('specialist-documents')
+            .getPublicUrl(item.image_url);
+          return { ...item, image_url: publicUrl };
+        }
+        return item;
+      }) || [];
+      
+      setPortfolioItems(portfolioWithUrls);
     } catch (error) {
       console.error('Error loading data:', error);
       toast({
