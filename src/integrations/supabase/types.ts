@@ -677,6 +677,41 @@ export type Database = {
           },
         ]
       }
+      specialist_portfolio: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          specialist_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          specialist_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          specialist_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "specialist_portfolio_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: false
+            referencedRelation: "specialist_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       specialist_profiles: {
         Row: {
           accepted_terms_at: string | null
