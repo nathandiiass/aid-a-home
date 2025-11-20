@@ -350,50 +350,32 @@ export default function SpecialistProfile() {
               </h3>
               {Object.values(groupedSpecialties).map((group: any) => <div key={group.category} className="bg-white rounded-2xl shadow-sm overflow-hidden">
                   {/* Header - Category and Experience */}
-                  <div className="px-5 py-4 bg-gradient-to-r from-primary to-accent flex items-center justify-between border-b border-gray-100">
+                  <div className="px-5 py-4 bg-gradient-to-r from-primary to-accent">
                     <h4 className="font-bold text-base text-white">
                       {group.category}
                     </h4>
-                    {group.maxExperience > 0 && <div className="flex items-center gap-2">
-                        <div className="h-px flex-1 bg-white/30 w-12"></div>
-                        <span className="text-sm font-semibold text-white/90">
-                          {group.maxExperience} {group.maxExperience === 1 ? 'año' : 'años'} de experiencia
-                        </span>
-                      </div>}
+                    {group.maxExperience > 0 && (
+                      <span className="text-sm font-semibold text-white/90">
+                        {group.maxExperience} {group.maxExperience === 1 ? 'año' : 'años'} de experiencia
+                      </span>
+                    )}
                   </div>
 
-                  {/* Table - Rappi Style */}
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="bg-muted/50">
-                          <th className="text-left py-3 px-5 font-bold text-xs text-foreground uppercase tracking-wider">
-                            Especialista
-                          </th>
-                          <th className="text-left py-3 px-5 font-bold text-xs text-foreground uppercase tracking-wider">
-                            Servicios
-                          </th>
-                          <th className="text-right py-3 px-5 font-bold text-xs text-foreground uppercase tracking-wider">
-                            Precio mínimo
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100">
-                        {group.specialists.flatMap((specialist: any) => specialist.activities.map((activity: any) => <tr key={activity.id} className="hover:bg-muted/30 transition-colors">
-                              <td className="py-4 px-5 text-sm font-medium text-gray-900">
-                                {specialist.role_label}
-                              </td>
-                              <td className="py-4 px-5 text-sm text-gray-700">
-                                {activity.activity}
-                              </td>
-                              <td className="py-4 px-5 text-right">
-                                {activity.price_min ? <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-rappi-green/10 text-rappi-green border border-rappi-green/20">
-                                    ${activity.price_min.toLocaleString()}
-                                  </span> : <span className="text-sm text-gray-400 font-medium">—</span>}
-                              </td>
-                            </tr>))}
-                      </tbody>
-                    </table>
+                  {/* Services List */}
+                  <div className="p-5">
+                    <div className="flex flex-wrap gap-2">
+                      {group.specialists.flatMap((specialist: any) => 
+                        specialist.activities.map((activity: any) => (
+                          <Badge
+                            key={activity.id}
+                            variant="secondary"
+                            className="bg-muted text-foreground hover:bg-muted/80"
+                          >
+                            {activity.activity}
+                          </Badge>
+                        ))
+                      )}
+                    </div>
                   </div>
                 </div>)}
             </div>;
