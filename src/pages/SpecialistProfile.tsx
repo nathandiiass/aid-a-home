@@ -345,31 +345,34 @@ export default function SpecialistProfile() {
           return acc;
         }, {});
         return <div className="space-y-3">
-              <h3 className="font-bold text-base text-gray-900 px-1">
-                Especialidades y servicios
-              </h3>
-              {Object.values(groupedSpecialties).map((group: any) => <div key={group.category} className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                  {/* Header - Category and Experience */}
-                  <div className="px-5 py-4 bg-gradient-to-r from-primary to-accent">
-                    <h4 className="font-bold text-base text-white">
-                      {group.category}
-                    </h4>
-                    {group.maxExperience > 0 && (
-                      <span className="text-sm font-semibold text-white/90">
-                        {group.maxExperience} {group.maxExperience === 1 ? 'año' : 'años'} de experiencia
-                      </span>
-                    )}
+              {Object.values(groupedSpecialties).map((group: any) => (
+                <div key={group.category} className="bg-white rounded-2xl shadow-sm">
+                  {/* Header - Clean Rappi Style */}
+                  <div className="px-5 py-4 border-b border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-bold text-base text-gray-900">
+                          {group.category}
+                        </h4>
+                        {group.maxExperience > 0 && (
+                          <span className="text-sm text-gray-500">
+                            {group.maxExperience} {group.maxExperience === 1 ? 'año' : 'años'} de experiencia
+                          </span>
+                        )}
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    </div>
                   </div>
 
-                  {/* Services List */}
-                  <div className="p-5">
+                  {/* Services List - Compact */}
+                  <div className="px-5 py-4">
                     <div className="flex flex-wrap gap-2">
                       {group.specialists.flatMap((specialist: any) => 
                         specialist.activities.map((activity: any) => (
                           <Badge
                             key={activity.id}
                             variant="secondary"
-                            className="bg-muted text-foreground hover:bg-muted/80"
+                            className="bg-gray-100 text-gray-700 hover:bg-gray-200 border-0 rounded-full"
                           >
                             {activity.activity}
                           </Badge>
@@ -377,7 +380,8 @@ export default function SpecialistProfile() {
                       )}
                     </div>
                   </div>
-                </div>)}
+                </div>
+              ))}
             </div>;
       })()}
 
