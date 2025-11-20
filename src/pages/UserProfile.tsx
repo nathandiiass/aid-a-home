@@ -92,93 +92,95 @@ export default function UserProfile() {
   const displayBio = showFullBio || !shouldTruncate ? bio : bio.substring(0, 150) + "...";
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-gray-50 pb-24">
       {/* App Bar */}
-      <div className="sticky top-0 z-10 bg-background border-b border-border">
-        <div className="flex items-center justify-between px-4 py-3">
+      <div className="sticky top-0 z-10 bg-white border-b border-gray-100">
+        <div className="flex items-center justify-between px-6 py-4">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
+            className="flex items-center gap-2 text-gray-900 hover:text-rappi-green transition-colors"
           >
             <ChevronLeft className="h-5 w-5" />
-            <span>Volver</span>
+            <span className="font-medium">Volver</span>
           </button>
         </div>
       </div>
 
-      <div className="container max-w-2xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-2xl mx-auto px-6 py-6 space-y-5">
         {/* Hero Section */}
-        <div className="text-center space-y-4">
-          <Avatar className="h-28 w-28 mx-auto border-4 border-background shadow-lg">
-            <AvatarImage src="" alt={displayName} />
-            <AvatarFallback className="text-3xl bg-primary/10 text-primary">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+          <div className="text-center space-y-4">
+            <Avatar className="h-24 w-24 mx-auto border-4 border-white shadow-lg">
+              <AvatarImage src={profile.avatar_url || ""} alt={displayName} />
+              <AvatarFallback className="text-3xl bg-rappi-green/10 text-rappi-green font-bold">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
 
-          <div className="space-y-2">
-            <div className="flex items-center justify-center gap-2">
-              <h1 className="text-2xl font-semibold text-foreground">{displayName}</h1>
-              {mockData.verified && (
-                <Badge variant="secondary" className="bg-[#FDF0D5] text-[#003049] border-0">
-                  <Shield className="h-3 w-3 mr-1" />
-                  Verificado
-                </Badge>
+            <div className="space-y-2">
+              <div className="flex items-center justify-center gap-2">
+                <h1 className="text-2xl font-bold text-gray-900">{displayName}</h1>
+                {mockData.verified && (
+                  <Badge variant="secondary" className="bg-rappi-green/10 text-rappi-green border-0">
+                    <Shield className="h-3 w-3 mr-1" />
+                    Verificado
+                  </Badge>
+                )}
+              </div>
+              {mockData.zones.length > 0 && (
+                <div className="flex items-center justify-center gap-1 text-sm text-gray-600">
+                  <MapPin className="h-4 w-4" />
+                  <span>{mockData.zones[0]}</span>
+                </div>
               )}
             </div>
-            {mockData.zones.length > 0 && (
-              <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
-                <MapPin className="h-4 w-4" />
-                <span>{mockData.zones[0]}</span>
-              </div>
-            )}
           </div>
         </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 gap-4">
-          <Card className="p-4 text-center space-y-2 border-[#E6EEF4]">
+          <div className="bg-white rounded-2xl shadow-lg p-5 text-center space-y-2">
             <div className="flex items-center justify-center gap-1">
-              <Star className="h-5 w-5 fill-[#C1121F] text-[#C1121F]" />
-              <span className="text-2xl font-bold text-foreground">
+              <Star className="h-5 w-5 fill-rappi-green text-rappi-green" />
+              <span className="text-3xl font-bold text-gray-900">
                 {clientStats?.averageRating ? clientStats.averageRating.toFixed(1) : '0.0'}
               </span>
             </div>
-            <p className="text-xs text-muted-foreground">Promedio</p>
-          </Card>
+            <p className="text-sm text-gray-600 font-medium">Promedio</p>
+          </div>
 
-          <Card className="p-4 text-center space-y-2 border-[#E6EEF4]">
-            <div className="text-2xl font-bold text-foreground">
+          <div className="bg-white rounded-2xl shadow-lg p-5 text-center space-y-2">
+            <div className="text-3xl font-bold text-gray-900">
               {clientStats?.totalReviews || 0}
             </div>
-            <p className="text-xs text-muted-foreground">De especialistas</p>
-          </Card>
+            <p className="text-sm text-gray-600 font-medium">De especialistas</p>
+          </div>
         </div>
 
         {/* Sobre mí */}
         {bio && (
-          <Card className="p-6 space-y-3 border-[#E6EEF4]">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-[#003049]">
+          <div className="bg-white rounded-2xl shadow-lg p-6 space-y-3">
+            <h2 className="text-base font-bold text-gray-900">
               Sobre mí
             </h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-sm text-gray-600 leading-relaxed">
               {displayBio}
             </p>
             {shouldTruncate && (
               <button
                 onClick={() => setShowFullBio(!showFullBio)}
-                className="text-sm text-[#C1121F] hover:underline"
+                className="text-sm text-rappi-green font-semibold hover:text-rappi-green/80 transition-colors"
               >
                 {showFullBio ? "Ver menos" : "Ver más"}
               </button>
             )}
-          </Card>
+          </div>
         )}
 
         {/* Necesidades frecuentes */}
         {mockData.top_services.length > 0 && (
-          <Card className="p-6 space-y-3 border-[#E6EEF4]">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-[#003049]">
+          <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4">
+            <h2 className="text-base font-bold text-gray-900">
               Necesidades frecuentes
             </h2>
             <div className="flex flex-wrap gap-2">
@@ -186,30 +188,32 @@ export default function UserProfile() {
                 <Badge
                   key={index}
                   variant="outline"
-                  className="bg-[#FDF0D5] border-[#669BBC]/30 text-[#003049]"
+                  className="bg-gray-50 border-gray-200 text-gray-700 font-medium px-3 py-1"
                 >
                   {service}
                 </Badge>
               ))}
             </div>
-          </Card>
+          </div>
         )}
 
         {/* Preferencias de atención */}
         {(mockData.time_preferences.length > 0 || mockData.materials_preference) && (
-          <Card className="p-6 space-y-4 border-[#E6EEF4]">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-[#003049]">
+          <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4">
+            <h2 className="text-base font-bold text-gray-900">
               Preferencias de atención
             </h2>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {mockData.time_preferences.length > 0 && (
                 <div className="flex items-start gap-3">
-                  <Clock className="h-5 w-5 text-[#669BBC] mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground mb-1">Horarios preferidos</p>
+                  <div className="w-10 h-10 rounded-full bg-rappi-green/10 flex items-center justify-center flex-shrink-0">
+                    <Clock className="h-5 w-5 text-rappi-green" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-gray-900 mb-2">Horarios preferidos</p>
                     <div className="flex flex-wrap gap-2">
                       {mockData.time_preferences.map((time, index) => (
-                        <Badge key={index} variant="secondary" className="bg-[#669BBC]/10 text-[#003049]">
+                        <Badge key={index} variant="secondary" className="bg-gray-50 text-gray-700 border-0 font-medium">
                           {time}
                         </Badge>
                       ))}
@@ -219,23 +223,25 @@ export default function UserProfile() {
               )}
               {mockData.materials_preference && (
                 <div className="flex items-start gap-3">
-                  <Package className="h-5 w-5 text-[#669BBC] mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground mb-1">Materiales</p>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="w-10 h-10 rounded-full bg-rappi-green/10 flex items-center justify-center flex-shrink-0">
+                    <Package className="h-5 w-5 text-rappi-green" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-gray-900 mb-1">Materiales</p>
+                    <p className="text-sm text-gray-600">
                       Prefiere que el {mockData.materials_preference.toLowerCase()} los proporcione
                     </p>
                   </div>
                 </div>
               )}
             </div>
-          </Card>
+          </div>
         )}
 
         {/* Zonas de servicio */}
         {mockData.zones.length > 0 && (
-          <Card className="p-6 space-y-3 border-[#E6EEF4]">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-[#003049]">
+          <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4">
+            <h2 className="text-base font-bold text-gray-900">
               Zonas de servicio (referencia)
             </h2>
             <div className="flex flex-wrap gap-2">
@@ -243,63 +249,62 @@ export default function UserProfile() {
                 <Badge
                   key={index}
                   variant="outline"
-                  className="border-[#669BBC] text-[#003049]"
+                  className="border-rappi-green/30 text-gray-700 bg-rappi-green/5 font-medium px-3 py-1"
                 >
                   <MapPin className="h-3 w-3 mr-1" />
                   {zone}
                 </Badge>
               ))}
             </div>
-          </Card>
+          </div>
         )}
 
         {/* Políticas y seguridad */}
-        <Card className="p-6 space-y-3 border-[#E6EEF4]">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-[#003049]">
+        <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4">
+          <h2 className="text-base font-bold text-gray-900">
             Políticas y seguridad
           </h2>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Cuenta verificada</span>
-              <Badge variant="secondary" className="bg-[#FDF0D5] text-[#003049]">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between py-2 border-b border-gray-100">
+              <span className="text-sm text-gray-600">Cuenta verificada</span>
+              <Badge variant="secondary" className="bg-rappi-green/10 text-rappi-green border-0 font-semibold">
                 {mockData.verified ? "Sí" : "No"}
               </Badge>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Pago verificado</span>
-              <Badge variant="secondary" className="bg-[#FDF0D5] text-[#003049]">
+            <div className="flex items-center justify-between py-2 border-b border-gray-100">
+              <span className="text-sm text-gray-600">Pago verificado</span>
+              <Badge variant="secondary" className="bg-rappi-green/10 text-rappi-green border-0 font-semibold">
                 {mockData.payment_verified ? "Sí" : "No"}
               </Badge>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Historial de cancelaciones</span>
+            <div className="flex items-center justify-between py-2">
+              <span className="text-sm text-gray-600">Historial de cancelaciones</span>
               <Badge
                 variant="secondary"
                 className={
                   mockData.cancellation_level === "low"
-                    ? "bg-green-100 text-green-800"
+                    ? "bg-green-100 text-green-800 border-0 font-semibold"
                     : mockData.cancellation_level === "mid"
-                    ? "bg-yellow-100 text-yellow-800"
-                    : "bg-red-100 text-red-800"
+                    ? "bg-yellow-100 text-yellow-800 border-0 font-semibold"
+                    : "bg-red-100 text-red-800 border-0 font-semibold"
                 }
               >
                 {mockData.cancellation_level === "low" ? "Bajo" : mockData.cancellation_level === "mid" ? "Medio" : "Alto"}
               </Badge>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* Footer CTA */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 shadow-lg">
-        <div className="container max-w-2xl mx-auto">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 shadow-lg">
+        <div className="max-w-2xl mx-auto">
           <Button
-            variant="outline"
             size="lg"
-            className="w-full border-[#669BBC] text-[#003049] hover:bg-[#669BBC]/10"
+            className="w-full bg-rappi-green hover:bg-rappi-green/90 text-white font-semibold rounded-full"
             onClick={() => navigate(-1)}
           >
-            Volver al chat
+            Volver
           </Button>
         </div>
       </div>
