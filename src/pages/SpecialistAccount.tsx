@@ -36,6 +36,7 @@ export default function SpecialistAccount() {
   const { toggleSpecialistMode } = useSpecialistMode();
   const [reviewsCount, setReviewsCount] = useState(0);
   const [averageRating, setAverageRating] = useState(0);
+  const [specialistId, setSpecialistId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -52,6 +53,8 @@ export default function SpecialistAccount() {
         .single();
 
       if (specialistProfile) {
+        setSpecialistId(specialistProfile.id);
+        
         const { data: reviews, error } = await supabase
           .from('reviews')
           .select('rating')
@@ -282,6 +285,12 @@ export default function SpecialistAccount() {
                 title="Información personal"
                 subtitle="Edita tu perfil y datos de contacto"
                 onClick={() => navigate('/specialist/personal-info')}
+              />
+              <MenuItem
+                icon={Briefcase}
+                title="Ver mi Perfil"
+                subtitle="Visualiza tu perfil público"
+                onClick={() => specialistId && navigate(`/specialist/${specialistId}/profile`)}
               />
             </div>
 
