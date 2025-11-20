@@ -31,6 +31,7 @@ export default function SpecialistProfile() {
   const [specialties, setSpecialties] = useState<any[]>([]);
   const [workZones, setWorkZones] = useState<any[]>([]);
   const [credentials, setCredentials] = useState<any[]>([]);
+  const [portfolioItems, setPortfolioItems] = useState<any[]>([]);
   const [rating, setRating] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -177,6 +178,17 @@ export default function SpecialistProfile() {
       if (credentialsData) {
         setCredentials(credentialsData);
       }
+
+      // Load portfolio items
+      const {
+        data: portfolioData
+      } = await supabase.from('specialist_portfolio').select('*').eq('specialist_id', targetSpecialistId).order('created_at', {
+        ascending: false
+      });
+      if (portfolioData) {
+        setPortfolioItems(portfolioData);
+      }
+
       setLoading(false);
     } catch (error: any) {
       console.error('Error loading specialist data:', error);
@@ -410,6 +422,32 @@ export default function SpecialistProfile() {
                     </p>
                   </div>
                 </a>)}
+            </div>
+          </div>}
+
+        {/* Portfolio */}
+        {portfolioItems.length > 0 && <div className="space-y-3">
+            <h3 className="font-bold text-lg text-gray-900 px-1">
+              Portafolio
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              {portfolioItems.map((item: any) => <div key={item.id} className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow active:scale-[0.98]">
+                  {/* Image Area */}
+                  <div className="aspect-square bg-gray-100 overflow-hidden">
+                    <img 
+                      src={item.image_url} 
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="p-3">
+                    <p className="font-bold text-sm text-gray-900 line-clamp-2">
+                      {item.title}
+                    </p>
+                  </div>
+                </div>)}
             </div>
           </div>}
       </div>
