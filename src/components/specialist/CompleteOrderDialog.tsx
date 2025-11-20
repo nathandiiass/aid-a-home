@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Upload } from 'lucide-react';
@@ -23,6 +24,14 @@ export function CompleteOrderDialog({ open, onOpenChange, order, onComplete }: C
   const [materials, setMaterials] = useState('');
   const [notes, setNotes] = useState('');
   const [photos, setPhotos] = useState<File[]>([]);
+  
+  // Client review ratings
+  const [claridadNecesidades, setClaridadNecesidades] = useState<string>('');
+  const [claridadPago, setClaridadPago] = useState<string>('');
+  const [puntualidad, setPuntualidad] = useState<string>('');
+  const [condicionesTrabajo, setCondicionesTrabajo] = useState<string>('');
+  const [respetoProfesionalismo, setRespetoProfesionalismo] = useState<string>('');
+  const [volveriaTrabajar, setVolveriaTrabajar] = useState<string>('');
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -43,6 +52,16 @@ export function CompleteOrderDialog({ open, onOpenChange, order, onComplete }: C
         variant: 'destructive',
         title: 'Error',
         description: 'Ingresa un precio final válido'
+      });
+      return;
+    }
+
+    // Validate client review
+    if (!claridadNecesidades || !claridadPago || !puntualidad || !condicionesTrabajo || !respetoProfesionalismo || !volveriaTrabajar) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Por favor completa la evaluación del cliente'
       });
       return;
     }
@@ -93,6 +112,38 @@ export function CompleteOrderDialog({ open, onOpenChange, order, onComplete }: C
         .eq('id', order.service_requests?.id || order.request?.id);
 
       if (requestError) throw requestError;
+
+      // Get current user (specialist)
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
+      // Calculate average score
+      const ratings = [
+        parseInt(claridadNecesidades),
+        parseInt(claridadPago),
+        parseInt(puntualidad),
+        parseInt(condicionesTrabajo),
+        parseInt(respetoProfesionalismo)
+      ];
+      const averageScore = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+
+      // Insert client review
+      const { error: reviewError } = await supabase
+        .from('client_reviews')
+        .insert({
+          order_id: order.id,
+          specialist_id: user.id,
+          client_id: order.service_requests?.user_id || order.request?.user_id,
+          claridad_necesidades: parseInt(claridadNecesidades),
+          claridad_cumplimiento_pago: parseInt(claridadPago),
+          puntualidad_disponibilidad: parseInt(puntualidad),
+          facilito_condiciones_trabajo: parseInt(condicionesTrabajo),
+          respeto_profesionalismo_cliente: parseInt(respetoProfesionalismo),
+          volveria_trabajar_con_cliente: volveriaTrabajar === 'si',
+          average_score: averageScore
+        });
+
+      if (reviewError) throw reviewError;
 
       // Trigger confetti
       confetti({
