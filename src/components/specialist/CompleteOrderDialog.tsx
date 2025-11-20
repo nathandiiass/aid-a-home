@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Upload } from 'lucide-react';
+import { Loader2, Upload, Star } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface CompleteOrderDialogProps {
@@ -23,6 +23,14 @@ export function CompleteOrderDialog({ open, onOpenChange, order, onComplete }: C
   const [materials, setMaterials] = useState('');
   const [notes, setNotes] = useState('');
   const [photos, setPhotos] = useState<File[]>([]);
+  
+  // Client review ratings
+  const [claridadNecesidades, setClaridadNecesidades] = useState(0);
+  const [puntualidadDisponibilidad, setPuntualidadDisponibilidad] = useState(0);
+  const [respetoCliente, setRespetoCliente] = useState(0);
+  const [facilitoCondiciones, setFacilitoCondiciones] = useState(0);
+  const [claridadPago, setClaridadPago] = useState(0);
+  const [volveriaTrabajar, setVolveriaTrabajar] = useState<boolean | null>(null);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -43,6 +51,17 @@ export function CompleteOrderDialog({ open, onOpenChange, order, onComplete }: C
         variant: 'destructive',
         title: 'Error',
         description: 'Ingresa un precio final válido'
+      });
+      return;
+    }
+
+    // Validate client review
+    if (!claridadNecesidades || !puntualidadDisponibilidad || !respetoCliente || 
+        !facilitoCondiciones || !claridadPago || volveriaTrabajar === null) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Por favor completa la evaluación del cliente'
       });
       return;
     }
@@ -93,6 +112,33 @@ export function CompleteOrderDialog({ open, onOpenChange, order, onComplete }: C
         .eq('id', order.service_requests?.id || order.request?.id);
 
       if (requestError) throw requestError;
+
+      // Calculate average score for client review
+      const averageScore = (
+        claridadNecesidades + 
+        puntualidadDisponibilidad + 
+        respetoCliente + 
+        facilitoCondiciones + 
+        claridadPago
+      ) / 5;
+
+      // Insert client review
+      const { error: reviewError } = await supabase
+        .from('client_reviews')
+        .insert({
+          client_id: order.service_requests?.user_id || order.request?.user_id,
+          specialist_id: order.specialist_id,
+          order_id: order.service_requests?.id || order.request?.id,
+          claridad_necesidades: claridadNecesidades,
+          puntualidad_disponibilidad: puntualidadDisponibilidad,
+          respeto_profesionalismo_cliente: respetoCliente,
+          facilito_condiciones_trabajo: facilitoCondiciones,
+          claridad_cumplimiento_pago: claridadPago,
+          volveria_trabajar_con_cliente: volveriaTrabajar,
+          average_score: averageScore
+        });
+
+      if (reviewError) throw reviewError;
 
       // Trigger confetti
       confetti({
@@ -188,6 +234,80 @@ export function CompleteOrderDialog({ open, onOpenChange, order, onComplete }: C
               />
             </label>
           </div>
+
+          {/* Client Review Section */}
+          <div className="bg-gradient-to-br from-orange-50 to-pink-50 rounded-2xl p-5 space-y-4 border-2 border-orange-100">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                <Star className="w-4 h-4 text-white fill-white" />
+              </div>
+              <Label className="text-base font-bold text-foreground">Evaluación del cliente *</Label>
+            </div>
+
+            <div className="space-y-4">
+              <ReviewQuestion
+                question="¿El cliente explicó claramente lo que necesitaba?"
+                value={claridadNecesidades}
+                onChange={setClaridadNecesidades}
+              />
+              
+              <ReviewQuestion
+                question="¿El cliente estuvo disponible y puntual para recibir el servicio?"
+                value={puntualidadDisponibilidad}
+                onChange={setPuntualidadDisponibilidad}
+              />
+              
+              <ReviewQuestion
+                question="¿Qué tan respetuoso y profesional fue el cliente durante la interacción?"
+                value={respetoCliente}
+                onChange={setRespetoCliente}
+              />
+              
+              <ReviewQuestion
+                question="¿El cliente facilitó las condiciones necesarias para realizar el trabajo?"
+                value={facilitoCondiciones}
+                onChange={setFacilitoCondiciones}
+              />
+              
+              <ReviewQuestion
+                question="¿Hubo claridad y cumplimiento en el pago del servicio?"
+                value={claridadPago}
+                onChange={setClaridadPago}
+              />
+
+              <div className="bg-white rounded-xl p-4 border-2 border-orange-200">
+                <Label className="text-sm font-bold text-foreground mb-3 block">
+                  ¿Volverías a trabajar con este cliente? *
+                </Label>
+                <div className="flex gap-3">
+                  <Button
+                    type="button"
+                    variant={volveriaTrabajar === true ? "default" : "outline"}
+                    onClick={() => setVolveriaTrabajar(true)}
+                    className={`flex-1 h-12 rounded-xl font-semibold ${
+                      volveriaTrabajar === true 
+                        ? 'bg-green-500 hover:bg-green-600 text-white' 
+                        : 'border-2 border-gray-300 hover:border-green-500 hover:bg-green-50'
+                    }`}
+                  >
+                    Sí
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={volveriaTrabajar === false ? "default" : "outline"}
+                    onClick={() => setVolveriaTrabajar(false)}
+                    className={`flex-1 h-12 rounded-xl font-semibold ${
+                      volveriaTrabajar === false 
+                        ? 'bg-red-500 hover:bg-red-600 text-white' 
+                        : 'border-2 border-gray-300 hover:border-red-500 hover:bg-red-50'
+                    }`}
+                  >
+                    No
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <DialogFooter className="flex-col sm:flex-row gap-3 pt-4">
@@ -210,5 +330,36 @@ export function CompleteOrderDialog({ open, onOpenChange, order, onComplete }: C
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+// Star Rating Component
+function ReviewQuestion({ question, value, onChange }: { 
+  question: string; 
+  value: number; 
+  onChange: (value: number) => void;
+}) {
+  return (
+    <div className="bg-white rounded-xl p-4 border border-gray-200">
+      <Label className="text-sm font-medium text-foreground mb-3 block">{question}</Label>
+      <div className="flex gap-2 justify-center">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type="button"
+            onClick={() => onChange(star)}
+            className="transition-all hover:scale-110 focus:outline-none"
+          >
+            <Star
+              className={`w-8 h-8 ${
+                star <= value
+                  ? 'fill-orange-500 text-orange-500'
+                  : 'fill-gray-200 text-gray-300'
+              }`}
+            />
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
