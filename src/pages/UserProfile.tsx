@@ -308,9 +308,7 @@ export default function UserProfile() {
       {/* Footer CTA */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 shadow-lg">
         <div className="max-w-2xl mx-auto">
-          <Button size="lg" className="w-full bg-rappi-green hover:bg-rappi-green/90 text-white font-semibold rounded-full" onClick={() => navigate(-1)}>
-            Volver
-          </Button>
+          
         </div>
       </div>
     </div>;
