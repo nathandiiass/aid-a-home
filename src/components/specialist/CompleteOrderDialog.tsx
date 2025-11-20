@@ -168,12 +168,12 @@ export function CompleteOrderDialog({ open, onOpenChange, order, onComplete }: C
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg bg-white rounded-3xl border-0">
-        <DialogHeader className="space-y-3 pb-2">
+      <DialogContent className="max-w-lg max-h-[90vh] bg-white rounded-3xl border-0 overflow-hidden flex flex-col">
+        <DialogHeader className="space-y-3 pb-2 flex-shrink-0">
           <DialogTitle className="text-2xl font-bold text-foreground">Finalizar trabajo</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-5 py-4">
+        <div className="space-y-5 py-4 overflow-y-auto flex-1">
           <div className="bg-gray-50 rounded-2xl p-4 space-y-3">
             <Label htmlFor="finalPrice" className="text-sm font-bold text-foreground">Precio final *</Label>
             <Input
@@ -310,7 +310,7 @@ export function CompleteOrderDialog({ open, onOpenChange, order, onComplete }: C
           </div>
         </div>
 
-        <DialogFooter className="flex-col sm:flex-row gap-3 pt-4">
+        <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 flex-shrink-0 border-t border-gray-100 mt-2">
           <Button 
             variant="outline" 
             onClick={() => onOpenChange(false)} 
