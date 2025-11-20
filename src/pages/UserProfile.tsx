@@ -157,6 +157,128 @@ export default function UserProfile() {
           </div>
         </div>
 
+        {/* Resumen de reseñas de especialistas */}
+        {clientStats && clientStats.totalReviews > 0 && (
+          <div className="bg-white rounded-2xl shadow-lg p-6 space-y-5">
+            <h2 className="text-base font-bold text-gray-900">
+              Resumen General
+            </h2>
+
+            {/* Rating breakdown */}
+            <div className="space-y-4">
+              {/* Claridad en necesidades */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-700">Claridad en necesidades</span>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`h-4 w-4 ${
+                        star <= Math.round(clientStats.avgClaridadNecesidades)
+                          ? 'fill-rappi-green text-rappi-green'
+                          : 'fill-gray-200 text-gray-200'
+                      }`}
+                    />
+                  ))}
+                  <span className="text-sm font-bold text-gray-900 w-8 text-right">
+                    {clientStats.avgClaridadNecesidades.toFixed(1)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Puntualidad y disponibilidad */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-700">Puntualidad y disponibilidad</span>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`h-4 w-4 ${
+                        star <= Math.round(clientStats.avgPuntualidad)
+                          ? 'fill-rappi-green text-rappi-green'
+                          : 'fill-gray-200 text-gray-200'
+                      }`}
+                    />
+                  ))}
+                  <span className="text-sm font-bold text-gray-900 w-8 text-right">
+                    {clientStats.avgPuntualidad.toFixed(1)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Respeto y profesionalismo */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-700">Respeto y profesionalismo</span>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`h-4 w-4 ${
+                        star <= Math.round(clientStats.avgRespeto)
+                          ? 'fill-rappi-green text-rappi-green'
+                          : 'fill-gray-200 text-gray-200'
+                      }`}
+                    />
+                  ))}
+                  <span className="text-sm font-bold text-gray-900 w-8 text-right">
+                    {clientStats.avgRespeto.toFixed(1)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Facilitó condiciones de trabajo */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-700">Facilitó condiciones de trabajo</span>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`h-4 w-4 ${
+                        star <= Math.round(clientStats.avgFacilito)
+                          ? 'fill-rappi-green text-rappi-green'
+                          : 'fill-gray-200 text-gray-200'
+                      }`}
+                    />
+                  ))}
+                  <span className="text-sm font-bold text-gray-900 w-8 text-right">
+                    {clientStats.avgFacilito.toFixed(1)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Claridad en pago */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-700">Claridad en pago</span>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`h-4 w-4 ${
+                        star <= Math.round(clientStats.avgPago)
+                          ? 'fill-rappi-green text-rappi-green'
+                          : 'fill-gray-200 text-gray-200'
+                      }`}
+                    />
+                  ))}
+                  <span className="text-sm font-bold text-gray-900 w-8 text-right">
+                    {clientStats.avgPago.toFixed(1)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Volverían a trabajar */}
+            <div className="pt-4 border-t border-gray-100">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-700 font-medium">Volverían a trabajar contigo</span>
+                <span className="text-2xl font-bold text-rappi-green">
+                  {clientStats.porcentajeVolveria.toFixed(0)}%
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Sobre mí */}
         {bio && (
           <div className="bg-white rounded-2xl shadow-lg p-6 space-y-3">
