@@ -231,7 +231,7 @@ export default function Profile() {
                   icon={User}
                   title="Ver Perfil"
                   subtitle="Visualiza tu perfil público"
-                  onClick={() => navigate(`/user/${user?.id}`)}
+                  onClick={() => navigate(`/user/${user?.id}/profile`)}
                 />
                 <MenuItem
                   icon={User}
