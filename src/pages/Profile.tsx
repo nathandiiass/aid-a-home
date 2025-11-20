@@ -229,6 +229,12 @@ export default function Profile() {
               <div className="bg-white rounded-2xl shadow-lg overflow-hidden divide-y divide-gray-100">
                 <MenuItem
                   icon={User}
+                  title="Ver Perfil"
+                  subtitle="Visualiza tu perfil público"
+                  onClick={() => navigate(`/user/${user?.id}`)}
+                />
+                <MenuItem
+                  icon={User}
                   title="Información personal"
                   subtitle="Editar nombre, apellidos, teléfono y más"
                   onClick={() => navigate('/profile/personal-info')}
