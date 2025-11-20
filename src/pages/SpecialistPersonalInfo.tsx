@@ -1058,11 +1058,12 @@ export default function SpecialistPersonalInfo() {
             <div className="grid grid-cols-2 gap-3">
               {portfolioItems.map(item => (
                 <div key={item.id} className="relative group">
-                  <div className="aspect-square rounded-2xl overflow-hidden bg-gray-100">
+                  <div className="aspect-square rounded-2xl overflow-hidden bg-gray-100 border border-gray-200">
                     <img 
                       src={item.image_url} 
                       alt={item.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-center"
+                      loading="lazy"
                     />
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity">

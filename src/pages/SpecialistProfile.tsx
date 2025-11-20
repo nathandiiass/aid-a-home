@@ -433,11 +433,12 @@ export default function SpecialistProfile() {
             <div className="grid grid-cols-2 gap-3">
               {portfolioItems.map((item: any) => <div key={item.id} className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow active:scale-[0.98]">
                   {/* Image Area */}
-                  <div className="aspect-square bg-gray-100 overflow-hidden">
+                  <div className="aspect-square bg-gray-100 overflow-hidden border-b border-gray-100">
                     <img 
                       src={item.image_url} 
                       alt={item.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-center"
+                      loading="lazy"
                     />
                   </div>
                   
