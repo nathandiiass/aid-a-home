@@ -648,12 +648,12 @@ export default function SpecialistRegistration() {
 
             {/* Photo Upload Section with Guidelines */}
             <div className="space-y-4 bg-white rounded-2xl shadow-sm p-6">
-              <Label className="text-base font-bold text-gray-900">
+              <Label className="text-base font-bold text-gray-900 text-center block">
                 {personType === 'fisica' ? 'Foto de Perfil Profesional *' : 'Logo de tu Agencia *'}
               </Label>
               
-              {/* Photo Preview and Upload */}
-              <div className="flex flex-col md:flex-row gap-6 items-start">
+              {/* Photo Preview and Upload - Centered */}
+              <div className="flex flex-col items-center gap-6">
                 {/* Circular Preview */}
                 <div className="flex flex-col items-center gap-3">
                   <div className="relative">
@@ -697,14 +697,14 @@ export default function SpecialistRegistration() {
                   )}
                 </div>
 
-                {/* Guidelines */}
+                {/* Guidelines - 2 Columns */}
                 {personType === 'fisica' ? (
-                  <div className="flex-1 space-y-3">
-                    <p className="text-sm font-semibold text-gray-900 mb-3">
+                  <div className="w-full max-w-2xl">
+                    <p className="text-sm font-semibold text-gray-900 mb-3 text-center">
                       Requisitos de la foto:
                     </p>
                     
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-3">
                       <div className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
                         <img src={photoGuideFace} alt="" className="w-8 h-8 flex-shrink-0" />
                         <div>
@@ -737,7 +737,7 @@ export default function SpecialistRegistration() {
                         </div>
                       </div>
                       
-                      <div className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg sm:col-span-2">
+                      <div className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg col-span-2">
                         <img src={photoGuideAttire} alt="" className="w-8 h-8 flex-shrink-0" />
                         <div>
                           <p className="text-xs font-semibold text-gray-900">Vestimenta presentable</p>
@@ -747,8 +747,8 @@ export default function SpecialistRegistration() {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex-1 space-y-3">
-                    <p className="text-sm font-semibold text-gray-900 mb-3">
+                  <div className="w-full max-w-2xl">
+                    <p className="text-sm font-semibold text-gray-900 mb-3 text-center">
                       Requisitos del logo:
                     </p>
                     <div className="p-4 bg-gray-50 rounded-lg">
