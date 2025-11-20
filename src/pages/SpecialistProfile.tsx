@@ -389,26 +389,26 @@ export default function SpecialistProfile() {
       })()}
 
         {/* Licenses and Certifications */}
-        {credentials.length > 0 && <div className="bg-white rounded-2xl shadow-sm p-5">
-            <h3 className="font-bold text-base text-gray-900 mb-3">
+        {credentials.length > 0 && <div className="space-y-3">
+            <h3 className="font-bold text-lg text-gray-900 px-1">
               Licencias y certificaciones
             </h3>
-            <div className="space-y-2">
-              {credentials.map((credential: any) => <a key={credential.id} href={credential.attachment_url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors active:scale-[0.98]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center">
-                      <FileText className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm text-gray-900">
-                        {credential.title}
-                      </p>
-                      <p className="text-xs text-gray-600">
-                        {credential.issuer}
-                      </p>
-                    </div>
+            <div className="grid grid-cols-2 gap-3">
+              {credentials.map((credential: any) => <a key={credential.id} href={credential.attachment_url} target="_blank" rel="noopener noreferrer" className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow active:scale-[0.98]">
+                  {/* Image/Icon Area */}
+                  <div className="aspect-square bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-6">
+                    <FileText className="w-16 h-16 text-blue-600" />
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                  
+                  {/* Content */}
+                  <div className="p-3">
+                    <p className="font-bold text-sm text-gray-900 line-clamp-2 mb-1">
+                      {credential.title}
+                    </p>
+                    <p className="text-xs text-gray-600 line-clamp-1">
+                      {credential.issuer}
+                    </p>
+                  </div>
                 </a>)}
             </div>
           </div>}
