@@ -705,6 +705,7 @@ export type Database = {
           rating_promedio: number | null
           razon_social: string | null
           rfc: string
+          specialist_type: string | null
           state: string | null
           status: string
           street: string | null
@@ -741,6 +742,7 @@ export type Database = {
           rating_promedio?: number | null
           razon_social?: string | null
           rfc: string
+          specialist_type?: string | null
           state?: string | null
           status?: string
           street?: string | null
@@ -777,6 +779,7 @@ export type Database = {
           rating_promedio?: number | null
           razon_social?: string | null
           rfc?: string
+          specialist_type?: string | null
           state?: string | null
           status?: string
           street?: string | null
