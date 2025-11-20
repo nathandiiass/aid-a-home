@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Plus, X, ChevronDown, Search } from 'lucide-react';
+import { ChevronLeft, Plus, X, ChevronDown, Search, Upload, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,8 +13,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import confetti from 'canvas-confetti';
 import CategoryServicesSelector, { SelectedCategory } from '@/components/specialist/CategoryServicesSelector';
+import photoGuideFace from '@/assets/photo-guide-face.png';
+import photoGuideNoAccessories from '@/assets/photo-guide-no-accessories.png';
+import photoGuideSolo from '@/assets/photo-guide-solo.png';
+import photoGuideLighting from '@/assets/photo-guide-lighting.png';
+import photoGuideAttire from '@/assets/photo-guide-attire.png';
 
 interface Specialty {
   id: string;
@@ -640,17 +646,134 @@ export default function SpecialistRegistration() {
               </p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="profilePhoto">Foto de Perfil Profesional *</Label>
-              <Input
-                id="profilePhoto"
-                type="file"
-                accept="image/jpeg,image/png"
-                onChange={(e) => e.target.files?.[0] && handleFileUpload('profilePhoto', e.target.files[0])}
-              />
-              {personalData.profilePhoto && (
-                <p className="text-sm text-muted-foreground">✓ {personalData.profilePhoto.name}</p>
-              )}
+            {/* Photo Upload Section with Guidelines */}
+            <div className="space-y-4 bg-white rounded-2xl shadow-sm p-6">
+              <Label className="text-base font-bold text-gray-900">
+                {personType === 'fisica' ? 'Foto de Perfil Profesional *' : 'Logo de tu Agencia *'}
+              </Label>
+              
+              {/* Photo Preview and Upload */}
+              <div className="flex flex-col md:flex-row gap-6 items-start">
+                {/* Circular Preview */}
+                <div className="flex flex-col items-center gap-3">
+                  <div className="relative">
+                    <Avatar className="w-32 h-32 border-4 border-gray-200">
+                      {personalData.profilePhoto ? (
+                        <AvatarImage 
+                          src={URL.createObjectURL(personalData.profilePhoto)} 
+                          alt="Preview"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <AvatarFallback className="bg-gray-100">
+                          <Upload className="w-8 h-8 text-gray-400" />
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                    {personalData.profilePhoto && (
+                      <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center border-2 border-white">
+                        <Check className="w-4 h-4 text-white" />
+                      </div>
+                    )}
+                  </div>
+                  
+                  <label htmlFor="profilePhoto" className="cursor-pointer">
+                    <div className="px-4 py-2 bg-rappi-green hover:bg-rappi-green/90 text-white text-sm font-semibold rounded-full transition-colors">
+                      {personalData.profilePhoto ? 'Cambiar foto' : 'Subir foto'}
+                    </div>
+                    <Input
+                      id="profilePhoto"
+                      type="file"
+                      accept="image/jpeg,image/png,image/jpg"
+                      className="hidden"
+                      onChange={(e) => e.target.files?.[0] && handleFileUpload('profilePhoto', e.target.files[0])}
+                    />
+                  </label>
+                  
+                  {personalData.profilePhoto && (
+                    <p className="text-xs text-gray-600 text-center">
+                      {personalData.profilePhoto.name}
+                    </p>
+                  )}
+                </div>
+
+                {/* Guidelines */}
+                {personType === 'fisica' ? (
+                  <div className="flex-1 space-y-3">
+                    <p className="text-sm font-semibold text-gray-900 mb-3">
+                      Requisitos de la foto:
+                    </p>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+                        <img src={photoGuideFace} alt="" className="w-8 h-8 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-gray-900">Rostro visible</p>
+                          <p className="text-xs text-gray-600">De frente y completo</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+                        <img src={photoGuideNoAccessories} alt="" className="w-8 h-8 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-gray-900">Sin accesorios</p>
+                          <p className="text-xs text-gray-600">No gorras ni lentes oscuros</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+                        <img src={photoGuideSolo} alt="" className="w-8 h-8 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-gray-900">Solo tú</p>
+                          <p className="text-xs text-gray-600">Una persona en la foto</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+                        <img src={photoGuideLighting} alt="" className="w-8 h-8 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-gray-900">Buena iluminación</p>
+                          <p className="text-xs text-gray-600">Fondo limpio y claro</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg sm:col-span-2">
+                        <img src={photoGuideAttire} alt="" className="w-8 h-8 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-gray-900">Vestimenta presentable</p>
+                          <p className="text-xs text-gray-600">Foto reciente y profesional</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex-1 space-y-3">
+                    <p className="text-sm font-semibold text-gray-900 mb-3">
+                      Requisitos del logo:
+                    </p>
+                    <div className="p-4 bg-gray-50 rounded-lg">
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span>Logo oficial de tu agencia o empresa</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span>Formato cuadrado preferentemente</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span>Fondo transparente o de color sólido</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span>Alta resolución y buena calidad</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="flex items-start space-x-2">
