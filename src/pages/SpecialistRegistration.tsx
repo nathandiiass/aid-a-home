@@ -82,6 +82,7 @@ export default function SpecialistRegistration() {
   const [loading, setLoading] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<SelectedCategory[]>([]);
   
+  const [specialistType, setSpecialistType] = useState<'independiente' | 'agencia'>('independiente');
   const [personType, setPersonType] = useState<'fisica' | 'moral'>('fisica');
   const [personalData, setPersonalData] = useState({
     nombreCompleto: '',
@@ -298,6 +299,7 @@ export default function SpecialistRegistration() {
           csf_document_url: csfDocumentUrl,
           address_proof_url: addressProofUrl,
           professional_description: professionalDescription,
+          specialist_type: specialistType,
           status: 'pending',
           accepted_terms_at: new Date().toISOString()
         }])
@@ -437,6 +439,42 @@ export default function SpecialistRegistration() {
                 style={{ width: `${(step / 3) * 100}%` }}
               />
             </div>
+          </div>
+
+          {/* Specialist Type Selection - Always visible */}
+          <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4 mb-6">
+            <div className="space-y-2">
+              <Label className="text-base font-bold text-gray-900">
+                Tipo de Especialista *
+              </Label>
+              <p className="text-sm text-gray-600">
+                Selecciona el tipo de especialista que mejor te describe
+              </p>
+            </div>
+            
+            <RadioGroup 
+              value={specialistType} 
+              onValueChange={(value: 'independiente' | 'agencia') => setSpecialistType(value)}
+              className="space-y-3"
+            >
+              <div className="flex items-center space-x-3 p-4 border-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+                   style={{ borderColor: specialistType === 'independiente' ? '#00D170' : '#E5E7EB' }}>
+                <RadioGroupItem value="independiente" id="independiente" />
+                <Label htmlFor="independiente" className="flex-1 cursor-pointer">
+                  <p className="font-semibold text-gray-900">Especialista Independiente</p>
+                  <p className="text-sm text-gray-600">Trabajo de forma independiente ofreciendo mis servicios</p>
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-3 p-4 border-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+                   style={{ borderColor: specialistType === 'agencia' ? '#00D170' : '#E5E7EB' }}>
+                <RadioGroupItem value="agencia" id="agencia" />
+                <Label htmlFor="agencia" className="flex-1 cursor-pointer">
+                  <p className="font-semibold text-gray-900">Agencia de Especialistas</p>
+                  <p className="text-sm text-gray-600">Represento a una agencia con múltiples especialistas</p>
+                </Label>
+              </div>
+            </RadioGroup>
           </div>
 
           {step === 1 && (
