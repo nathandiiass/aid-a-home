@@ -5,8 +5,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { BottomNavSpecialist } from '@/components/BottomNavSpecialist';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Calendar, Clock, MapPin, DollarSign, ArrowLeft, Image as ImageIcon } from 'lucide-react';
+import { Calendar, Clock, MapPin, DollarSign, ArrowLeft, Image as ImageIcon, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { RejectRequestDialog } from '@/components/specialist/RejectRequestDialog';
+import { toast } from 'sonner';
 
 interface RequestDetail {
   id: string;
@@ -39,6 +41,8 @@ export default function SpecialistRequestDetail() {
   const [request, setRequest] = useState<RequestDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [specialistActivities, setSpecialistActivities] = useState<string[]>([]);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [specialistId, setSpecialistId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -80,6 +84,8 @@ export default function SpecialistRequestDetail() {
           .single();
 
         if (specialistProfile) {
+          setSpecialistId(specialistProfile.id);
+          
           const { data: specialistTags } = await supabase
             .from('specialist_tags')
             .select(`
@@ -126,6 +132,31 @@ export default function SpecialistRequestDetail() {
     return timeOptions[request.time_preference || ''] || "Por definir";
   };
 
+  const handleReject = async (reason: string, otherText?: string) => {
+    if (!specialistId || !user?.id || !id) return;
+
+    try {
+      const { error } = await supabase
+        .from('specialist_request_rejections')
+        .insert({
+          request_id: id,
+          specialist_id: specialistId,
+          user_id: user.id,
+          main_reason: reason,
+          other_reason_text: otherText,
+        });
+
+      if (error) throw error;
+
+      toast.success('Solicitud rechazada exitosamente');
+      setRejectDialogOpen(false);
+      navigate('/specialist');
+    } catch (error: any) {
+      console.error('Error rejecting request:', error);
+      toast.error('Error al rechazar la solicitud');
+    }
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center pb-20">
@@ -158,9 +189,16 @@ export default function SpecialistRequestDetail() {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-xl font-bold text-foreground">
+          <h1 className="text-xl font-bold text-foreground flex-1">
             {request.service_title || request.activity}
           </h1>
+          <Button
+            onClick={() => setRejectDialogOpen(true)}
+            className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-full shadow-[0_4px_12px_rgba(220,38,38,0.4)] hover:shadow-[0_6px_16px_rgba(220,38,38,0.5)] transition-all hover:scale-105 active:scale-95"
+          >
+            <X className="w-4 h-4 mr-1" />
+            Rechazar
+          </Button>
         </div>
 
         <div className="p-4 space-y-4">
@@ -311,6 +349,12 @@ export default function SpecialistRequestDetail() {
       </button>
 
       <BottomNavSpecialist />
+      
+      <RejectRequestDialog
+        open={rejectDialogOpen}
+        onOpenChange={setRejectDialogOpen}
+        onConfirm={handleReject}
+      />
     </div>
   );
 }
