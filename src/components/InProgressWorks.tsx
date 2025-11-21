@@ -236,8 +236,22 @@ export function InProgressWorks() {
 
   const handleProblemSubmit = async (data: any) => {
     try {
-      // Here you could save the problem report to a dedicated table
-      console.log('Problem report:', data);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Usuario no autenticado');
+
+      // Save problem report
+      const { error: reportError } = await supabase
+        .from('specialist_problem_reports')
+        .insert({
+          request_id: selectedWork.id,
+          user_id: user.id,
+          quote_id: selectedWork.quote.id,
+          specialist_id: selectedWork.quote.specialist_id,
+          main_reason: data.mainReason,
+          other_reason_text: data.otherReasonText
+        });
+
+      if (reportError) throw reportError;
       
       toast({
         title: 'Reporte enviado',
@@ -246,6 +260,7 @@ export function InProgressWorks() {
 
       setShowProblemSurvey(false);
       setSelectedWork(null);
+      fetchInProgressWorks();
     } catch (error) {
       console.error('Error submitting problem:', error);
       toast({

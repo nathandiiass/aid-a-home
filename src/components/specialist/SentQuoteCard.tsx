@@ -18,6 +18,9 @@ export const SentQuoteCard = ({ quote }: SentQuoteCardProps) => {
   const location = Array.isArray(request?.locations)
     ? request?.locations[0]
     : request?.locations;
+  
+  const isCancelled = quote.isCancelled;
+  const hasProblemReport = quote.hasProblemReport;
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -97,7 +100,19 @@ export const SentQuoteCard = ({ quote }: SentQuoteCardProps) => {
           <h3 className="font-bold text-foreground text-lg flex-1">
             {request?.service_title || request?.activity}
           </h3>
-          {getStatusBadge(quote.status)}
+          <div className="flex flex-col gap-2 items-end">
+            {getStatusBadge(quote.status)}
+            {isCancelled && (
+              <Badge variant="secondary" className="bg-red-100 text-red-700 border-0 rounded-full px-3 py-1 text-xs font-medium">
+                Cancelado
+              </Badge>
+            )}
+            {hasProblemReport && (
+              <Badge variant="secondary" className="bg-orange-100 text-orange-700 border-0 rounded-full px-3 py-1 text-xs font-medium">
+                Inconveniente
+              </Badge>
+            )}
+          </div>
         </div>
 
         <div className="space-y-3">
