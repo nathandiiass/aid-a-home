@@ -103,6 +103,16 @@ export default function SpecialistHome() {
 
         const quotedRequestIds = existingQuotes?.map(q => q.request_id) || [];
 
+        // Get rejected requests
+        const { data: rejectedRequests, error: rejectionsError } = await supabase
+          .from('specialist_request_rejections')
+          .select('request_id')
+          .eq('specialist_id', profile.id);
+
+        if (rejectionsError) throw rejectionsError;
+
+        const rejectedRequestIds = rejectedRequests?.map(r => r.request_id) || [];
+
         // Load active requests matching categories
         const { data: requestsData, error: requestsError } = await supabase
           .from('service_requests')
@@ -119,9 +129,9 @@ export default function SpecialistHome() {
 
         if (requestsError) throw requestsError;
 
-        // Filter out requests that already have quotes from this specialist
+        // Filter out requests that already have quotes or were rejected by this specialist
         let filteredRequests: ServiceRequest[] = (requestsData?.filter(
-          req => !quotedRequestIds.includes(req.id)
+          req => !quotedRequestIds.includes(req.id) && !rejectedRequestIds.includes(req.id)
         ) || []).map(request => {
           let score = 0;
           

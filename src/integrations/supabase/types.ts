@@ -882,6 +882,51 @@ export type Database = {
           },
         ]
       }
+      specialist_request_rejections: {
+        Row: {
+          created_at: string
+          id: string
+          main_reason: string
+          other_reason_text: string | null
+          request_id: string
+          specialist_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          main_reason: string
+          other_reason_text?: string | null
+          request_id: string
+          specialist_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          main_reason?: string
+          other_reason_text?: string | null
+          request_id?: string
+          specialist_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "specialist_request_rejections_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "service_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "specialist_request_rejections_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: false
+            referencedRelation: "specialist_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       specialist_tags: {
         Row: {
           created_at: string | null
