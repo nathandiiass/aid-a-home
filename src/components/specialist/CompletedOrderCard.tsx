@@ -62,10 +62,16 @@ export function CompletedOrderCard({
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-              <Star className="w-4 h-4 text-gray-600" />
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+              hasClientReview ? 'bg-green-100' : 'bg-gray-100'
+            }`}>
+              <Star className={`w-4 h-4 ${hasClientReview ? 'text-green-600 fill-green-600' : 'text-gray-600'}`} />
             </div>
-            <span className="text-xs text-foreground/70">Esperando calificación del cliente</span>
+            {hasClientReview ? (
+              <span className="text-xs text-green-700 font-medium">Cliente calificó</span>
+            ) : (
+              <span className="text-xs text-foreground/70">Esperando calificación del cliente</span>
+            )}
           </div>
         </div>
 
