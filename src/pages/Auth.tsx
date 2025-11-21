@@ -130,8 +130,8 @@ export default function Auth() {
           return;
         }
 
-        // If profile exists and has required fields, redirect to home
-        if (profile && profile.phone && profile.date_of_birth) {
+        // If profile exists and has ALL required fields, redirect to home
+        if (profile && profile.phone && profile.date_of_birth && profile.accepted_terms_at && profile.accepted_privacy_at) {
           navigate('/', { replace: true });
           return;
         }
