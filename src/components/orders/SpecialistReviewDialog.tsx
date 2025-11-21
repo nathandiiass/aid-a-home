@@ -252,7 +252,7 @@ export function SpecialistReviewDialog({
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="max-h-[80vh]">
+        <DrawerContent className="max-h-[80vh] shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
           <DrawerHeader className="pb-3">
             <DrawerTitle className="text-xl font-bold text-foreground">
               Evalúa el servicio
