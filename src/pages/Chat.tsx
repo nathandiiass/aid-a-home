@@ -9,7 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { ArrowLeft, Send, Paperclip, Clock, DollarSign, Package, FileText, Ban, Timer, Shield, Eye } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ArrowLeft, Send, Paperclip, Clock, DollarSign, Package, FileText, Ban, Timer, Shield, Eye, MoreVertical } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import confetti from 'canvas-confetti';
@@ -27,6 +28,7 @@ export default function Chat() {
   const [loading, setLoading] = useState(true);
   const [newMessage, setNewMessage] = useState('');
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -211,6 +213,48 @@ export default function Chat() {
         variant: 'destructive',
         title: 'Error',
         description: 'No se pudo contratar al especialista'
+      });
+    }
+  };
+
+  const handleCancelOrder = async () => {
+    if (!quoteId) return;
+
+    try {
+      // Update quote status to rejected
+      const { error: quoteError } = await supabase
+        .from('quotes')
+        .update({ status: 'rejected' })
+        .eq('id', quoteId);
+
+      if (quoteError) throw quoteError;
+
+      // Update service request status to cancelled
+      if (quote?.request_id) {
+        const { error: requestError } = await supabase
+          .from('service_requests')
+          .update({ status: 'cancelled' })
+          .eq('id', quote.request_id);
+
+        if (requestError) throw requestError;
+      }
+
+      setShowCancelDialog(false);
+
+      toast({
+        title: "Solicitud cancelada",
+        description: "La solicitud ha sido cancelada exitosamente.",
+      });
+
+      setTimeout(() => {
+        navigate('/specialist/orders');
+      }, 1000);
+    } catch (error: any) {
+      console.error('Error cancelling order:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'No se pudo cancelar la solicitud'
       });
     }
   };
@@ -405,6 +449,24 @@ export default function Chat() {
               Contratar
             </Button>
           )}
+
+          {isSpecialistMode && quote?.status === 'accepted' && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors">
+                  <MoreVertical className="w-5 h-5 text-gray-700" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem 
+                  onClick={() => setShowCancelDialog(true)}
+                  className="text-red-600 focus:text-red-600 cursor-pointer"
+                >
+                  Cancelar solicitud
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </header>
 
@@ -501,6 +563,31 @@ export default function Chat() {
               className="rounded-full bg-green-600 hover:bg-green-700"
             >
               Confirmar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Cancel Dialog for Specialists */}
+      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold text-red-600">
+              ¿Cancelar esta solicitud?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-700 leading-relaxed">
+              Cancelar esta solicitud puede afectar tu perfil y tu visibilidad dentro de la app.
+              <br /><br />
+              ¿Deseas continuar?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-full">No, mantener</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCancelOrder}
+              className="rounded-full bg-red-600 hover:bg-red-700"
+            >
+              Sí, cancelar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
