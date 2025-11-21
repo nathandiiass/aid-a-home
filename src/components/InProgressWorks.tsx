@@ -8,6 +8,10 @@ import { Clock, User, Calendar, MapPin, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
+import { WorkOptionsSheet } from '@/components/orders/WorkOptionsSheet';
+import { CancelWorkSurvey } from '@/components/orders/CancelWorkSurvey';
+import { SpecialistProblemSurvey } from '@/components/orders/SpecialistProblemSurvey';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 export function InProgressWorks() {
   const navigate = useNavigate();
@@ -16,6 +20,13 @@ export function InProgressWorks() {
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  const [selectedWork, setSelectedWork] = useState<any | null>(null);
+  const [showOptionsSheet, setShowOptionsSheet] = useState(false);
+  const [showCancelSurvey, setShowCancelSurvey] = useState(false);
+  const [showFinishConfirm, setShowFinishConfirm] = useState(false);
+  const [showProblemSurvey, setShowProblemSurvey] = useState(false);
 
   useEffect(() => {
     fetchInProgressWorks();
@@ -126,6 +137,124 @@ export function InProgressWorks() {
     }
   };
 
+  const handleLongPressStart = (work: any) => {
+    longPressTimerRef.current = setTimeout(() => {
+      setSelectedWork(work);
+      setShowOptionsSheet(true);
+    }, 500);
+  };
+
+  const handleLongPressEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+
+  const handleOptionSelect = (option: 'cancel' | 'finish' | 'problem') => {
+    setShowOptionsSheet(false);
+    
+    setTimeout(() => {
+      if (option === 'cancel') {
+        setShowCancelSurvey(true);
+      } else if (option === 'finish') {
+        setShowFinishConfirm(true);
+      } else if (option === 'problem') {
+        setShowProblemSurvey(true);
+      }
+    }, 200);
+  };
+
+  const handleCancelWork = async (data: any) => {
+    try {
+      // Save feedback
+      const { error: feedbackError } = await supabase
+        .from('request_cancellation_feedback')
+        .insert({
+          request_id: selectedWork.id,
+          user_id: (await supabase.auth.getUser()).data.user?.id,
+          main_reason: data.mainReason,
+          other_reason_text: data.otherReasonText,
+          improvement_text: data.improvementText
+        });
+
+      if (feedbackError) throw feedbackError;
+
+      // Update request status
+      const { error: updateError } = await supabase
+        .from('service_requests')
+        .update({ status: 'cancelled' })
+        .eq('id', selectedWork.id);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: 'Servicio cancelado',
+        description: 'El servicio ha sido cancelado exitosamente'
+      });
+
+      setShowCancelSurvey(false);
+      setSelectedWork(null);
+      fetchInProgressWorks();
+    } catch (error) {
+      console.error('Error cancelling work:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'No se pudo cancelar el servicio'
+      });
+    }
+  };
+
+  const handleFinishWork = async () => {
+    try {
+      const { error } = await supabase
+        .from('service_requests')
+        .update({ status: 'completed' })
+        .eq('id', selectedWork.id);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Servicio finalizado',
+        description: 'El servicio ha sido marcado como finalizado'
+      });
+
+      setShowFinishConfirm(false);
+      setSelectedWork(null);
+      fetchInProgressWorks();
+    } catch (error) {
+      console.error('Error finishing work:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'No se pudo finalizar el servicio'
+      });
+    }
+  };
+
+  const handleProblemSubmit = async (data: any) => {
+    try {
+      // Here you could save the problem report to a dedicated table
+      console.log('Problem report:', data);
+      
+      toast({
+        title: 'Reporte enviado',
+        description: 'Hemos recibido tu reporte y lo atenderemos pronto'
+      });
+
+      setShowProblemSurvey(false);
+      setSelectedWork(null);
+    } catch (error) {
+      console.error('Error submitting problem:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'No se pudo enviar el reporte'
+      });
+    }
+  };
+
   return (
     <div className="mb-10 bg-gray-50 -mx-4 px-4 py-6">
       <h2 className="text-lg font-bold text-foreground mb-5">
@@ -153,6 +282,11 @@ export function InProgressWorks() {
               key={work.id}
               className="flex-shrink-0 w-[300px] bg-white rounded-2xl shadow-sm border-0 p-4 cursor-pointer hover:shadow-md transition-all snap-start"
               onClick={() => navigate(`/chat/${work.quote.id}`)}
+              onTouchStart={() => handleLongPressStart(work)}
+              onTouchEnd={handleLongPressEnd}
+              onMouseDown={() => handleLongPressStart(work)}
+              onMouseUp={handleLongPressEnd}
+              onMouseLeave={handleLongPressEnd}
             >
               <div className="space-y-3">
                 {/* Header */}
@@ -254,6 +388,44 @@ export function InProgressWorks() {
           ))}
         </div>
       )}
+
+      <WorkOptionsSheet
+        open={showOptionsSheet}
+        onOpenChange={setShowOptionsSheet}
+        onOptionSelect={handleOptionSelect}
+      />
+
+      <CancelWorkSurvey
+        open={showCancelSurvey}
+        onOpenChange={setShowCancelSurvey}
+        onSubmit={handleCancelWork}
+      />
+
+      <AlertDialog open={showFinishConfirm} onOpenChange={setShowFinishConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Finalizar servicio?</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro que deseas marcar este servicio como finalizado?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleFinishWork}
+              className="bg-rappi-green hover:bg-rappi-green/90"
+            >
+              Finalizar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <SpecialistProblemSurvey
+        open={showProblemSurvey}
+        onOpenChange={setShowProblemSurvey}
+        onSubmit={handleProblemSubmit}
+      />
     </div>
   );
 }
