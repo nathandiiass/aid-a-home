@@ -18,6 +18,8 @@ export function InProgressOrderCard({ order, onUpdate }: InProgressOrderCardProp
   const [showCompleteDialog, setShowCompleteDialog] = useState(false);
   const request = order.request;
   const location = request?.location;
+  const isCancelled = request?.status === 'cancelled';
+  const hasProblemReport = order.hasProblemReport;
 
   const getPrice = () => {
     if (order.price_fixed) {
@@ -43,9 +45,21 @@ export function InProgressOrderCard({ order, onUpdate }: InProgressOrderCardProp
               <h3 className="font-bold text-lg text-foreground mb-2">
                 {request?.activity || 'Trabajo'}
               </h3>
-              <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 border-0 rounded-full px-3 py-1 text-xs font-medium">
-                Pendiente de iniciar
-              </Badge>
+              <div className="flex gap-2 flex-wrap">
+                {isCancelled ? (
+                  <Badge variant="secondary" className="bg-red-100 text-red-700 border-0 rounded-full px-3 py-1 text-xs font-medium">
+                    Cancelado
+                  </Badge>
+                ) : hasProblemReport ? (
+                  <Badge variant="secondary" className="bg-orange-100 text-orange-700 border-0 rounded-full px-3 py-1 text-xs font-medium">
+                    Inconveniente
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 border-0 rounded-full px-3 py-1 text-xs font-medium">
+                    Pendiente de iniciar
+                  </Badge>
+                )}
+              </div>
             </div>
             <Button
               size="sm"

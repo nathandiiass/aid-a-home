@@ -98,10 +98,26 @@ export default function SpecialistOrders() {
               state
             )
           )
-        `).eq('specialist_id', profile.id).eq('status', 'accepted').neq('request.status', 'completed').order('created_at', {
+        `).eq('specialist_id', profile.id).eq('status', 'accepted').in('request.status', ['active', 'in_progress', 'cancelled']).order('created_at', {
         ascending: false
       });
       if (inProgressError) throw inProgressError;
+
+      // Check for problem reports for each order
+      const inProgressWithStatus = await Promise.all(
+        (inProgressData || []).map(async (order) => {
+          const { data: problemReport } = await supabase
+            .from('specialist_problem_reports')
+            .select('id')
+            .eq('quote_id', order.id)
+            .maybeSingle();
+
+          return {
+            ...order,
+            hasProblemReport: !!problemReport
+          };
+        })
+      );
 
       // Get completed orders (where service_request status is completed)
       const {
@@ -170,6 +186,7 @@ export default function SpecialistOrders() {
             time_preference,
             is_urgent,
             user_id,
+            status,
             locations!inner(
               neighborhood,
               city,
@@ -180,9 +197,31 @@ export default function SpecialistOrders() {
         ascending: false
       });
       if (sentError) throw sentError;
-      setInProgressOrders(inProgressData || []);
+
+      // Check for problem reports for each sent quote
+      const sentWithStatus = await Promise.all(
+        (sentData || []).map(async (quote) => {
+          const request = Array.isArray(quote.service_requests) 
+            ? quote.service_requests[0] 
+            : quote.service_requests;
+
+          const { data: problemReport } = await supabase
+            .from('specialist_problem_reports')
+            .select('id')
+            .eq('quote_id', quote.id)
+            .maybeSingle();
+
+          return {
+            ...quote,
+            hasProblemReport: !!problemReport,
+            isCancelled: request?.status === 'cancelled'
+          };
+        })
+      );
+
+      setInProgressOrders(inProgressWithStatus || []);
       setCompletedOrders(completedData || []);
-      setSentQuotes(sentData || []);
+      setSentQuotes(sentWithStatus || []);
     } catch (error: any) {
       console.error('Error loading orders:', error);
       toast({

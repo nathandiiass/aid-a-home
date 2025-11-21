@@ -712,6 +712,54 @@ export type Database = {
           },
         ]
       }
+      specialist_problem_reports: {
+        Row: {
+          created_at: string
+          id: string
+          main_reason: string
+          other_reason_text: string | null
+          quote_id: string
+          request_id: string
+          specialist_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          main_reason: string
+          other_reason_text?: string | null
+          quote_id: string
+          request_id: string
+          specialist_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          main_reason?: string
+          other_reason_text?: string | null
+          quote_id?: string
+          request_id?: string
+          specialist_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "specialist_problem_reports_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "specialist_problem_reports_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "service_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       specialist_profiles: {
         Row: {
           accepted_terms_at: string | null
