@@ -41,7 +41,7 @@ export function InProgressWorks() {
         return;
       }
 
-      // Fetch service requests that have an accepted quote
+      // Fetch service requests that have an accepted quote and are active or in progress
       const { data, error } = await supabase
         .from('service_requests')
         .select(`
@@ -60,6 +60,7 @@ export function InProgressWorks() {
           )
         `)
         .eq('user_id', user.id)
+        .in('status', ['active', 'in_progress'])
         .eq('quotes.status', 'accepted')
         .is('quotes.attachments', null)
         .order('created_at', { ascending: false });
@@ -240,7 +241,7 @@ export function InProgressWorks() {
       
       toast({
         title: 'Reporte enviado',
-        description: 'Hemos recibido tu reporte y lo atenderemos pronto'
+        description: 'Te recomendamos escoger a otro especialista, por el momento'
       });
 
       setShowProblemSurvey(false);
