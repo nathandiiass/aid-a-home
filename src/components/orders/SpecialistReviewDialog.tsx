@@ -23,6 +23,7 @@ interface SpecialistReviewDialogProps {
 interface RatingCategory {
   key: 'puntualidad' | 'calidad_trabajo' | 'profesionalismo' | 'cumplimiento_servicio' | 'relacion_calidad_precio';
   label: string;
+  description: string;
   value: number;
 }
 
@@ -41,11 +42,11 @@ export function SpecialistReviewDialog({
   const [submitting, setSubmitting] = useState(false);
   
   const [ratings, setRatings] = useState<RatingCategory[]>([
-    { key: 'puntualidad', label: 'Puntualidad', value: 0 },
-    { key: 'calidad_trabajo', label: 'Calidad del trabajo', value: 0 },
-    { key: 'profesionalismo', label: 'Profesionalismo', value: 0 },
-    { key: 'cumplimiento_servicio', label: 'Cumplimiento del servicio', value: 0 },
-    { key: 'relacion_calidad_precio', label: 'Relación calidad-precio', value: 0 }
+    { key: 'puntualidad', label: 'Puntualidad', description: 'Llegó a tiempo y respetó los horarios acordados', value: 0 },
+    { key: 'calidad_trabajo', label: 'Calidad del trabajo', description: 'El resultado cumplió o superó tus expectativas', value: 0 },
+    { key: 'profesionalismo', label: 'Profesionalismo', description: 'Fue respetuoso, educado y mantuvo buena comunicación', value: 0 },
+    { key: 'cumplimiento_servicio', label: 'Cumplimiento del servicio', description: 'Realizó todo lo acordado en la cotización', value: 0 },
+    { key: 'relacion_calidad_precio', label: 'Relación calidad-precio', description: 'El servicio valió lo que pagaste', value: 0 }
   ]);
   
   const [volveriaTrabajar, setVolveriaTrabajar] = useState<boolean | null>(null);
@@ -183,12 +184,17 @@ export function SpecialistReviewDialog({
         Tu opinión ayuda a otros usuarios
       </p>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {ratings.map((rating, index) => (
-          <div key={rating.key} className="space-y-1">
-            <label className="text-xs font-semibold text-foreground">
-              {rating.label}
-            </label>
+          <div key={rating.key} className="space-y-1.5">
+            <div>
+              <label className="text-sm font-semibold text-foreground block">
+                {rating.label}
+              </label>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {rating.description}
+              </p>
+            </div>
             <StarRating 
               value={rating.value} 
               onChange={(v) => handleRatingChange(index, v)} 
