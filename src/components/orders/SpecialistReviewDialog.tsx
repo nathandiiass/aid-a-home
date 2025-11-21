@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
 import { Star, Briefcase, User, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -35,6 +37,7 @@ export function SpecialistReviewDialog({
   onReviewSubmitted 
 }: SpecialistReviewDialogProps) {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [submitting, setSubmitting] = useState(false);
   
   const [ratings, setRatings] = useState<RatingCategory[]>([
@@ -140,6 +143,132 @@ export function SpecialistReviewDialog({
     </div>
   );
 
+  const contentSection = (
+    <>
+      {(requestTitle || specialistName || completedDate) && (
+        <div className="bg-gray-50 rounded-xl p-3 space-y-2 border border-gray-100">
+          {requestTitle && (
+            <div className="flex items-start gap-2">
+              <Briefcase className="w-4 h-4 text-foreground mt-0.5 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-muted-foreground">Servicio</p>
+                <p className="text-sm font-bold text-foreground">{requestTitle}</p>
+              </div>
+            </div>
+          )}
+          {specialistName && (
+            <div className="flex items-start gap-2">
+              <User className="w-4 h-4 text-foreground mt-0.5 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-muted-foreground">Especialista</p>
+                <p className="text-sm font-bold text-foreground">{specialistName}</p>
+              </div>
+            </div>
+          )}
+          {completedDate && (
+            <div className="flex items-start gap-2">
+              <Calendar className="w-4 h-4 text-foreground mt-0.5 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-muted-foreground">Fecha de finalización</p>
+                <p className="text-sm font-bold text-foreground">
+                  {format(new Date(completedDate), "d 'de' MMMM 'de' yyyy", { locale: es })}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      
+      <p className="text-xs text-muted-foreground text-center">
+        Tu opinión ayuda a otros usuarios
+      </p>
+
+      <div className="space-y-3">
+        {ratings.map((rating, index) => (
+          <div key={rating.key} className="space-y-1">
+            <label className="text-xs font-semibold text-foreground">
+              {rating.label}
+            </label>
+            <StarRating 
+              value={rating.value} 
+              onChange={(v) => handleRatingChange(index, v)} 
+            />
+          </div>
+        ))}
+
+        <div className="space-y-2 pt-2 border-t border-border/30">
+          <label className="text-xs font-semibold text-foreground block">
+            ¿Volverías a trabajar con este especialista?
+          </label>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setVolveriaTrabajar(true)}
+              className={`flex-1 py-2 px-3 rounded-xl font-semibold text-sm transition-all ${
+                volveriaTrabajar === true
+                  ? 'bg-rappi-green text-white shadow-md'
+                  : 'bg-gray-100 text-foreground hover:bg-gray-200'
+              }`}
+            >
+              Sí
+            </button>
+            <button
+              type="button"
+              onClick={() => setVolveriaTrabajar(false)}
+              className={`flex-1 py-2 px-3 rounded-xl font-semibold text-sm transition-all ${
+                volveriaTrabajar === false
+                  ? 'bg-red-500 text-white shadow-md'
+                  : 'bg-gray-100 text-foreground hover:bg-gray-200'
+              }`}
+            >
+              No
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
+  const footerButtons = (
+    <>
+      <Button
+        variant="outline"
+        onClick={() => onOpenChange(false)}
+        className="flex-1 rounded-full h-10 text-sm"
+        disabled={submitting}
+      >
+        Cancelar
+      </Button>
+      <Button
+        onClick={handleSubmit}
+        disabled={!isFormValid() || submitting}
+        className="flex-1 bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-10 font-semibold text-sm"
+      >
+        {submitting ? 'Enviando...' : 'Enviar evaluación'}
+      </Button>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={onOpenChange}>
+        <DrawerContent className="max-h-[80vh]">
+          <DrawerHeader className="pb-3">
+            <DrawerTitle className="text-xl font-bold text-foreground">
+              Evalúa el servicio
+            </DrawerTitle>
+          </DrawerHeader>
+          <div className="overflow-y-auto px-4 space-y-3 pb-4">
+            {contentSection}
+          </div>
+          <div className="flex gap-2 p-4 border-t border-border/20">
+            {footerButtons}
+          </div>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto bg-white rounded-2xl">
@@ -147,106 +276,12 @@ export function SpecialistReviewDialog({
           <DialogTitle className="text-xl font-bold text-foreground">
             Evalúa el servicio
           </DialogTitle>
-          {(requestTitle || specialistName || completedDate) && (
-            <div className="bg-gray-50 rounded-xl p-3 mt-2 space-y-2 border border-gray-100">
-              {requestTitle && (
-                <div className="flex items-start gap-2">
-                  <Briefcase className="w-4 h-4 text-foreground mt-0.5 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-muted-foreground">Servicio</p>
-                    <p className="text-sm font-bold text-foreground">{requestTitle}</p>
-                  </div>
-                </div>
-              )}
-              {specialistName && (
-                <div className="flex items-start gap-2">
-                  <User className="w-4 h-4 text-foreground mt-0.5 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-muted-foreground">Especialista</p>
-                    <p className="text-sm font-bold text-foreground">{specialistName}</p>
-                  </div>
-                </div>
-              )}
-              {completedDate && (
-                <div className="flex items-start gap-2">
-                  <Calendar className="w-4 h-4 text-foreground mt-0.5 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-muted-foreground">Fecha de finalización</p>
-                    <p className="text-sm font-bold text-foreground">
-                      {format(new Date(completedDate), "d 'de' MMMM 'de' yyyy", { locale: es })}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-          <DialogDescription className="text-xs text-muted-foreground pt-2">
-            Tu opinión ayuda a otros usuarios
-          </DialogDescription>
         </DialogHeader>
-
         <div className="space-y-3 py-2">
-          {/* Calificaciones por categoría */}
-          {ratings.map((rating, index) => (
-            <div key={rating.key} className="space-y-1">
-              <label className="text-xs font-semibold text-foreground">
-                {rating.label}
-              </label>
-              <StarRating 
-                value={rating.value} 
-                onChange={(v) => handleRatingChange(index, v)} 
-              />
-            </div>
-          ))}
-
-          {/* Pregunta de volvería a trabajar */}
-          <div className="space-y-2 pt-2 border-t border-border/30">
-            <label className="text-xs font-semibold text-foreground block">
-              ¿Volverías a trabajar con este especialista?
-            </label>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setVolveriaTrabajar(true)}
-                className={`flex-1 py-2 px-3 rounded-xl font-semibold text-sm transition-all ${
-                  volveriaTrabajar === true
-                    ? 'bg-rappi-green text-white shadow-md'
-                    : 'bg-gray-100 text-foreground hover:bg-gray-200'
-                }`}
-              >
-                Sí
-              </button>
-              <button
-                type="button"
-                onClick={() => setVolveriaTrabajar(false)}
-                className={`flex-1 py-2 px-3 rounded-xl font-semibold text-sm transition-all ${
-                  volveriaTrabajar === false
-                    ? 'bg-red-500 text-white shadow-md'
-                    : 'bg-gray-100 text-foreground hover:bg-gray-200'
-                }`}
-              >
-                No
-              </button>
-            </div>
-          </div>
+          {contentSection}
         </div>
-
         <div className="flex gap-2 pt-2">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            className="flex-1 rounded-full h-10 text-sm"
-            disabled={submitting}
-          >
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={!isFormValid() || submitting}
-            className="flex-1 bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-10 font-semibold text-sm"
-          >
-            {submitting ? 'Enviando...' : 'Enviar evaluación'}
-          </Button>
+          {footerButtons}
         </div>
       </DialogContent>
     </Dialog>
