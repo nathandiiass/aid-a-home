@@ -95,7 +95,7 @@ export default function SpecialistProfile() {
       if (specialistError) throw specialistError;
       setSpecialist(specialistData);
 
-      // Calculate cancellation stats from accepted orders
+      // Calculate cancellation stats from accepted orders (only specialist cancellations)
       if (specialistData) {
         // Get all accepted quotes for this specialist
         const { data: quotesData } = await supabase
@@ -113,12 +113,25 @@ export default function SpecialistProfile() {
             .select('id, status')
             .in('id', requestIds);
 
+          const cancelledRequests = requestsData?.filter(r => r.status === 'cancelled') || [];
+          const cancelledRequestIds = cancelledRequests.map(r => r.id);
+
+          // Get cancellations made by users (they leave feedback)
+          const { data: userCancellations } = await supabase
+            .from('request_cancellation_feedback')
+            .select('request_id')
+            .in('request_id', cancelledRequestIds);
+
+          const userCancelledIds = new Set(userCancellations?.map(c => c.request_id) || []);
+          
+          // Specialist cancellations are those without user feedback
+          const specialistCancellations = cancelledRequests.filter(r => !userCancelledIds.has(r.id));
+
           const totalOrders = requestsData?.length || 0;
-          const cancelledOrders = requestsData?.filter(r => r.status === 'cancelled').length || 0;
-          const cancellationRate = totalOrders > 0 ? (cancelledOrders / totalOrders) * 100 : 0;
+          const cancellationRate = totalOrders > 0 ? (specialistCancellations.length / totalOrders) * 100 : 0;
 
           setCancellationStats({
-            totalCancellations: cancelledOrders,
+            totalCancellations: specialistCancellations.length,
             cancellationRate: cancellationRate
           });
         }
