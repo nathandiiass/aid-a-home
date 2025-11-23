@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import tutorialSearchImage from "@/assets/tutorial-search.png";
-import tutorialCreateImage from "@/assets/tutorial-create.png";
+import tutorialCreateImage from "@/assets/tutorial-create-new.png";
 import tutorialOrdersImage from "@/assets/tutorial-orders.png";
 import tutorialAccountImage from "@/assets/tutorial-account.png";
 
