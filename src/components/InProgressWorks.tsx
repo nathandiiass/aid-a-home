@@ -296,7 +296,7 @@ export function InProgressWorks() {
           return (
             <Card
               key={work.id}
-              className="flex-shrink-0 w-[300px] bg-white rounded-2xl shadow-sm border-0 p-4 cursor-pointer hover:shadow-md transition-all snap-start"
+              className="flex-shrink-0 w-[300px] bg-white rounded-2xl border-0 p-4 cursor-pointer shadow-[0_8px_24px_rgba(0,0,0,0.12)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.18)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] snap-start"
               onClick={() => navigate(`/chat/${work.quote.id}`)}
               onTouchStart={() => handleLongPressStart(work)}
               onTouchEnd={handleLongPressEnd}
