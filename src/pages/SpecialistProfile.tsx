@@ -91,22 +91,43 @@ export default function SpecialistProfile() {
       const {
         data: specialistData,
         error: specialistError
-      } = await supabase.from('specialist_profiles').select('id, user_id, materials_policy, warranty_days, status, professional_description, total_cancellations, cancellation_rate, created_at, updated_at').eq('id', targetSpecialistId).maybeSingle();
+      } = await supabase.from('specialist_profiles').select('id, user_id, materials_policy, warranty_days, status, professional_description, created_at, updated_at').eq('id', targetSpecialistId).maybeSingle();
       if (specialistError) throw specialistError;
       setSpecialist(specialistData);
 
-      // Set cancellation stats
+      // Calculate cancellation stats from accepted orders
       if (specialistData) {
-        setCancellationStats({
-          totalCancellations: (specialistData as any).total_cancellations || 0,
-          cancellationRate: (specialistData as any).cancellation_rate || 0
-        });
+        // Get all accepted quotes for this specialist
+        const { data: quotesData } = await supabase
+          .from('quotes')
+          .select('request_id')
+          .eq('specialist_id', targetSpecialistId)
+          .eq('status', 'accepted');
+
+        if (quotesData && quotesData.length > 0) {
+          const requestIds = quotesData.map(q => q.request_id);
+          
+          // Get service requests for these quotes
+          const { data: requestsData } = await supabase
+            .from('service_requests')
+            .select('id, status')
+            .in('id', requestIds);
+
+          const totalOrders = requestsData?.length || 0;
+          const cancelledOrders = requestsData?.filter(r => r.status === 'cancelled').length || 0;
+          const cancellationRate = totalOrders > 0 ? (cancelledOrders / totalOrders) * 100 : 0;
+
+          setCancellationStats({
+            totalCancellations: cancelledOrders,
+            cancellationRate: cancellationRate
+          });
+        }
       }
 
       // Load user profile
       const {
         data: profileData
-      } = await supabase.from('profiles').select('*').eq('id', (specialistData as any).user_id).maybeSingle();
+      } = await supabase.from('profiles').select('*').eq('id', specialistData?.user_id).maybeSingle();
       if (profileData) {
         setProfile(profileData);
       }
