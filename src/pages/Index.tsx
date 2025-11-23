@@ -64,12 +64,12 @@ const Index = () => {
       {/* Tutorial Card */}
       <div className="container max-w-2xl mx-auto px-4 py-8">
         <Card 
-          className="bg-gradient-to-br from-primary/5 to-rappi-green/5 border-2 border-primary/20 p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-[1.02] active:scale-95"
+          className="bg-white border-0 rounded-2xl p-6 cursor-pointer shadow-[0_8px_24px_rgba(0,0,0,0.12)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.18)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
           onClick={() => setShowTutorial(true)}
         >
           <div className="flex items-center gap-4">
-            <div className="flex-shrink-0 w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-              <HelpCircle className="w-7 h-7 text-primary" />
+            <div className="flex-shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-br from-rappi-orange to-rappi-green flex items-center justify-center shadow-md">
+              <HelpCircle className="w-8 h-8 text-white" strokeWidth={2.5} />
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-bold text-gray-900 mb-1">
@@ -79,9 +79,9 @@ const Index = () => {
                 Aprende a crear solicitudes y gestionar tus servicios
               </p>
             </div>
-            <div className="text-primary">
+            <div className="text-rappi-orange">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
               </svg>
             </div>
           </div>
