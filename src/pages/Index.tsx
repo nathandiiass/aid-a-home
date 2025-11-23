@@ -11,19 +11,18 @@ import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 const Index = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
-
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
   const handleCreateRequest = () => {
     if (!user) {
       toast.info("Inicia sesión para crear una solicitud");
@@ -32,23 +31,16 @@ const Index = () => {
     }
     navigate('/create-request');
   };
-
   return <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header with search - STICKY with BLUR */}
-      <div className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled 
-          ? 'bg-white/80 backdrop-blur-xl shadow-md' 
-          : 'bg-white'
-      }`}>
+      <div className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-xl shadow-md' : 'bg-white'}`}>
         <div className="container max-w-2xl mx-auto px-4 py-4">
-          {!scrolled && (
-            <div className="mb-4 animate-fade-in">
+          {!scrolled && <div className="mb-4 animate-fade-in">
               <h1 className="text-2xl font-bold text-gray-900 mb-1">Aid a Home</h1>
               <p className="text-gray-600 text-sm">
                 Encuentra especialistas para tus servicios domésticos
               </p>
-            </div>
-          )}
+            </div>}
           
           <div className="service-search-container">
             <ServiceSearch />
@@ -63,13 +55,10 @@ const Index = () => {
 
       {/* Tutorial Card */}
       <div className="container max-w-2xl mx-auto px-4 py-8">
-        <Card 
-          className="bg-white border-0 rounded-2xl p-6 cursor-pointer shadow-[0_8px_24px_rgba(0,0,0,0.12)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.18)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
-          onClick={() => setShowTutorial(true)}
-        >
+        <Card className="bg-white border-0 rounded-2xl p-6 cursor-pointer shadow-[0_8px_24px_rgba(0,0,0,0.12)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.18)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" onClick={() => setShowTutorial(true)}>
           <div className="flex items-center gap-4">
             <div className="flex-shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-br from-rappi-orange to-rappi-green flex items-center justify-center shadow-md">
-              <HelpCircle className="w-8 h-8 text-white" strokeWidth={2.5} />
+              <HelpCircle strokeWidth={2.5} className="w-8 h-8 text-slate-950" />
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-bold text-gray-900 mb-1">
@@ -93,11 +82,7 @@ const Index = () => {
       <BottomNav />
       
       {/* Floating Action Button */}
-      <button
-        onClick={handleCreateRequest}
-        className="fab-button fixed bottom-24 right-6 w-14 h-14 bg-rappi-green text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 active:scale-95 z-40 flex items-center justify-center"
-        aria-label="Crear nueva solicitud"
-      >
+      <button onClick={handleCreateRequest} className="fab-button fixed bottom-24 right-6 w-14 h-14 bg-rappi-green text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 active:scale-95 z-40 flex items-center justify-center" aria-label="Crear nueva solicitud">
         <Plus className="w-7 h-7" strokeWidth={2.5} />
       </button>
     </div>;
