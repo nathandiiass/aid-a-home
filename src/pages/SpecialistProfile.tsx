@@ -34,6 +34,10 @@ export default function SpecialistProfile() {
   const [portfolioItems, setPortfolioItems] = useState<any[]>([]);
   const [rating, setRating] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
+  const [cancellationStats, setCancellationStats] = useState({
+    totalCancellations: 0,
+    cancellationRate: 0
+  });
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [reviewStats, setReviewStats] = useState({
     total: 0,
@@ -87,14 +91,22 @@ export default function SpecialistProfile() {
       const {
         data: specialistData,
         error: specialistError
-      } = await supabase.from('specialist_profiles').select('id, user_id, materials_policy, warranty_days, status, professional_description, created_at, updated_at').eq('id', targetSpecialistId).maybeSingle();
+      } = await supabase.from('specialist_profiles').select('id, user_id, materials_policy, warranty_days, status, professional_description, total_cancellations, cancellation_rate, created_at, updated_at').eq('id', targetSpecialistId).maybeSingle();
       if (specialistError) throw specialistError;
       setSpecialist(specialistData);
+
+      // Set cancellation stats
+      if (specialistData) {
+        setCancellationStats({
+          totalCancellations: (specialistData as any).total_cancellations || 0,
+          cancellationRate: (specialistData as any).cancellation_rate || 0
+        });
+      }
 
       // Load user profile
       const {
         data: profileData
-      } = await supabase.from('profiles').select('*').eq('id', specialistData.user_id).maybeSingle();
+      } = await supabase.from('profiles').select('*').eq('id', (specialistData as any).user_id).maybeSingle();
       if (profileData) {
         setProfile(profileData);
       }
@@ -327,6 +339,39 @@ export default function SpecialistProfile() {
                 </div>)}
             </div>
           </div>}
+
+        {/* Cancellation Statistics */}
+        <div className="bg-white rounded-2xl shadow-sm p-5">
+          <div className="flex items-start justify-between mb-3">
+            <div>
+              <h3 className="font-bold text-sm text-gray-900 mb-1">Historial de cancelaciones</h3>
+              <p className="text-xs text-gray-600">Transparencia en el servicio</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gray-50 rounded-xl p-4 text-center">
+              <div className="text-2xl font-bold text-gray-900 mb-1">
+                {cancellationStats.totalCancellations}
+              </div>
+              <div className="text-xs text-gray-600">
+                Cancelaciones totales
+              </div>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4 text-center">
+              <div className="text-2xl font-bold text-gray-900 mb-1">
+                {cancellationStats.cancellationRate.toFixed(1)}%
+              </div>
+              <div className="text-xs text-gray-600">
+                Tasa de cancelación
+              </div>
+            </div>
+          </div>
+          {cancellationStats.cancellationRate === 0 && cancellationStats.totalCancellations === 0 && (
+            <div className="mt-3 flex items-center gap-2 text-xs text-green-700 bg-green-50 rounded-lg p-3">
+              <span className="font-medium">✓ Sin cancelaciones registradas</span>
+            </div>
+          )}
+        </div>
 
         {/* Rating and Reviews */}
         
