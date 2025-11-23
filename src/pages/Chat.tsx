@@ -14,6 +14,9 @@ import { ArrowLeft, Send, Paperclip, Clock, DollarSign, Package, FileText, Ban, 
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import confetti from 'canvas-confetti';
+import { WorkOptionsSheet } from '@/components/orders/WorkOptionsSheet';
+import { CancelWorkSurvey } from '@/components/orders/CancelWorkSurvey';
+import { SpecialistProblemSurvey } from '@/components/orders/SpecialistProblemSurvey';
 
 export default function Chat() {
   const { quoteId } = useParams();
@@ -29,6 +32,10 @@ export default function Chat() {
   const [newMessage, setNewMessage] = useState('');
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [showOptionsSheet, setShowOptionsSheet] = useState(false);
+  const [showCancelSurvey, setShowCancelSurvey] = useState(false);
+  const [showFinishConfirm, setShowFinishConfirm] = useState(false);
+  const [showProblemSurvey, setShowProblemSurvey] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -259,6 +266,124 @@ export default function Chat() {
     }
   };
 
+  const handleOptionSelect = (option: 'cancel' | 'finish' | 'problem') => {
+    setShowOptionsSheet(false);
+    
+    setTimeout(() => {
+      if (option === 'cancel') {
+        setShowCancelSurvey(true);
+      } else if (option === 'finish') {
+        setShowFinishConfirm(true);
+      } else if (option === 'problem') {
+        setShowProblemSurvey(true);
+      }
+    }, 200);
+  };
+
+  const handleCancelWork = async (data: any) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Usuario no autenticado');
+
+      // Save feedback
+      const { error: feedbackError } = await supabase
+        .from('request_cancellation_feedback')
+        .insert({
+          request_id: quote.request_id,
+          user_id: user.id,
+          main_reason: data.mainReason,
+          other_reason_text: data.otherReasonText,
+          improvement_text: data.improvementText
+        });
+
+      if (feedbackError) throw feedbackError;
+
+      // Update request status
+      const { error: updateError } = await supabase
+        .from('service_requests')
+        .update({ status: 'cancelled' })
+        .eq('id', quote.request_id);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: 'Servicio cancelado',
+        description: 'El servicio ha sido cancelado exitosamente'
+      });
+
+      setShowCancelSurvey(false);
+      navigate('/orders');
+    } catch (error) {
+      console.error('Error cancelling work:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'No se pudo cancelar el servicio'
+      });
+    }
+  };
+
+  const handleFinishWork = async () => {
+    try {
+      const { error } = await supabase
+        .from('service_requests')
+        .update({ status: 'completed' })
+        .eq('id', quote.request_id);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Servicio finalizado',
+        description: 'El servicio ha sido marcado como finalizado'
+      });
+
+      setShowFinishConfirm(false);
+      navigate('/orders');
+    } catch (error) {
+      console.error('Error finishing work:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'No se pudo finalizar el servicio'
+      });
+    }
+  };
+
+  const handleProblemSubmit = async (data: any) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Usuario no autenticado');
+
+      // Save problem report
+      const { error: reportError } = await supabase
+        .from('specialist_problem_reports')
+        .insert({
+          request_id: quote.request_id,
+          user_id: user.id,
+          quote_id: quote.id,
+          specialist_id: quote.specialist_id,
+          main_reason: data.mainReason,
+          other_reason_text: data.otherReasonText
+        });
+
+      if (reportError) throw reportError;
+      
+      toast({
+        title: 'Reporte enviado',
+        description: 'Te recomendamos escoger a otro especialista, por el momento'
+      });
+
+      setShowProblemSurvey(false);
+    } catch (error) {
+      console.error('Error submitting problem:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'No se pudo enviar el reporte'
+      });
+    }
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -450,6 +575,15 @@ export default function Chat() {
             </Button>
           )}
 
+          {!isSpecialistMode && quote?.status === 'accepted' && (quote?.request?.status === 'active' || quote?.request?.status === 'in_progress') && (
+            <button 
+              onClick={() => setShowOptionsSheet(true)}
+              className="w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
+            >
+              <MoreVertical className="w-5 h-5 text-gray-700" />
+            </button>
+          )}
+
           {isSpecialistMode && quote?.status === 'accepted' && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -592,6 +726,48 @@ export default function Chat() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Work Options Sheet for Users */}
+      <WorkOptionsSheet
+        open={showOptionsSheet}
+        onOpenChange={setShowOptionsSheet}
+        onOptionSelect={handleOptionSelect}
+      />
+
+      {/* Cancel Work Survey */}
+      <CancelWorkSurvey
+        open={showCancelSurvey}
+        onOpenChange={setShowCancelSurvey}
+        onSubmit={handleCancelWork}
+      />
+
+      {/* Finish Work Confirmation */}
+      <AlertDialog open={showFinishConfirm} onOpenChange={setShowFinishConfirm}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Finalizar servicio?</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro que deseas marcar este servicio como finalizado?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-full">Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleFinishWork}
+              className="rounded-full bg-rappi-green hover:bg-rappi-green/90"
+            >
+              Finalizar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Problem Report Survey */}
+      <SpecialistProblemSurvey
+        open={showProblemSurvey}
+        onOpenChange={setShowProblemSurvey}
+        onSubmit={handleProblemSubmit}
+      />
     </div>
   );
 }
