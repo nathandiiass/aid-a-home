@@ -272,7 +272,7 @@ export function InProgressWorks() {
   };
 
   return (
-    <div className="mb-10 bg-gray-50 -mx-4 px-4 py-6">
+    <div className="mb-10 bg-gray-50 -mx-4 px-4 py-8">
       <h2 className="text-lg font-bold text-foreground mb-5">
         Trabajos en curso
       </h2>
@@ -280,7 +280,7 @@ export function InProgressWorks() {
       <div 
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide"
+        className="flex gap-4 overflow-x-auto pb-6 snap-x snap-mandatory scrollbar-hide"
       >
         {works.map((work) => {
           const getPrice = () => {
