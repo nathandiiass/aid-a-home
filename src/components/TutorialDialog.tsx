@@ -18,8 +18,9 @@ const tutorialSteps = [
     subtitle: "(1era forma de crear una solicitud)",
     description: "Escribe lo que necesitas y elige la categoría para enviar tu solicitud.",
     targetSelector: ".service-search-container", // Search bar
-    spotlightSize: { width: "calc(100% - 2rem)", height: "60px" },
-    spotlightPosition: { top: "70px", left: "1rem", right: "1rem" }
+    spotlightSize: { width: "calc(100% - 2rem)", height: "48px" },
+    spotlightPosition: { top: "84px", left: "1rem", right: "1rem" },
+    imagePosition: "0%" // Show top 80%
   },
   {
     image: tutorialCreateImage,
@@ -27,8 +28,9 @@ const tutorialSteps = [
     subtitle: "(2da forma de crear una solicitud)",
     description: "Toca el botón '+' para crear una solicitud y enviarla a los especialistas.",
     targetSelector: ".fab-button", // FAB button
-    spotlightSize: { width: "64px", height: "64px" },
-    spotlightPosition: { bottom: "7rem", right: "1.5rem" }
+    spotlightSize: { width: "56px", height: "56px" },
+    spotlightPosition: { bottom: "6.5rem", right: "1.5rem" },
+    imagePosition: "50%" // Show middle 80%
   },
   {
     image: tutorialOrdersImage,
@@ -36,8 +38,9 @@ const tutorialSteps = [
     subtitle: "",
     description: "Aquí ves tus solicitudes activas, en borradores o ya completadas. Adminístralos cuando lo necesites.",
     targetSelector: ".nav-orders", // Orders nav item
-    spotlightSize: { width: "80px", height: "64px" },
-    spotlightPosition: { bottom: "0", left: "33.33%" }
+    spotlightSize: { width: "70px", height: "60px" },
+    spotlightPosition: { bottom: "4px", left: "calc(33.33% - 2px)" },
+    imagePosition: "70%" // Show bottom 80%
   },
   {
     image: tutorialAccountImage,
@@ -45,8 +48,9 @@ const tutorialSteps = [
     subtitle: "",
     description: "Administra tus datos, direcciones y ajustes. Desde aquí también puedes registrarte o activar el modo especialista si ofreces algún servicio.",
     targetSelector: ".nav-account", // Account nav item
-    spotlightSize: { width: "80px", height: "64px" },
-    spotlightPosition: { bottom: "0", right: "0" }
+    spotlightSize: { width: "70px", height: "60px" },
+    spotlightPosition: { bottom: "4px", right: "calc(0px + 8px)" },
+    imagePosition: "70%" // Show bottom 80%
   }
 ];
 
@@ -112,12 +116,18 @@ export const TutorialDialog = ({ open, onOpenChange }: TutorialDialogProps) => {
       <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
         <div className="pointer-events-auto animate-scale-in">
           <Card className="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-sm w-full">
-            {/* Screenshot preview - smaller */}
-            <div className="relative w-full h-32 bg-gray-100 overflow-hidden">
+            {/* Screenshot preview - 80% visible */}
+            <div className="relative w-full h-40 bg-gray-100 overflow-hidden">
               <img 
                 src={step.image} 
                 alt={step.title}
-                className="w-full h-full object-cover object-top"
+                className="w-full h-auto object-cover"
+                style={{
+                  objectPosition: `center ${step.imagePosition}`,
+                  height: '125%', // Show 80% of image (100/0.8 = 125%)
+                  marginTop: step.imagePosition === '0%' ? '0' : 
+                            step.imagePosition === '50%' ? '-12.5%' : '-25%'
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
             </div>
