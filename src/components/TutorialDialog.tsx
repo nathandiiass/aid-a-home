@@ -99,76 +99,78 @@ export const TutorialDialog = ({ open, onOpenChange }: TutorialDialogProps) => {
 
       {/* Spotlight highlight on actual element */}
       <div
-        className="absolute border-4 border-primary rounded-2xl pointer-events-none animate-pulse"
+        className="absolute border-4 border-rappi-green rounded-2xl pointer-events-none animate-pulse"
         style={{
           ...step.spotlightPosition,
           width: step.spotlightSize.width,
           height: step.spotlightSize.height,
-          boxShadow: "0 0 0 4px rgba(59, 130, 246, 0.3), 0 0 20px 8px rgba(59, 130, 246, 0.4)"
+          boxShadow: "0 0 0 4px rgba(16, 185, 129, 0.3), 0 0 20px 8px rgba(16, 185, 129, 0.4)"
         }}
       />
 
-      {/* Content card at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 animate-slide-in-bottom">
-        <Card className="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-lg mx-auto">
-          {/* Screenshot preview */}
-          <div className="relative w-full h-48 bg-gray-100 overflow-hidden">
-            <img 
-              src={step.image} 
-              alt={step.title}
-              className="w-full h-full object-cover object-top"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
-          </div>
-
-          {/* Content */}
-          <div className="px-6 py-6">
-            {/* Title */}
-            <h2 className="text-xl font-bold text-gray-900 text-center mb-1">
-              {step.title}
-            </h2>
-            
-            {/* Subtitle */}
-            {step.subtitle && (
-              <p className="text-xs text-gray-600 text-center mb-3">
-                {step.subtitle}
-              </p>
-            )}
-
-            {/* Description */}
-            <p className="text-gray-600 text-center mb-6 text-sm leading-relaxed">
-              {step.description}
-            </p>
-
-            {/* Pagination dots */}
-            <div className="flex gap-2 mb-6 justify-center">
-              {tutorialSteps.map((_, index) => (
-                <div
-                  key={index}
-                  className={`h-2 rounded-full transition-all ${
-                    index === currentStep ? "bg-primary w-8" : "bg-gray-300 w-2"
-                  }`}
-                />
-              ))}
+      {/* Content card centered */}
+      <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+        <div className="pointer-events-auto animate-scale-in">
+          <Card className="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-sm w-full">
+            {/* Screenshot preview - smaller */}
+            <div className="relative w-full h-32 bg-gray-100 overflow-hidden">
+              <img 
+                src={step.image} 
+                alt={step.title}
+                className="w-full h-full object-cover object-top"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
             </div>
 
-            {/* Next button */}
-            <Button
-              onClick={handleNext}
-              className="w-full bg-primary hover:bg-primary/90 text-white rounded-full h-12 text-base font-semibold mb-3"
-            >
-              {currentStep < tutorialSteps.length - 1 ? "SIGUIENTE" : "EMPEZAR"}
-            </Button>
+            {/* Content */}
+            <div className="px-6 py-6">
+              {/* Title */}
+              <h2 className="text-xl font-bold text-gray-900 text-center mb-1">
+                {step.title}
+              </h2>
+              
+              {/* Subtitle */}
+              {step.subtitle && (
+                <p className="text-xs text-gray-600 text-center mb-3">
+                  {step.subtitle}
+                </p>
+              )}
 
-            {/* Dismiss button */}
-            <button
-              onClick={handleDismiss}
-              className="w-full text-gray-600 font-medium text-sm"
-            >
-              Saltar tutorial
-            </button>
-          </div>
-        </Card>
+              {/* Description */}
+              <p className="text-gray-600 text-center mb-6 text-sm leading-relaxed">
+                {step.description}
+              </p>
+
+              {/* Pagination dots */}
+              <div className="flex gap-2 mb-6 justify-center">
+                {tutorialSteps.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`h-2 rounded-full transition-all ${
+                      index === currentStep ? "bg-rappi-green w-8" : "bg-gray-300 w-2"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              {/* Next button */}
+              <Button
+                onClick={handleNext}
+                className="w-full bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-12 text-base font-semibold mb-3"
+              >
+                {currentStep < tutorialSteps.length - 1 ? "SIGUIENTE" : "EMPEZAR"}
+              </Button>
+
+              {/* Dismiss button */}
+              <button
+                onClick={handleDismiss}
+                className="w-full text-gray-600 font-medium text-sm"
+              >
+                Saltar tutorial
+              </button>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );
