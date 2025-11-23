@@ -10,17 +10,17 @@ export const BottomNavSpecialist = () => {
   const navItems = [
     {
       icon: Home,
-      label: 'Home',
+      label: 'Inicio',
       path: '/specialist'
     },
     {
       icon: ClipboardList,
-      label: 'Orders',
+      label: 'Solicitudes',
       path: '/specialist/orders'
     },
     {
       icon: User,
-      label: 'Account',
+      label: 'Cuenta',
       path: '/specialist/account'
     }
   ];

@@ -12,17 +12,17 @@ export const BottomNav = () => {
   const navItems = [
     {
       icon: Home,
-      label: 'Home',
+      label: 'Inicio',
       path: '/'
     },
     {
       icon: Receipt,
-      label: 'Orders',
+      label: 'Solicitudes',
       path: '/orders'
     },
     {
       icon: UserCircle,
-      label: 'Account',
+      label: 'Cuenta',
       path: '/profile'
     }
   ];
