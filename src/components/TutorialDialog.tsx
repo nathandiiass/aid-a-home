@@ -115,59 +115,47 @@ export const TutorialDialog = ({ open, onOpenChange }: TutorialDialogProps) => {
       {/* Content card centered */}
       <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
         <div className="pointer-events-auto animate-scale-in">
-          <Card className="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-sm w-full">
-            {/* Screenshot preview - 80% visible */}
-            <div className="relative w-full h-40 bg-gray-100 overflow-hidden">
-              <div 
-                className="w-full"
+          <Card className="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-xs w-full">
+            {/* Screenshot preview - imagen completa pero pequeña */}
+            <div className="relative w-full bg-gray-100 overflow-hidden">
+              <img 
+                src={step.image} 
+                alt={step.title}
+                className="w-full h-auto object-contain"
                 style={{
-                  height: '200px', // Container más alto para tener más espacio
-                  overflow: 'hidden'
+                  maxHeight: '180px',
+                  objectFit: 'contain'
                 }}
-              >
-                <img 
-                  src={step.image} 
-                  alt={step.title}
-                  className="w-full"
-                  style={{
-                    display: 'block',
-                    height: 'auto',
-                    width: '100%',
-                    transform: step.imagePosition === '0%' ? 'translateY(0%)' : 
-                               step.imagePosition === '50%' ? 'translateY(-30%)' : 
-                               'translateY(-60%)'
-                  }}
-                />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-transparent to-transparent pointer-events-none" />
             </div>
 
             {/* Content */}
-            <div className="px-6 py-6">
+            <div className="px-5 py-5">
               {/* Title */}
-              <h2 className="text-xl font-bold text-gray-900 text-center mb-1">
+              <h2 className="text-lg font-bold text-gray-900 text-center mb-1">
                 {step.title}
               </h2>
               
               {/* Subtitle */}
               {step.subtitle && (
-                <p className="text-xs text-gray-600 text-center mb-3">
+                <p className="text-xs text-gray-600 text-center mb-2">
                   {step.subtitle}
                 </p>
               )}
 
               {/* Description */}
-              <p className="text-gray-600 text-center mb-6 text-sm leading-relaxed">
+              <p className="text-gray-600 text-center mb-5 text-xs leading-relaxed">
                 {step.description}
               </p>
 
               {/* Pagination dots */}
-              <div className="flex gap-2 mb-6 justify-center">
+              <div className="flex gap-2 mb-5 justify-center">
                 {tutorialSteps.map((_, index) => (
                   <div
                     key={index}
-                    className={`h-2 rounded-full transition-all ${
-                      index === currentStep ? "bg-rappi-green w-8" : "bg-gray-300 w-2"
+                    className={`h-1.5 rounded-full transition-all ${
+                      index === currentStep ? "bg-rappi-green w-6" : "bg-gray-300 w-1.5"
                     }`}
                   />
                 ))}
@@ -176,7 +164,7 @@ export const TutorialDialog = ({ open, onOpenChange }: TutorialDialogProps) => {
               {/* Next button */}
               <Button
                 onClick={handleNext}
-                className="w-full bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-12 text-base font-semibold mb-3"
+                className="w-full bg-rappi-green hover:bg-rappi-green/90 text-white rounded-full h-11 text-sm font-semibold mb-2"
               >
                 {currentStep < tutorialSteps.length - 1 ? "SIGUIENTE" : "EMPEZAR"}
               </Button>
@@ -184,7 +172,7 @@ export const TutorialDialog = ({ open, onOpenChange }: TutorialDialogProps) => {
               {/* Dismiss button */}
               <button
                 onClick={handleDismiss}
-                className="w-full text-gray-600 font-medium text-sm"
+                className="w-full text-gray-600 font-medium text-xs"
               >
                 Saltar tutorial
               </button>
