@@ -64,7 +64,7 @@ const Index = () => {
       {/* Tutorial Card */}
       <div className="container max-w-2xl mx-auto px-4 py-8">
         <Card 
-          className="bg-gradient-to-br from-primary/5 to-rappi-green/5 border-2 border-primary/20 p-6 cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_12px_40px_rgb(16,185,129,0.25)] transition-all duration-300 hover:scale-[1.02] active:scale-95 rounded-2xl"
+          className="bg-gradient-to-br from-primary/5 to-rappi-green/5 border-2 border-primary/20 p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-[1.02] active:scale-95"
           onClick={() => setShowTutorial(true)}
         >
           <div className="flex items-center gap-4">
