@@ -118,18 +118,28 @@ export const TutorialDialog = ({ open, onOpenChange }: TutorialDialogProps) => {
           <Card className="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-sm w-full">
             {/* Screenshot preview - 80% visible */}
             <div className="relative w-full h-40 bg-gray-100 overflow-hidden">
-              <img 
-                src={step.image} 
-                alt={step.title}
-                className="w-full h-auto object-cover"
+              <div 
+                className="w-full"
                 style={{
-                  objectPosition: `center ${step.imagePosition}`,
-                  height: '125%', // Show 80% of image (100/0.8 = 125%)
-                  marginTop: step.imagePosition === '0%' ? '0' : 
-                            step.imagePosition === '50%' ? '-12.5%' : '-25%'
+                  height: '200px', // Container más alto para tener más espacio
+                  overflow: 'hidden'
                 }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
+              >
+                <img 
+                  src={step.image} 
+                  alt={step.title}
+                  className="w-full"
+                  style={{
+                    display: 'block',
+                    height: 'auto',
+                    width: '100%',
+                    transform: step.imagePosition === '0%' ? 'translateY(0%)' : 
+                               step.imagePosition === '50%' ? 'translateY(-30%)' : 
+                               'translateY(-60%)'
+                  }}
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
             </div>
 
             {/* Content */}
