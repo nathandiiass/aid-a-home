@@ -50,7 +50,9 @@ const Index = () => {
             </div>
           )}
           
-          <ServiceSearch />
+          <div className="service-search-container">
+            <ServiceSearch />
+          </div>
         </div>
       </div>
 
@@ -93,7 +95,7 @@ const Index = () => {
       {/* Floating Action Button */}
       <button
         onClick={handleCreateRequest}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-rappi-green text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 active:scale-95 z-40 flex items-center justify-center"
+        className="fab-button fixed bottom-24 right-6 w-14 h-14 bg-rappi-green text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 active:scale-95 z-40 flex items-center justify-center"
         aria-label="Crear nueva solicitud"
       >
         <Plus className="w-7 h-7" strokeWidth={2.5} />

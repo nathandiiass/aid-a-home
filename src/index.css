@@ -90,6 +90,21 @@ All colors MUST be HSL.
       box-shadow: 0 0 10px hsla(354, 83%, 42%, 0.4);
     }
   }
+
+  @keyframes slide-in-bottom {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slide-in-bottom {
+    animation: slide-in-bottom 0.3s ease-out;
+  }
 }
 
 @layer base {

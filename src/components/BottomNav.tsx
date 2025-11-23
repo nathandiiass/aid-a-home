@@ -40,6 +40,8 @@ export const BottomNav = () => {
               onClick={() => navigate(item.path)}
               className={cn(
                 "flex flex-col items-center justify-center gap-0.5 flex-1 py-2 transition-all",
+                item.path === '/orders' && "nav-orders",
+                item.path === '/profile' && "nav-account",
                 isActive 
                   ? "text-red-600" 
                   : "text-gray-500 hover:text-gray-700"
