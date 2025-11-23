@@ -4,39 +4,16 @@ import ServiceSearch from "@/components/ServiceSearch";
 import { BottomNav } from "@/components/BottomNav";
 import { InProgressWorks } from "@/components/InProgressWorks";
 import { Logo } from "@/components/Logo";
-import { HowItWorksStep } from "@/components/HowItWorksStep";
-import { Plus } from "lucide-react";
+import { TutorialDialog } from "@/components/TutorialDialog";
+import { Plus, HelpCircle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import step1Image from "@/assets/step-1-busca.png";
-import step2Image from "@/assets/step-2-completa.png";
-import step3Image from "@/assets/step-3-recibe.png";
-import step4Image from "@/assets/step-4-elige.png";
-const howItWorksSteps = [{
-  stepNumber: 1,
-  title: "Busca al especialista que necesitas",
-  imageSrc: step1Image,
-  imagePosition: "left" as const
-}, {
-  stepNumber: 2,
-  title: "Completa los detalles",
-  imageSrc: step2Image,
-  imagePosition: "right" as const
-}, {
-  stepNumber: 3,
-  title: "Recibe cotizaciones",
-  imageSrc: step3Image,
-  imagePosition: "left" as const
-}, {
-  stepNumber: 4,
-  title: "Elige al mejor y agenda tu servicio",
-  imageSrc: step4Image,
-  imagePosition: "right" as const
-}];
+import { Card } from "@/components/ui/card";
 const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [scrolled, setScrolled] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -82,14 +59,34 @@ const Index = () => {
         <InProgressWorks />
       </div>
 
-      {/* How it works */}
-      <div className="container max-w-md mx-auto px-4 py-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
-          ¿Cómo funciona?
-        </h2>
-        
-        {howItWorksSteps.map(step => <HowItWorksStep key={step.stepNumber} stepNumber={step.stepNumber} title={step.title} imageSrc={step.imageSrc} imagePosition={step.imagePosition} />)}
+      {/* Tutorial Card */}
+      <div className="container max-w-2xl mx-auto px-4 py-8">
+        <Card 
+          className="bg-gradient-to-br from-primary/5 to-rappi-green/5 border-2 border-primary/20 p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-[1.02] active:scale-95"
+          onClick={() => setShowTutorial(true)}
+        >
+          <div className="flex items-center gap-4">
+            <div className="flex-shrink-0 w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+              <HelpCircle className="w-7 h-7 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-gray-900 mb-1">
+                ¿Cómo usar la app?
+              </h3>
+              <p className="text-sm text-gray-600">
+                Aprende a crear solicitudes y gestionar tus servicios
+              </p>
+            </div>
+            <div className="text-primary">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+        </Card>
       </div>
+
+      <TutorialDialog open={showTutorial} onOpenChange={setShowTutorial} />
 
       <BottomNav />
       
