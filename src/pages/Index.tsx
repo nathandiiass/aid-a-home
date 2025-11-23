@@ -57,7 +57,7 @@ const Index = () => {
       <div className="container max-w-2xl mx-auto px-4 py-8">
         <Card className="bg-white border-0 rounded-2xl p-6 cursor-pointer shadow-[0_8px_24px_rgba(0,0,0,0.12)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.18)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" onClick={() => setShowTutorial(true)}>
           <div className="flex items-center gap-4">
-            <div className="flex-shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-br from-rappi-orange to-rappi-green flex items-center justify-center shadow-md">
+            <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-rappi-orange to-rappi-green flex items-center justify-center rounded-2xl shadow-none">
               <HelpCircle strokeWidth={2.5} className="w-8 h-8 text-slate-950" />
             </div>
             <div className="flex-1">
