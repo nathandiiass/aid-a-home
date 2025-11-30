@@ -11,50 +11,42 @@ import { ActiveOrders } from '@/components/orders/ActiveOrders';
 import { DraftOrders } from '@/components/orders/DraftOrders';
 import { CompletedOrders } from '@/components/orders/CompletedOrders';
 import { Logo } from '@/components/Logo';
-
 export default function Orders() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user, loading: authLoading } = useAuth();
-  const { toast } = useToast();
+  const {
+    user,
+    loading: authLoading
+  } = useAuth();
+  const {
+    toast
+  } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'active');
-
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/auth?returnTo=orders&tab=' + activeTab);
     }
   }, [user, authLoading, navigate, activeTab]);
-
   if (authLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+    return <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-foreground">Cargando...</div>
-      </div>
-    );
+      </div>;
   }
-
   if (!user) {
     return null;
   }
-
-  return (
-    <div className="min-h-screen bg-background pb-20">
+  return <div className="min-h-screen bg-background pb-20">
       {/* Header con blur estilo Rappi */}
       <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-border/10 shadow-sm">
         <Logo className="pt-4 pb-2" />
         <div className="container max-w-4xl mx-auto px-4 pb-4">
-          <h1 className="text-2xl font-bold text-foreground mb-4">Órdenes</h1>
+          <h1 className="text-2xl font-bold mb-4 text-[#36004e]">​Solicitudes</h1>
           
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Buscar por actividad..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-gray-50 border-gray-200 rounded-full h-11 focus-visible:ring-1"
-              />
+              <Input placeholder="Buscar por actividad..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 bg-gray-50 border-gray-200 rounded-full h-11 focus-visible:ring-1" />
             </div>
             <button className="p-2.5 bg-gray-50 border border-gray-200 rounded-full hover:bg-gray-100 transition-colors">
               <Filter className="w-5 h-5 text-foreground" />
@@ -92,6 +84,5 @@ export default function Orders() {
       </div>
 
       <BottomNav />
-    </div>
-  );
+    </div>;
 }
