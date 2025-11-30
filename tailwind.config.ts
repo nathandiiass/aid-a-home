@@ -51,6 +51,7 @@ export default {
           green: "hsl(var(--rappi-green))",
           "green-foreground": "hsl(var(--rappi-green-foreground))",
         },
+        "active-nav": "hsl(var(--active-nav))",
         category: {
           jardines: "hsl(var(--category-jardines))",
           plomeria: "hsl(var(--category-plomeria))",
