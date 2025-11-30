@@ -331,7 +331,7 @@ const ServiceSelector = ({
           </Popover>
         </div>
 
-        {selectedCategoria && <Badge variant="secondary" className="gap-2 py-2 px-3">
+        {selectedCategoria && <Badge variant="secondary" className="gap-2 py-2 px-3 text-[#009aff] bg-[#0099ff]/[0.08]">
             Filtrado por: {selectedCategoria}
             <button onClick={clearFilters} className="ml-1 hover:bg-muted rounded-full p-0.5">
               <X className="w-3 h-3" />
