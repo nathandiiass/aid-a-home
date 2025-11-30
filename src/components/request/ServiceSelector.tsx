@@ -280,7 +280,7 @@ const ServiceSelector = ({
           <Label htmlFor="filter-categoria" className="text-sm font-semibold">Filtrar por categoría *</Label>
           <Popover open={openCategoria} onOpenChange={setOpenCategoria}>
             <PopoverTrigger asChild>
-              <Button variant="outline" role="combobox" aria-expanded={openCategoria} className="w-full h-12 justify-between bg-white">
+              <Button variant="outline" role="combobox" aria-expanded={openCategoria} className="w-full h-12 justify-between bg-white hover:bg-[#009AFF] hover:text-white hover:border-[#009AFF] transition-colors">
                 {selectedCategoria || "Todas las categorías"}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
