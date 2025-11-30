@@ -230,8 +230,8 @@ export default function Profile() {
               </div> : <div className="bg-white rounded-2xl shadow-lg p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-rappi-green/10 flex items-center justify-center">
-                      <Briefcase className="w-6 h-6 text-rappi-green" />
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[#ff9500]/10">
+                      <Briefcase className="w-6 h-6 text-[#ff9601]" />
                     </div>
                     <div className="flex-1">
                       <h3 className="font-bold text-gray-900 text-base">Modo especialista</h3>
