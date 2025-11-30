@@ -6,6 +6,7 @@ import { InProgressWorks } from "@/components/InProgressWorks";
 import { Logo } from "@/components/Logo";
 import { TutorialDialog } from "@/components/TutorialDialog";
 import { Plus, HelpCircle } from "lucide-react";
+import logoEnlazo from "@/assets/logo-enlazo.png";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
@@ -36,7 +37,7 @@ const Index = () => {
       <div className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-xl shadow-md' : 'bg-white'}`}>
         <div className="container max-w-2xl mx-auto px-4 py-4">
           {!scrolled && <div className="mb-4 animate-fade-in">
-              <h1 className="text-2xl font-bold text-gray-900 mb-1 font-mono">​enlazo  </h1>
+              <img src={logoEnlazo} alt="enlazo" className="h-10 mb-1" />
               <p className="text-gray-600 text-sm font-semibold">
                 Cotiza, compara y elige tu especialista.
               </p>
