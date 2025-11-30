@@ -56,6 +56,7 @@ export default {
         calendar: {
           today: "hsl(var(--calendar-today))",
           selected: "hsl(var(--calendar-selected))",
+          hover: "hsl(var(--calendar-hover))",
         },
         category: {
           jardines: "hsl(var(--category-jardines))",
