@@ -44,6 +44,9 @@ All colors MUST be HSL.
     
     /* Active navigation color */
     --active-nav: 279 82% 60%;
+    
+    /* Progress bar color */
+    --progress-bar: 280 88% 53%;
 
     /* Category colors */
     --category-jardines: 199 52% 57%;
