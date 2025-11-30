@@ -353,7 +353,7 @@ const ServiceSelector = ({
           </div> : availableTags.length === 0 ? <div className="p-4 text-center text-muted-foreground text-sm border-2 border-dashed rounded-xl">
             No hay servicios disponibles para esta categoría
           </div> : <div className="flex flex-wrap gap-2">
-            {availableTags.map(tag => <Badge key={tag.id} variant={selectedTags.includes(tag.tag_name) ? "default" : "outline"} className={cn("cursor-pointer transition-all hover:scale-105 py-2 px-4 text-sm", selectedTags.includes(tag.tag_name) && "bg-[#0099ff]/[0.09] text-[#009aff] border-[#009aff]/20")} onClick={() => handleTagToggle(tag.tag_name)}>
+            {availableTags.map(tag => <Badge key={tag.id} variant={selectedTags.includes(tag.tag_name) ? "default" : "outline"} className={cn("cursor-pointer transition-all hover:scale-105 py-2 px-4 text-sm", selectedTags.includes(tag.tag_name) && "bg-[#009AFF] text-white border-[#009AFF]")} onClick={() => handleTagToggle(tag.tag_name)}>
                 {tag.tag_name}
               </Badge>)}
           </div>}
