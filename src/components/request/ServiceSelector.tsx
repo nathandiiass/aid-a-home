@@ -300,7 +300,7 @@ const ServiceSelector = ({
                                 <div className="flex-1 min-w-0">
                                   <p className="font-medium text-gray-900 text-sm truncate">{cat.category_name}</p>
                                 </div>
-                                <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-medium rounded-full shrink-0">
+                                <span className="px-2 py-0.5 text-[10px] font-medium rounded-full shrink-0 text-[#ff9601] bg-[#ff9500]/10">
                                   Categoría
                                 </span>
                               </button>)}
@@ -311,14 +311,14 @@ const ServiceSelector = ({
                           <p className="text-[10px] font-bold text-gray-500 uppercase mb-1.5 px-1">Categorías relacionadas</p>
                           <div className="space-y-0.5">
                             {searchResults.keywordMatches.map(cat => <button key={`keyword-${cat.id}`} onClick={() => handleCategoriaFilterChange(cat.category_name)} className="w-full p-2 text-left hover:bg-gray-50 transition-colors rounded-lg flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                                  <span className="text-purple-700 font-bold text-xs">{cat.category_name.charAt(0)}</span>
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-[#ff9500]/10">
+                                  <span className="font-bold text-xs text-[#ff9601]">{cat.category_name.charAt(0)}</span>
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <p className="font-medium text-gray-900 text-sm truncate">{cat.category_name}</p>
                                   {cat.matchedKeyword && <p className="text-xs text-gray-500 truncate">{cat.matchedKeyword}</p>}
                                 </div>
-                                <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-medium rounded-full shrink-0">
+                                <span className="px-2 py-0.5 text-[10px] font-medium rounded-full shrink-0 text-[#009aff] bg-[#0099ff]/[0.09]">
                                   Relacionada
                                 </span>
                               </button>)}
