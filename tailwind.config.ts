@@ -58,6 +58,9 @@ export default {
           selected: "hsl(var(--calendar-selected))",
           hover: "hsl(var(--calendar-hover))",
         },
+        tab: {
+          active: "hsl(var(--tab-active))",
+        },
         category: {
           jardines: "hsl(var(--category-jardines))",
           plomeria: "hsl(var(--category-plomeria))",
