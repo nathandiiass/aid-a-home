@@ -14,29 +14,24 @@ interface Category {
   category_key: string;
   category_name: string;
 }
-
 interface CategoryTag {
   id: number;
   category_id: number;
   tag_key: string;
   tag_name: string;
 }
-
 interface CategoryKeyword {
   id: number;
   category_id: number;
   keyword: string;
 }
-
 interface CategoryWithKeyword extends Category {
   matchedKeyword?: string;
 }
-
 interface SearchResults {
   directMatches: Category[];
   keywordMatches: CategoryWithKeyword[];
 }
-
 interface ServiceSelectorProps {
   categoria: string;
   actividad: string;
@@ -86,24 +81,18 @@ const ServiceSelector = ({
   // Load categories and keywords on mount
   useEffect(() => {
     const loadData = async () => {
-      const [categoriesResult, keywordsResult] = await Promise.all([
-        supabase.from('categories').select('*').order('category_name'),
-        supabase.from('category_keywords').select('*')
-      ]);
-      
+      const [categoriesResult, keywordsResult] = await Promise.all([supabase.from('categories').select('*').order('category_name'), supabase.from('category_keywords').select('*')]);
       if (categoriesResult.error) {
         console.error('Error loading categories:', categoriesResult.error);
       } else if (categoriesResult.data) {
         setCategories(categoriesResult.data);
       }
-      
       if (keywordsResult.error) {
         console.error('Error loading keywords:', keywordsResult.error);
       } else if (keywordsResult.data) {
         setCategoryKeywords(keywordsResult.data);
       }
     };
-    
     loadData();
   }, []);
 
@@ -113,20 +102,16 @@ const ServiceSelector = ({
       if (selectedCategoria && categories.length > 0) {
         // Find category by name
         const category = categories.find(cat => cat.category_name === selectedCategoria);
-        
         if (category) {
-          const { data, error } = await supabase
-            .from('category_tags')
-            .select('*')
-            .eq('category_id', category.id)
-            .order('tag_name');
-          
+          const {
+            data,
+            error
+          } = await supabase.from('category_tags').select('*').eq('category_id', category.id).order('tag_name');
           if (error) {
             console.error('Error loading tags:', error);
             setAvailableTags([]);
             return;
           }
-          
           if (data) {
             setAvailableTags(data);
             setHasLoadedInitialTags(true);
@@ -139,7 +124,7 @@ const ServiceSelector = ({
       } else {
         setAvailableTags([]);
       }
-      
+
       // Only clear selected tags if we've already loaded tags once before and user is manually changing category
       // Don't clear on initial load when we're editing an order
       if (hasLoadedInitialTags && selectedCategoria !== categoria) {
@@ -147,31 +132,23 @@ const ServiceSelector = ({
         onActividadChange("");
       }
     };
-    
     loadTags();
   }, [selectedCategoria, categories]);
-  
   const handleCategoriaFilterChange = (categoryName: string) => {
     setSelectedCategoria(categoryName);
     setCategorySearchTerm("");
     setOpenCategoria(false);
     onCategoriaChange(categoryName);
   };
-  
   const clearFilters = () => {
     setSelectedCategoria("");
     onCategoriaChange("");
   };
-  
   const handleTagToggle = (tagName: string) => {
-    const newTags = selectedTags.includes(tagName)
-      ? selectedTags.filter(t => t !== tagName)
-      : [...selectedTags, tagName];
-    
+    const newTags = selectedTags.includes(tagName) ? selectedTags.filter(t => t !== tagName) : [...selectedTags, tagName];
     setSelectedTags(newTags);
     onActividadChange(newTags.join(','));
   };
-  
   const validateTitle = (value: string) => {
     if (!value.trim()) {
       setErrors(prev => ({
@@ -256,21 +233,19 @@ const ServiceSelector = ({
   // Get filtered categories based on search (including keywords)
   const getFilteredCategories = () => {
     if (!categorySearchTerm || categorySearchTerm.length < 2) {
-      return { directMatches: categories, keywordMatches: [] };
+      return {
+        directMatches: categories,
+        keywordMatches: []
+      };
     }
-
     const searchLower = categorySearchTerm.toLowerCase();
-    
+
     // Direct matches in category name or key
-    const directMatches = categories.filter(cat => 
-      cat.category_name.toLowerCase().includes(searchLower) ||
-      cat.category_key.toLowerCase().includes(searchLower)
-    );
+    const directMatches = categories.filter(cat => cat.category_name.toLowerCase().includes(searchLower) || cat.category_key.toLowerCase().includes(searchLower));
 
     // Keyword matches
     const keywordMatchIds = new Set<number>();
     const keywordMatches: CategoryWithKeyword[] = [];
-    
     categoryKeywords.forEach(kw => {
       if (kw.keyword.toLowerCase().includes(searchLower)) {
         if (!keywordMatchIds.has(kw.category_id)) {
@@ -285,10 +260,11 @@ const ServiceSelector = ({
         }
       }
     });
-
-    return { directMatches, keywordMatches };
+    return {
+      directMatches,
+      keywordMatches
+    };
   };
-
   const searchResults = getFilteredCategories();
   return <div className="space-y-4">
       <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
@@ -311,29 +287,15 @@ const ServiceSelector = ({
             </PopoverTrigger>
             <PopoverContent className="p-0 bg-white rounded-2xl shadow-2xl border-0" align="start" sideOffset={4}>
               <Command shouldFilter={false} className="rounded-2xl">
-                <CommandInput 
-                  placeholder="Buscar categoría o sinónimo..." 
-                  value={categorySearchTerm}
-                  onValueChange={setCategorySearchTerm}
-                  className="border-0 h-10"
-                />
+                <CommandInput placeholder="Buscar categoría o sinónimo..." value={categorySearchTerm} onValueChange={setCategorySearchTerm} className="border-0 h-10" />
                 <CommandList className="max-h-[400px]">
-                  {searchResults.directMatches.length === 0 && searchResults.keywordMatches.length === 0 ? (
-                    <CommandEmpty>No se encontró la categoría.</CommandEmpty>
-                  ) : (
-                    <div className="divide-y divide-gray-100">
-                      {searchResults.directMatches.length > 0 && (
-                        <div className="p-2">
+                  {searchResults.directMatches.length === 0 && searchResults.keywordMatches.length === 0 ? <CommandEmpty>No se encontró la categoría.</CommandEmpty> : <div className="divide-y divide-gray-100">
+                      {searchResults.directMatches.length > 0 && <div className="p-2">
                           <p className="text-[10px] font-bold text-gray-500 uppercase mb-1.5 px-1">Categorías</p>
                           <div className="space-y-0.5">
-                            {searchResults.directMatches.map(cat => (
-                              <button
-                                key={cat.id}
-                                onClick={() => handleCategoriaFilterChange(cat.category_name)}
-                                className="w-full p-2 text-left hover:bg-gray-50 transition-colors rounded-lg flex items-center gap-2"
-                              >
-                                <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                                  <span className="text-purple-700 font-bold text-xs">{cat.category_name.charAt(0)}</span>
+                            {searchResults.directMatches.map(cat => <button key={cat.id} onClick={() => handleCategoriaFilterChange(cat.category_name)} className="w-full p-2 text-left hover:bg-gray-50 transition-colors rounded-lg flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-[#ff9500]/10">
+                                  <span className="font-bold text-xs text-[#ff9601]">{cat.category_name.charAt(0)}</span>
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <p className="font-medium text-gray-900 text-sm truncate">{cat.category_name}</p>
@@ -341,41 +303,28 @@ const ServiceSelector = ({
                                 <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-medium rounded-full shrink-0">
                                   Categoría
                                 </span>
-                              </button>
-                            ))}
+                              </button>)}
                           </div>
-                        </div>
-                      )}
+                        </div>}
                       
-                      {searchResults.keywordMatches.length > 0 && (
-                        <div className="p-2">
+                      {searchResults.keywordMatches.length > 0 && <div className="p-2">
                           <p className="text-[10px] font-bold text-gray-500 uppercase mb-1.5 px-1">Categorías relacionadas</p>
                           <div className="space-y-0.5">
-                            {searchResults.keywordMatches.map(cat => (
-                              <button
-                                key={`keyword-${cat.id}`}
-                                onClick={() => handleCategoriaFilterChange(cat.category_name)}
-                                className="w-full p-2 text-left hover:bg-gray-50 transition-colors rounded-lg flex items-center gap-2"
-                              >
+                            {searchResults.keywordMatches.map(cat => <button key={`keyword-${cat.id}`} onClick={() => handleCategoriaFilterChange(cat.category_name)} className="w-full p-2 text-left hover:bg-gray-50 transition-colors rounded-lg flex items-center gap-2">
                                 <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
                                   <span className="text-purple-700 font-bold text-xs">{cat.category_name.charAt(0)}</span>
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <p className="font-medium text-gray-900 text-sm truncate">{cat.category_name}</p>
-                                  {cat.matchedKeyword && (
-                                    <p className="text-xs text-gray-500 truncate">{cat.matchedKeyword}</p>
-                                  )}
+                                  {cat.matchedKeyword && <p className="text-xs text-gray-500 truncate">{cat.matchedKeyword}</p>}
                                 </div>
                                 <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-medium rounded-full shrink-0">
                                   Relacionada
                                 </span>
-                              </button>
-                            ))}
+                              </button>)}
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                        </div>}
+                    </div>}
                 </CommandList>
               </Command>
             </PopoverContent>
@@ -399,50 +348,27 @@ const ServiceSelector = ({
           </p>
         </div>
         
-        {!selectedCategoria ? (
-          <div className="p-4 text-center text-muted-foreground text-sm border-2 border-dashed rounded-xl">
+        {!selectedCategoria ? <div className="p-4 text-center text-muted-foreground text-sm border-2 border-dashed rounded-xl">
             Primero selecciona una categoría para ver los servicios disponibles
-          </div>
-        ) : availableTags.length === 0 ? (
-          <div className="p-4 text-center text-muted-foreground text-sm border-2 border-dashed rounded-xl">
+          </div> : availableTags.length === 0 ? <div className="p-4 text-center text-muted-foreground text-sm border-2 border-dashed rounded-xl">
             No hay servicios disponibles para esta categoría
-          </div>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {availableTags.map(tag => (
-              <Badge
-                key={tag.id}
-                variant={selectedTags.includes(tag.tag_name) ? "default" : "outline"}
-                className={cn(
-                  "cursor-pointer transition-all hover:scale-105 py-2 px-4 text-sm",
-                  selectedTags.includes(tag.tag_name) && "bg-primary text-primary-foreground"
-                )}
-                onClick={() => handleTagToggle(tag.tag_name)}
-              >
+          </div> : <div className="flex flex-wrap gap-2">
+            {availableTags.map(tag => <Badge key={tag.id} variant={selectedTags.includes(tag.tag_name) ? "default" : "outline"} className={cn("cursor-pointer transition-all hover:scale-105 py-2 px-4 text-sm", selectedTags.includes(tag.tag_name) && "bg-primary text-primary-foreground")} onClick={() => handleTagToggle(tag.tag_name)}>
                 {tag.tag_name}
-              </Badge>
-            ))}
-          </div>
-        )}
+              </Badge>)}
+          </div>}
         
-        {selectedTags.length > 0 && (
-          <div className="pt-2 border-t">
+        {selectedTags.length > 0 && <div className="pt-2 border-t">
             <p className="text-xs text-muted-foreground mb-2">Seleccionados ({selectedTags.length}):</p>
             <div className="flex flex-wrap gap-2">
-              {selectedTags.map(tagName => (
-                <Badge key={tagName} variant="secondary" className="gap-2 py-1.5 px-3">
+              {selectedTags.map(tagName => <Badge key={tagName} variant="secondary" className="gap-2 py-1.5 px-3">
                   {tagName}
-                  <button 
-                    onClick={() => handleTagToggle(tagName)} 
-                    className="hover:bg-muted rounded-full p-0.5"
-                  >
+                  <button onClick={() => handleTagToggle(tagName)} className="hover:bg-muted rounded-full p-0.5">
                     <X className="w-3 h-3" />
                   </button>
-                </Badge>
-              ))}
+                </Badge>)}
             </div>
-          </div>
-        )}
+          </div>}
       </div>
 
       {/* Service title */}
