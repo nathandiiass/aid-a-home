@@ -358,17 +358,7 @@ const ServiceSelector = ({
               </Badge>)}
           </div>}
         
-        {selectedTags.length > 0 && <div className="pt-2 border-t">
-            <p className="text-xs text-muted-foreground mb-2">Seleccionados ({selectedTags.length}):</p>
-            <div className="flex flex-wrap gap-2">
-              {selectedTags.map(tagName => <Badge key={tagName} variant="secondary" className="gap-2 py-1.5 px-3">
-                  {tagName}
-                  <button onClick={() => handleTagToggle(tagName)} className="hover:bg-muted rounded-full p-0.5">
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>)}
-            </div>
-          </div>}
+        {selectedTags.length > 0}
       </div>
 
       {/* Service title */}
