@@ -151,7 +151,7 @@ export default function Profile() {
             <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-full flex items-center justify-center bg-[#aa1bf2]/[0.11]">
-                  <User className="w-8 h-8 text-#AA1BF1" />
+                  <User className="w-8 h-8 text-[#aa1bf1]" />
                 </div>
                 <div className="flex-1">
                   <p className="font-bold text-gray-900 text-base">
