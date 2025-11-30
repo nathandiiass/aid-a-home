@@ -43,7 +43,7 @@ export const BottomNav = () => {
                 item.path === '/orders' && "nav-orders",
                 item.path === '/profile' && "nav-account",
                 isActive 
-                  ? "text-red-600" 
+                  ? "text-active-nav" 
                   : "text-gray-500 hover:text-gray-700"
               )}
             >

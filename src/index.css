@@ -41,6 +41,9 @@ All colors MUST be HSL.
     /* Rappi green color */
     --rappi-green: 142 71% 45%;
     --rappi-green-foreground: 0 0% 100%;
+    
+    /* Active navigation color */
+    --active-nav: 279 82% 60%;
 
     /* Category colors */
     --category-jardines: 199 52% 57%;
