@@ -52,6 +52,9 @@ All colors MUST be HSL.
     --calendar-today: 281 100% 15%;
     --calendar-selected: 280 88% 53%;
     --calendar-hover: 280 88% 85%;
+    
+    /* Tab colors */
+    --tab-active: 199 100% 50%;
 
     /* Category colors */
     --category-jardines: 199 52% 57%;
