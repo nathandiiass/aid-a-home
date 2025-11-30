@@ -392,7 +392,7 @@ const ServiceSelector = ({
         </div>
 
         {/* Upload area */}
-        <div className="border-2 border-dashed border-gray-200 rounded-xl hover:border-rappi-green/50 transition-colors">
+        <div className="border-2 border-dashed border-gray-200 rounded-xl hover:border-[#AA1BF1] transition-colors\n">
           <label htmlFor="file-upload-evidence" className="flex flex-col items-center justify-center p-6 cursor-pointer">
             <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
               <Camera className="w-6 h-6 text-gray-600" />
