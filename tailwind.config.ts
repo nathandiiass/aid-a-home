@@ -52,6 +52,7 @@ export default {
           "green-foreground": "hsl(var(--rappi-green-foreground))",
         },
         "active-nav": "hsl(var(--active-nav))",
+        "progress-bar": "hsl(var(--progress-bar))",
         category: {
           jardines: "hsl(var(--category-jardines))",
           plomeria: "hsl(var(--category-plomeria))",

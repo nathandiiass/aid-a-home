@@ -194,11 +194,11 @@ const CreateRequest = () => {
           
           {/* Progress bar */}
           <div className="flex gap-2 mt-4">
-            {[0, 1, 2, 3, 4].map((s) => (
+          {[0, 1, 2, 3, 4].map((s) => (
               <div
                 key={s}
                 className={`h-1.5 flex-1 rounded-full transition-colors ${
-                  s <= step ? "bg-rappi-green" : "bg-gray-200"
+                  s <= step ? "bg-progress-bar" : "bg-gray-200"
                 }`}
               />
             ))}
