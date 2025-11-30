@@ -37,7 +37,7 @@ const Index = () => {
       <div className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-xl shadow-md' : 'bg-white'}`}>
         <div className="container max-w-2xl mx-auto px-4 py-4">
           {!scrolled && <div className="mb-4 animate-fade-in">
-              <img src={logoEnlazo} alt="enlazo" className="h-10 mb-1 object-contain" />
+              <img src={logoEnlazo} alt="enlazo" className="h-10 mb-1 object-cover" />
               <p className="text-gray-600 text-sm font-semibold">
                 Cotiza, compara y elige tu especialista.
               </p>
