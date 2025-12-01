@@ -86,6 +86,8 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
   const [label, setLabel] = useState("");
   const [error, setError] = useState("");
   const [saveLocation, setSaveLocation] = useState(false);
+  const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
+  const [geocoding, setGeocoding] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -107,6 +109,39 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
       console.error('Error fetching locations:', error);
     }
   };
+
+  const geocodeAddress = async () => {
+    if (!street || !city || !state) return;
+
+    setGeocoding(true);
+    try {
+      const addressQuery = `${street} ${extNumber}, ${neighborhood}, ${city}, ${state}, México`;
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressQuery)}&limit=1`
+      );
+      const data = await response.json();
+
+      if (data && data.length > 0) {
+        setCoordinates({
+          lat: parseFloat(data[0].lat),
+          lng: parseFloat(data[0].lon),
+        });
+      }
+    } catch (error) {
+      console.error('Error geocoding address:', error);
+    } finally {
+      setGeocoding(false);
+    }
+  };
+
+  useEffect(() => {
+    if (street && city && state) {
+      const timer = setTimeout(() => {
+        geocodeAddress();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [street, extNumber, neighborhood, city, state]);
 
   const handleSelectSaved = (saved: SavedLocation) => {
     const fullAddress = [
@@ -159,6 +194,8 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
             neighborhood: neighborhood,
             city: city,
             state: state,
+            lat: coordinates?.lat || null,
+            lng: coordinates?.lng || null,
           })
           .select()
           .single();
@@ -183,8 +220,8 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
       updateData({
         location: {
           id: locationId,
-          lat: 19.4326,
-          lng: -99.1332,
+          lat: coordinates?.lat || 19.4326,
+          lng: coordinates?.lng || -99.1332,
           address: fullAddress,
           label: label || "Nueva dirección",
         },
@@ -361,19 +398,32 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
                     <Label className="text-sm font-semibold text-gray-900 mb-3 block flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
                       Ubicación en el mapa
+                      {geocoding && (
+                        <span className="text-xs text-gray-500 font-normal ml-2">
+                          Buscando ubicación...
+                        </span>
+                      )}
                     </Label>
                     <div className="w-full h-48 rounded-lg overflow-hidden border border-gray-200">
                       <iframe
+                        key={coordinates ? `${coordinates.lat}-${coordinates.lng}` : 'default'}
                         width="100%"
                         height="100%"
                         frameBorder="0"
                         scrolling="no"
-                        src={`https://www.openstreetmap.org/export/embed.html?bbox=-99.1382,-19.4376,-99.1282,19.4276&layer=mapnik&marker=19.4326,-99.1332`}
+                        src={
+                          coordinates
+                            ? `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates.lng - 0.005},${coordinates.lat - 0.005},${coordinates.lng + 0.005},${coordinates.lat + 0.005}&layer=mapnik&marker=${coordinates.lat},${coordinates.lng}`
+                            : `https://www.openstreetmap.org/export/embed.html?bbox=-99.1382,19.4276,-99.1282,19.4376&layer=mapnik&marker=19.4326,-99.1332`
+                        }
                         style={{ border: 0 }}
                       />
                     </div>
                     <p className="text-xs text-gray-500 mt-2">
-                      La ubicación exacta se mostrará una vez completada la dirección
+                      {coordinates 
+                        ? "Ubicación aproximada basada en la dirección ingresada"
+                        : "La ubicación exacta se mostrará una vez completada la dirección"
+                      }
                     </p>
                   </div>
                 </Card>
