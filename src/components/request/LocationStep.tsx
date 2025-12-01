@@ -368,7 +368,7 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
                         height="100%"
                         frameBorder="0"
                         scrolling="no"
-                        src={`https://www.openstreetmap.org/export/embed.html?bbox=-99.2,-19.3,-99.0,19.5&layer=mapnik&marker=19.4326,-99.1332`}
+                        src={`https://www.openstreetmap.org/export/embed.html?bbox=-99.1382,-19.4376,-99.1282,19.4276&layer=mapnik&marker=19.4326,-99.1332`}
                         style={{ border: 0 }}
                       />
                     </div>
