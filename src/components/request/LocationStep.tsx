@@ -355,6 +355,30 @@ const LocationStep = ({ data, updateData, onNext }: LocationStepProps) => {
                 />
               </div>
 
+              {(street && city && state) && (
+                <Card className="bg-gray-50 border-gray-200 rounded-xl overflow-hidden">
+                  <div className="p-4">
+                    <Label className="text-sm font-semibold text-gray-900 mb-3 block flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      Ubicación en el mapa
+                    </Label>
+                    <div className="w-full h-48 rounded-lg overflow-hidden border border-gray-200">
+                      <iframe
+                        width="100%"
+                        height="100%"
+                        frameBorder="0"
+                        scrolling="no"
+                        src={`https://www.openstreetmap.org/export/embed.html?bbox=-99.2,-19.3,-99.0,19.5&layer=mapnik&marker=19.4326,-99.1332`}
+                        style={{ border: 0 }}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                      La ubicación exacta se mostrará una vez completada la dirección
+                    </p>
+                  </div>
+                </Card>
+              )}
+
               {user && (
                 <div className="pt-6 border-t border-gray-200 mt-6">
                   <div className="flex items-start space-x-3 mb-4">
